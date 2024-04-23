@@ -1,0 +1,9 @@
+{
+    "plugins": ["eslint-plugin-nuxt"],
+    "extends": [
+        "@nuxt/eslint-config", // The same as @nuxt/eslint-config
+        "plugin:prettier/recommended",
+        "prettier"
+    ],
+    "rules": {}
+}
