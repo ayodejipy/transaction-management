@@ -2,8 +2,8 @@
 const links = [
     {
         label: 'Reports',
-        icon: 'i-heroicons-home',
-        to: '/getting-started/installation',
+        icon: 'i-hugeicons-presentation-bar-chart-01',
+        to: '/',
     },
     {
         label: 'Transactions',
@@ -12,12 +12,12 @@ const links = [
     },
     {
         label: 'User Management',
-        icon: 'i-heroicons-command-line',
+        icon: 'i-ph-users-three-light',
         to: '/components/command-palette',
     },
     {
         label: 'Settings',
-        icon: 'i-heroicons-command-line',
+        icon: 'i-heroicons-cog-8-tooth',
         to: '/settings',
     },
 ]
@@ -32,44 +32,56 @@ const sidebarOpen = ref(false)
 
 <template>
     <!-- Static sidebar for desktop -->
-    <div
-        class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"
-    >
+    <div class="hidden lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div
             class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4"
         >
             <div class="flex h-16 shrink-0 items-center">
                 <img
                     class="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                    src="https://tailwindui.com/img/logos/mark.svg?color=green&shade=600"
                     alt="Your Company"
                 />
             </div>
-            <nav class="flex flex-1 flex-col">
+            <div class="flex flex-1 flex-col pt-6">
+                <UVerticalNavigation
+                    :links="links"
+                    :ui="{
+                        base: 'flex items-center gap-2.5 mb-4',
+                        padding: 'px-2.5 py-2.5',
+                        active: 'text-white/80 dark:text-white before:bg-brand-green dark:before:bg-gray-800',
+                        inactive:
+                            'text-gray-600 dark:text-gray-400 hover:text-gray-100 dark:hover:text-white hover:before:bg-brand-green dark:hover:before:bg-green-800/50',
+                        label: 'truncate relative font-semibold',
+                        size: 'text-base',
+                        icon: {
+                            active: 'text-white/80 dark:text-gray-200',
+                            inactive:
+                                'text-icon-gray/80 dark:text-gray-500 group-hover:text-white/80 dark:group-hover:text-gray-200',
+                        },
+                    }"
+                />
+
                 <ul role="list" class="flex flex-1 flex-col gap-y-7">
-                    <UVerticalNavigation :links="navigation" />
-                    <li>
-                        <div
-                            class="text-xs font-semibold leading-6 text-gray-400"
+                    <li
+                        class="mt-auto before:w-full before:h-px before:bg-gray-300"
+                    >
+                        <button
+                            type="button"
+                            class="group flex items-center gap-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-green-600"
                         >
-                            Your teams
-                        </div>
-                    </li>
-                    <li class="mt-auto">
-                        <a
-                            href="#"
-                            class="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-indigo-600"
-                        >
-                            <Icon
-                                class="h-6 w-6 shrink-0 text-gray-400 group-hover:text-indigo-600"
-                                aria-hidden="true"
-                                name="i-heroicons-outline-cog-6-tooth"
-                            />
-                            Settings
-                        </a>
+                            <ClientOnly>
+                                <Icon
+                                    class="shrink-0 text-gray-400 group-hover:text-green-600"
+                                    aria-hidden="true"
+                                    name="i-octicon-sign-out-16"
+                                />
+                            </ClientOnly>
+                            Logout
+                        </button>
                     </li>
                 </ul>
-            </nav>
+            </div>
         </div>
     </div>
 </template>

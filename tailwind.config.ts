@@ -10,6 +10,18 @@ export default <Partial<Config>>{
         './plugins/**/*.{js,ts}',
         './nuxt.config.{js,ts}',
     ],
-    theme: {},
+    theme: {
+        extend: {
+            fontFamily: {
+                inter: ['"Inter"', 'sans-serif'],
+            },
+            colors: {
+                'brand-gray': '#101828',
+                'brand-green': '#17B26A',
+                'icon-gray': '#292D32',
+                'dk-gray-blue': '#475467',
+            },
+        },
+    },
     plugins: [],
 }
