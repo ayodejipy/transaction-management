@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const route = useRoute()
+
 const items = [
     [
         {
@@ -14,6 +16,8 @@ const items = [
         },
     ],
 ]
+
+// console.log({ route })
 </script>
 
 <template>
@@ -47,8 +51,8 @@ const items = [
                                 rounded: 'rounded-full',
                             }"
                         >
-						5
-						</UBadge>
+                            5
+                        </UBadge>
                     </button>
 
                     <div class="relative flex items-center">

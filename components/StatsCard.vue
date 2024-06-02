@@ -19,7 +19,7 @@ defineProps<{
         </div>
         <div class="flex">
             <div class="min-w-0 flex-1 space-y-3.5">
-                <p class="text-sm font-medium text-dk-gray-blue">
+                <p class="text-sm font-medium text-dark-gray">
                     {{ stats.title }}
                 </p>
                 <p class="text-3xl font-semibold text-brand-gray">

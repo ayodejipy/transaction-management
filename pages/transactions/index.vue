@@ -1,23 +1,4 @@
 <script setup lang="ts">
-const statistics = [
-    {
-        title: 'All Transactions',
-        figure: '100',
-    },
-    {
-        title: 'Credit Transactions',
-        figure: '$20,206.20',
-    },
-    {
-        title: 'Debit Transactions',
-        figure: '$20,206.20',
-    },
-    {
-        title: 'Net Amount',
-        figure: '$40,206.20',
-    },
-]
-
 const columns = [
     {
         key: 'id',
@@ -143,39 +124,31 @@ const transactions = [
         description: 'Books and stationery supplies',
     },
 ]
+
+const uiConfig = computed(() => ({
+	placeholder: 'text-icon-gray dark:text-gray-500',
+	rounded: 'rounded-full',
+	color: {
+		white: {
+			outline:
+				'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
+		},
+	},
+	icon: {
+		base: 'text-icon-gray dark:text-gray-500',
+	},
+}))
 </script>
 
 <template>
     <section class="w-full">
-        <section class="flex justify-between items-center">
-            <div class="">
-                <span class="text-gray-500 font-medium"
-                    >Your total revenue</span
-                >
-                <p class="text-4xl font-inter font-semibold text-brand-green">
-                    $80,000.00
-                </p>
-            </div>
-            <button
-                type="button"
-                class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
-            >
-                <Icon name="i-solar-upload-square-bold" />
-                Upload new transaction
-            </button>
-        </section>
-
-        <section class="grid grid-cols-4 gap-3 mt-6">
-            <StatsCard v-for="stats in statistics" :key="stats.title" :stats />
-        </section>
-
         <!-- recent transaction table -->
         <section
             class="bg-white rounded-lg border border-gray-100 mt-6 space-y-3"
         >
             <div class="flex justify-between items-center py-8 px-6">
                 <div class="flex items-center gap-2">
-                    <h3 class="font-semibold text-xl">Recent Transactions</h3>
+                    <h3 class="font-semibold text-xl">All Transactions</h3>
                     <UBadge
                         color="green"
                         variant="subtle"
@@ -183,21 +156,62 @@ const transactions = [
                             rounded: 'rounded-full',
                         }"
                     >
-                        10
+                        {{ transactions.length }}
                     </UBadge>
                 </div>
-                <ULink
-                    to="/transactions"
-                    active-class="text-primary"
-                    inactive-class="text-sm text-green-500 font-semibold dark:text-gray-400 hover:text-green-600 dark:hover:text-gray-200"
-                >
-                    View all
-                </ULink>
+                <div class="flex items-center gap-2.5">
+                    <UInput
+                        :ui="{
+                            rounded: 'rounded-full',
+							icon: {
+                                base: 'text-icon-gray dark:text-gray-500',
+                            },
+                        }"
+                        icon="i-heroicons-magnifying-glass-20-solid"
+                        size="sm"
+                        color="white"
+                        trailing
+                        placeholder="Search..."
+                    />
+                    <USelect
+                        icon="i-heroicons-calendar"
+                        color="white"
+                        size="lg"
+                        padding="lg"
+                        :options="['United States', 'Canada', 'Mexico']"
+                        placeholder="Past 30 days"
+                        :ui="uiConfig"
+                    />
+                    <USelect
+                        color="white"
+                        size="lg"
+                        padding="lg"
+                        :options="['United States', 'Canada', 'Mexico']"
+                        placeholder="Date Range"
+                        :ui="uiConfig"
+                    />
+
+                    <USelect
+						trailing-icon=""
+                        color="white"
+                        size="lg"
+                        padding="lg"
+                        :options="['Charity', 'Expenditure', 'Income']"
+                        placeholder="All Transactions"
+                        :ui="uiConfig"
+                    />
+
+					<UButton 
+					    icon="i-ic-outline-filter-alt"
+						color="gray" 
+						variant="outline"
+					> 
+						Export
+					</UButton>
+                </div>
             </div>
 
             <AppTable :columns :data="transactions" />
         </section>
-
-        <!-- analysis section -->
     </section>
 </template>
