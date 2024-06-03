@@ -160,7 +160,7 @@ const transactions = [
                 type="button"
                 class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
             >
-                <Icon name="i-solar-upload-square-bold" />
+                <Icon name="i-mage-file-upload" />
                 Upload new transaction
             </button>
         </section>

@@ -126,18 +126,38 @@ const transactions = [
 ]
 
 const uiConfig = computed(() => ({
-	placeholder: 'text-icon-gray dark:text-gray-500',
-	rounded: 'rounded-full',
-	color: {
-		white: {
-			outline:
-				'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
-		},
-	},
-	icon: {
-		base: 'text-icon-gray dark:text-gray-500',
-	},
+    placeholder: 'text-icon-gray dark:text-gray-500',
+    rounded: 'rounded-full',
+    color: {
+        white: {
+            outline:
+                'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
+        },
+    },
+    icon: {
+        base: 'text-icon-gray dark:text-gray-500',
+    },
 }))
+
+// days filters i.e 'Past 30days'
+const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
+	{
+		label: 'United States',
+		value: 'US'
+	},
+	{
+		label: 'Canada',
+		value: 'CA'
+	},
+	{
+		label: 'Mexico',
+		value: 'MX'
+	}
+])
+
+const handleExport = () => {
+    console.log('click')
+}
 </script>
 
 <template>
@@ -163,7 +183,7 @@ const uiConfig = computed(() => ({
                     <UInput
                         :ui="{
                             rounded: 'rounded-full',
-							icon: {
+                            icon: {
                                 base: 'text-icon-gray dark:text-gray-500',
                             },
                         }"
@@ -178,7 +198,7 @@ const uiConfig = computed(() => ({
                         color="white"
                         size="lg"
                         padding="lg"
-                        :options="['United States', 'Canada', 'Mexico']"
+                        :options="daysOptionFilter"
                         placeholder="Past 30 days"
                         :ui="uiConfig"
                     />
@@ -192,7 +212,7 @@ const uiConfig = computed(() => ({
                     />
 
                     <USelect
-						trailing-icon=""
+                        trailing-icon=""
                         color="white"
                         size="lg"
                         padding="lg"
@@ -201,13 +221,25 @@ const uiConfig = computed(() => ({
                         :ui="uiConfig"
                     />
 
-					<UButton 
-					    icon="i-ic-outline-filter-alt"
-						color="gray" 
-						variant="outline"
-					> 
-						Export
-					</UButton>
+                    <UButton
+                        icon="i-solar-upload-square-broken"
+                        color="white"
+                        variant="outline"
+                        size="lg"
+                        :ui="{
+                            font: 'font-normal',
+                            rounded: 'rounded-full',
+                            color: {
+                                white: {
+                                    outline:
+                                        'shadow-sm bg-white dark:bg-gray-900 text-icon-gray dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
+                                },
+                            },
+                        }"
+                        @click="handleExport"
+                    >
+                        Export
+                    </UButton>
                 </div>
             </div>
 

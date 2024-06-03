@@ -15,7 +15,7 @@ const form = reactive({
         class="w-full min-h-screen bg-gray-900 flex justify-center items-center"
     >
         <section class="w-2/6 bg-white flex flex-col px-10 py-12 rounded-3xl">
-            <div class="mx-auto mb-8">
+            <div class="mx-auto mb-6">
                 <img
                     class="w-16 h-16"
                     src="~/assets/logo.svg"
