@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const { $dayjs } = useNuxtApp()
+
 const columns = [
     {
         key: 'id',
@@ -140,20 +142,24 @@ const uiConfig = computed(() => ({
 }))
 
 // days filters i.e 'Past 30days'
+const daysOption = ref<string>('')
 const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
 	{
-		label: 'United States',
-		value: 'US'
+		label: 'Past 30 days',
+		value: $dayjs().subtract(30, 'days')
 	},
 	{
-		label: 'Canada',
-		value: 'CA'
+		label: 'Past week',
+		value: $dayjs().subtract(7, 'days')
 	},
 	{
-		label: 'Mexico',
-		value: 'MX'
+		label: 'Past 6 months',
+		value: $dayjs().subtract(6, 'months')
 	}
 ])
+
+// Transactions filter i.e: Income, Expenditure
+// 
 
 const handleExport = () => {
     console.log('click')
@@ -198,6 +204,7 @@ const handleExport = () => {
                         color="white"
                         size="lg"
                         padding="lg"
+						v-model="daysOption"
                         :options="daysOptionFilter"
                         placeholder="Past 30 days"
                         :ui="uiConfig"
