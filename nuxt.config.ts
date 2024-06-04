@@ -1,12 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    colorMode: {
+        preference: 'light',
+    },
     app: {
         head: {
             htmlAttrs: {
                 class: 'h-full',
             },
             bodyAttrs: {
-                class: 'h-screen bg-white text-base',
+                class: 'h-screen bg-white dark:bg-gray-800 text-base',
             },
             link: [
                 {

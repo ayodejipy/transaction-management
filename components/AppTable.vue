@@ -1,77 +1,17 @@
 <script setup lang="ts">
+import type { IColumn } from '~/types';
+
 interface IProps {
-    columns: []
+    columns: IColumn[]
     data: []
     paginate?: boolean
 }
 
-withDefaults(defineProps<IProps>(), {
+const props = withDefaults(defineProps<IProps>(), {
     columns: () => [],
     data: () => [],
     paginate: true,
 })
-
-const columns = [
-    {
-        key: 'id',
-        label: 'Transaction ID',
-    },
-    {
-        key: 'type',
-        label: 'Transaction Type',
-    },
-    {
-        key: 'category',
-        label: 'Transaction Category',
-    },
-    {
-        key: 'date',
-        label: 'Transaction Date',
-    },
-    {
-        key: 'amount',
-        label: 'Amount',
-    },
-    {
-        key: 'description',
-        label: 'Description',
-    },
-]
-
-const transactions = [
-    {
-        id: 1233,
-        type: 'Income',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1234,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-]
 
 // Pagination
 const page = ref<number>(1)
@@ -82,8 +22,11 @@ const pageTo = computed(() =>
     Math.min(page.value * pageCount.value, pageTotal.value)
 )
 
-const rows = computed<[]>(() => {
-    return data.slice((page.value - 1) * pageCount, page.value * pageCount)
+const rows = computed(() => {
+    return props.data.slice(
+        (page.value - 1) * pageCount.value,
+        page.value * pageCount.value
+    )
 })
 </script>
 
@@ -98,7 +41,7 @@ const rows = computed<[]>(() => {
     >
         <UTable
             :columns
-            :rows="data"
+            :rows
             class="w-full"
             :ui="{
                 th: {

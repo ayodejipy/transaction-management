@@ -10,11 +10,11 @@ const links = [
         icon: 'i-heroicons-chart-bar',
         to: '/transactions',
     },
-    {
-        label: 'User Management',
-        icon: 'i-ph-users-three-light',
-        to: '/components/command-palette',
-    },
+    // {
+    //     label: 'User Management',
+    //     icon: 'i-ph-users-three-light',
+    //     to: '/components/command-palette',
+    // },
     {
         label: 'Settings',
         icon: 'i-heroicons-cog-8-tooth',
