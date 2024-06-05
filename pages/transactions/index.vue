@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { sub, format, isSameDay, type Duration } from 'date-fns'
+import type { IDaysOptionFilter } from '~/types';
+
 const { $dayjs } = useNuxtApp()
 
 const columns = [
@@ -127,6 +130,10 @@ const transactions = [
     },
 ]
 
+// datepicker range selector
+const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
+
+
 const uiConfig = computed(() => ({
     placeholder: 'text-icon-gray dark:text-gray-500',
     rounded: 'rounded-full',
@@ -159,7 +166,6 @@ const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
 ])
 
 // Transactions filter i.e: Income, Expenditure
-//
 
 const handleExport = () => {
     console.log('click')
@@ -194,7 +200,7 @@ const handleExport = () => {
                             },
                         }"
                         icon="i-heroicons-magnifying-glass-20-solid"
-                        size="sm"
+                        size="lg"
                         color="white"
                         trailing
                         placeholder="Search..."
@@ -209,14 +215,31 @@ const handleExport = () => {
                         placeholder="Past 30 days"
                         :ui="uiConfig"
                     />
-                    <USelect
+                    <!-- <USelect
                         color="white"
                         size="lg"
                         padding="lg"
                         :options="['United States', 'Canada', 'Mexico']"
                         placeholder="Date Range"
                         :ui="uiConfig"
-                    />
+                    /> -->
+
+                    <UPopover>
+                        <UButton 
+                            icon="i-heroicons-calendar-days-20-solid" 
+                            trailing
+                            size="lg"
+                            color="white"
+                            variant="outline"
+                            :ui="{ rounded: 'rounded-full' }"
+                        >
+                            {{ format(selected.start, 'd MMM, yyy') }} - {{ format(selected.end, 'd MMM, yyy') }}
+                        </UButton>
+
+                        <template #panel="{ close }">
+                            <DatePicker v-model="selected" is-required @close="close" />
+                        </template>
+                    </UPopover>
 
                     <USelect
                         trailing-icon=""
@@ -252,7 +275,5 @@ const handleExport = () => {
 
             <AppTable :columns :data="transactions" />
         </section>
-
-        <AddTransactionDrawer />
     </section>
 </template>

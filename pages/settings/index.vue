@@ -1,9 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
 
-const props = defineProps(['foobar'])
-
-console.log(props.foobar)
 </script>
 
 <template>

@@ -16,9 +16,11 @@
     "@nuxt/ui": "latest",
     "@nuxtjs/google-fonts": "latest",
     "@pinia/nuxt": "^0.5.1",
+    "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
     "nuxt": "^3.11.2",
     "pinia": "^2.1.7",
+    "v-calendar": "next",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },

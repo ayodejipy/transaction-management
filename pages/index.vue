@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const isOpenAddTransaction = ref<boolean>(false)
+
 const statistics = [
     {
         title: 'All Transactions',
@@ -159,6 +161,7 @@ const transactions = [
             <button
                 type="button"
                 class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
+                @click="isOpenAddTransaction = true" 
             >
                 <Icon name="i-mage-file-upload" />
                 Upload new transaction
@@ -171,7 +174,7 @@ const transactions = [
 
         <!-- recent transaction table -->
         <section
-            class="bg-white rounded-lg border border-gray-100 mt-6 space-y-3"
+            class="rounded-lg border border-gray-100 mt-6 space-y-3"
         >
             <div class="flex justify-between items-center py-8 px-6">
                 <div class="flex items-center gap-2">
@@ -199,5 +202,19 @@ const transactions = [
         </section>
 
         <!-- analysis section -->
+        <section
+            class="flex gap-4"
+        >
+            <div class="rounded-lg border border-gray-100 mt-6 space-y-3">
+                <div class="flex items-center justify-between gap-2">
+                    <h3 class="font-semibold text-xl">Transaction Analytics</h3>
+                </div>
+            </div>
+            <div class="rounded-lg border border-gray-100 mt-6 space-y-3">
+                <h3 class="font-semibold text-xl">Transaction Summary</h3>
+            </div>
+        </section>
+
+        <AddTransactionDrawer v-model="isOpenAddTransaction" />
     </section>
 </template>

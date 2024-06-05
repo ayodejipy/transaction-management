@@ -1,24 +1,33 @@
 <script setup lang="ts">
-const isOpen = ref<boolean>(false)
+const isOpen = defineModel({ type: Boolean, default: false })
+
+// type
+const transactionTypes = ['Project', 'Pledge', 'Offering']
+
+// category
+const transactionCategories = ['Income', 'Expenditure']
 
 const transaction = reactive({
     amount: '',
-    type: '',
-    category: '',
+    type: transactionTypes[2],
+    category: transactionCategories[0],
     date: '',
     description: '',
 })
 
-const onCloseModal = () => {
+const onCloseSlide = () => {
     isOpen.value = !isOpen.value
 }
 </script>
 
 <template>
     <div>
-        <UButton label="Open" @click="isOpen = true" />
-
-        <USlideover v-model="isOpen">
+        <USlideover
+            v-model="isOpen"
+            :ui="{
+                width: 'max-w-xl',
+            }"
+        >
             <UCard
                 :ui="{
                     ring: '',
@@ -45,38 +54,40 @@ const onCloseModal = () => {
                     </div>
                 </template>
 
-                <div class="space-y-6">
+                <div class="space-y-4">
                     <UFormGroup size="xl" label="Amount">
                         <UInput
-                            placeholder="Enter user name"
+                            placeholder="Enter amount"
                             v-model="transaction.amount"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Type">
-                        <UInput
-                            placeholder="Enter user email address"
+                        <USelect
                             v-model="transaction.type"
+                            :options="transactionTypes"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Category">
-                        <UInput
-                            placeholder="Select category"
+                        <USelect
                             v-model="transaction.category"
+                            :options="transactionCategories"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Date">
                         <UInput
-                            placeholder="Enter user password"
+                            type="date"
+                            placeholder=""
                             v-model="transaction.date"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Description">
-                        <UInput
-                            placeholder="Enter user password"
+                        <UTextarea
+                            variant="outline"
+                            placeholder=""
                             v-model="transaction.description"
                         />
                     </UFormGroup>
@@ -93,7 +104,7 @@ const onCloseModal = () => {
                                 rounded: 'rounded-lg',
                                 font: 'font-semibold',
                             }"
-                            @click="onCloseModal"
+                            @click="onCloseSlide"
                         >
                             Cancel
                         </UButton>
