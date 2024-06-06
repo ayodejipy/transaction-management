@@ -145,6 +145,17 @@ const transactions = [
         description: 'Books and stationery supplies',
     },
 ]
+
+const uiConfig = computed(() => ({
+    divide: '',
+    ring: 'ring-1 ring-gray-100 dark:ring-gray-800',
+    header: {
+        padding: 'px-0 sm:p-6',
+    },
+    body: {
+        padding: 'px-0 sm:px-6',
+    },
+}))
 </script>
 
 <template>
@@ -161,7 +172,7 @@ const transactions = [
             <button
                 type="button"
                 class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
-                @click="isOpenAddTransaction = true" 
+                @click="isOpenAddTransaction = true"
             >
                 <Icon name="i-mage-file-upload" />
                 Upload new transaction
@@ -173,9 +184,7 @@ const transactions = [
         </section>
 
         <!-- recent transaction table -->
-        <section
-            class="rounded-lg border border-gray-100 mt-6 space-y-3"
-        >
+        <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
             <div class="flex justify-between items-center py-8 px-6">
                 <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-xl">Recent Transactions</h3>
@@ -202,17 +211,61 @@ const transactions = [
         </section>
 
         <!-- analysis section -->
-        <section
-            class="flex gap-4"
-        >
-            <div class="rounded-lg border border-gray-100 mt-6 space-y-3">
-                <div class="flex items-center justify-between gap-2">
-                    <h3 class="font-semibold text-xl">Transaction Analytics</h3>
+        <section class="flex gap-4 mt-6">
+            <UCard :ui="{ ...uiConfig, base: 'flex-1 space-y-3' }">
+                <template #header>
+                    <div class="flex items-center justify-between gap-2">
+                        <h3 class="font-semibold text-xl">
+                            Transaction Analytics
+                        </h3>
+                    </div>
+                </template>
+
+                <ChartsTransactionAnalytics />
+            </UCard>
+
+            <UCard
+                :ui="{
+                    ...uiConfig,
+                    base: 'w-full sm:w-1/4',
+                }"
+            >
+                <template #header>
+                    <div class="flex items-center">
+                        <h3 class="font-semibold text-xl">
+                            Transaction Summary
+                        </h3>
+                    </div>
+                </template>
+
+                <div class="mb-4">
+                    <ChartsTransactionSummary />
                 </div>
-            </div>
-            <div class="rounded-lg border border-gray-100 mt-6 space-y-3">
-                <h3 class="font-semibold text-xl">Transaction Summary</h3>
-            </div>
+                <template #footer>
+                    <div class="flex flex-col gap-4">
+                        <UMeter :value="30" :max="100">
+                            <template #indicator="{ percent }">
+                                <div
+                                    class="flex items-center justify-between text-sm text-right"
+                                >
+                                    <span>Credit Transactions</span>
+                                    <span>{{ Math.round(percent) }}%</span>
+                                </div>
+                            </template>
+                        </UMeter>
+                        <UMeter :value="70" :max="100">
+                            <template #indicator="{ percent }">
+                                <div
+                                    class="flex items-center justify-between text-sm text-right"
+                                >
+                                    <span>Debit Transactions</span>
+                                    <span>{{ Math.round(percent) }}%</span>
+                                </div>
+                            </template>
+                        </UMeter>
+                    </div>
+                </template>
+            </UCard>
         </section>
 
         <AddTransactionDrawer v-model="isOpenAddTransaction" />
