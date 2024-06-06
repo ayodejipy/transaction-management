@@ -2,6 +2,10 @@
 import { sub, format, isSameDay, type Duration } from 'date-fns'
 import type { IDaysOptionFilter } from '~/types';
 
+definePageMeta({
+    title: 'Transactions',
+})
+
 const { $dayjs } = useNuxtApp()
 
 const columns = [

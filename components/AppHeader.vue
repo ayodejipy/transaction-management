@@ -1,5 +1,12 @@
 <script setup lang="ts">
-const route = useRoute()
+withDefaults(
+    defineProps<{
+        pageTitle: string
+    }>(),
+    {
+        pageTitle: 'Default Page Title',
+    }
+)
 
 const items = [
     [
@@ -16,8 +23,6 @@ const items = [
         },
     ],
 ]
-
-// console.log({ route })
 </script>
 
 <template>
@@ -35,7 +40,7 @@ const items = [
 
             <div class="flex items-center justify-between px-4 flex-1">
                 <h1 class="text-2xl font-semibold text-brand-gray">
-                    Overview {{ route }}
+                    {{ pageTitle }}
                 </h1>
 
                 <div class="flex items-center gap-x-4 lg:gap-x-4">
