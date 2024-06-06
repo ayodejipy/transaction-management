@@ -19,18 +19,25 @@ const options = reactive({
                         fontWeight: 600,
                         color: '#101828',
                         offsetY: 10,
-                        formatter: function (w: number) {
-                            console.log({ w })
-                            return w + '%'
-                        },
                     },
                     total: {
                         showAlways: true,
                         show: true,
+                        // @ts-ignore
+                        formatter: function (w) {
+                            const totalSum = w.globals.seriesTotals.reduce((a: number, b: number) => {
+                                return a + b
+                            }, 0)
+
+                            return totalSum + '%'
+                        },
                     },
                 },
             },
         },
+    },
+    fill: {
+        colors: ['#17B26A', '#231F20'],
     },
     dataLabels: {
         enabled: false,

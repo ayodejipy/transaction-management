@@ -246,7 +246,7 @@ const uiConfig = computed(() => ({
                 </div>
                 <template #footer>
                     <div class="flex flex-col gap-4">
-                        <UMeter :value="30" :max="100">
+                        <UMeter color="black" :value="30" :max="100">
                             <template #indicator="{ percent }">
                                 <div
                                     class="flex items-center justify-between text-sm text-right"

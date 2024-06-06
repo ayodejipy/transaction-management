@@ -35,7 +35,8 @@ const options = reactive({
     },
     plotOptions: {
         bar: {
-            borderRadius: 5,
+            borderRadius: 7,
+            borderRadiusApplication: 'end'
         },
     },
     dataLabels: { enabled: false },
