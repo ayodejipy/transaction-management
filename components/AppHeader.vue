@@ -34,7 +34,9 @@ const items = [
             <div class="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
 
             <div class="flex items-center justify-between px-4 flex-1">
-                <h1 class="text-2xl font-semibold text-brand-gray">Overview</h1>
+                <h1 class="text-2xl font-semibold text-brand-gray">
+                    Overview {{ route }}
+                </h1>
 
                 <div class="flex items-center gap-x-4 lg:gap-x-4">
                     <button
