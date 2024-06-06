@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-    title: 'Report',
+    title: 'Reports',
 })
 const isOpenAddTransaction = ref<boolean>(false)
 
