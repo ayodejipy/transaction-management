@@ -20,6 +20,7 @@
     "@pinia/nuxt": "^0.5.1",
     "date-fns": "^3.6.0",
     "dayjs": "^1.11.11",
+    "defu": "^6.1.4",
     "nuxt": "^3.11.2",
     "pinia": "^2.1.7",
     "v-calendar": "next",
