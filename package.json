@@ -13,6 +13,8 @@
     "format": "prettier --write \"**/*.{js,ts,vue,json,md}\""
   },
   "dependencies": {
+    "@iconify-json/ci": "^1.1.13",
+    "@iconify-json/ri": "^1.1.20",
     "@nuxt/ui": "latest",
     "@nuxtjs/google-fonts": "latest",
     "@pinia/nuxt": "^0.5.1",

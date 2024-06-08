@@ -203,7 +203,7 @@ const handleExport = () => {
                                 base: 'text-icon-gray dark:text-gray-500',
                             },
                         }"
-                        icon="i-heroicons-magnifying-glass-20-solid"
+                        icon="i-ri-search-2-line"
                         size="lg"
                         color="white"
                         trailing
@@ -246,7 +246,7 @@ const handleExport = () => {
                     </UPopover>
 
                     <USelect
-                        trailing-icon=""
+                        trailing-icon="i-ci-filter-off-outline"
                         color="white"
                         size="lg"
                         padding="lg"
@@ -256,7 +256,7 @@ const handleExport = () => {
                     />
 
                     <UButton
-                        icon="i-solar-upload-square-broken"
+                        icon="i-lets-icons-arhive-alt-export-light"
                         color="white"
                         variant="outline"
                         size="lg"

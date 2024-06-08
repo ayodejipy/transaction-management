@@ -205,11 +205,11 @@ const onCloseModal = () => {
                     />
 
                     <USelect
-                        trailing-icon=""
+                        trailing-icon="i-ci-filter-off-outline"
                         color="white"
                         size="lg"
                         padding="lg"
-                        :options="['Charity', 'Expenditure', 'Income']"
+                        :options="['Active', 'None Active']"
                         placeholder="Filter"
                         :ui="uiConfig"
                     />

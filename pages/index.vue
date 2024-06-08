@@ -244,6 +244,7 @@ const uiConfig = computed(() => ({
                 <div class="mb-4">
                     <ChartsTransactionSummary />
                 </div>
+                
                 <template #footer>
                     <div class="flex flex-col gap-4">
                         <UMeter color="black" :value="30" :max="100">

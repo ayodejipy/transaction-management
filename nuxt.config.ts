@@ -3,6 +3,9 @@ export default defineNuxtConfig({
     colorMode: {
         preference: 'light',
     },
+    ui: {
+        icons: ['ri', 'ci']
+    },
     app: {
         head: {
             htmlAttrs: {
