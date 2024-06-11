@@ -1,10 +1,15 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    runtimeConfig: {
+        public: {
+            apiBaseURL: process.env.NUXT_PUBLIC_API_BASE, 
+        },
+    },
     colorMode: {
         preference: 'light',
     },
     ui: {
-        icons: ['ri', 'ci']
+        icons: ['ri', 'ci'],
     },
     app: {
         head: {
@@ -41,12 +46,4 @@ export default defineNuxtConfig({
         'nuxt-icon',
         '@nuxtjs/google-fonts',
     ],
-    // googleFonts: {
-    //     families: {
-    //         Inter: '100..900',
-    //     },
-    // },
-    // eslint: {
-    //   lintOnStart: false,
-    // },
 })

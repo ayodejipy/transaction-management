@@ -3,11 +3,55 @@ definePageMeta({
     layout: false,
 })
 
+const toast = useToast()
+
+const { $customFetch } = useNuxtApp()
+
+const loading = ref<boolean>(false)
 const form = reactive({
     email: '',
     password: '',
-    stay_logged_in: false,
+    // stay_logged_in: false,
 })
+
+async function handleLogin() {
+    loading.value = true
+    const authUrl = useEndpoints('authUrl')
+    try {
+        const data = await $customFetch(authUrl, {
+            method: 'POST',
+            body: form,
+        })
+
+        console.log({ data })
+    } catch {
+        toast.add({
+            title: 'Login failed',
+            color: 'red',
+            description: 'Email or password incorrect.',
+            icon: 'i-heroicons-outline-exclaimation-circle',
+        })
+        throw new Error('Failed authenticate user. Please try again.')
+    } finally {
+        loading.value = !loading.value
+    }
+}
+
+// onMounted(() => {
+//     toast.add({
+//         id: 'update_downloaded',
+//         title: 'Update downloaded.',
+//         description: 'It will be installed on restart. Restart now?',
+//         icon: 'i-octicon-desktop-download-24',
+//         timeout: 0,
+//         actions: [
+//             {
+//                 label: 'Restart',
+//                 click: () => {},
+//             },
+//         ],
+//     })
+// })
 </script>
 
 <template>
@@ -41,7 +85,7 @@ const form = reactive({
 
                 <UFormGroup size="xl" label="Password">
                     <UInput
-						type="password"
+                        type="password"
                         placeholder="Enter your password"
                         v-model="form.password"
                     />
@@ -49,7 +93,6 @@ const form = reactive({
 
                 <div class="flex items-center justify-between my-6">
                     <UCheckbox
-                        v-model="form.stay_logged_in"
                         name="stayLogged"
                         label="Remember for 30 days"
                         :ui="{
@@ -64,15 +107,17 @@ const form = reactive({
                         Forgot password
                     </ULink>
                 </div>
-                <UButton 
-					block 
-					size="xl" 
-					padding="md"
-					:ui="{ 
-						rounded: 'rounded-full',
-						font: 'font-semibold'
-					}"
-				>
+                <UButton
+                    block
+                    size="xl"
+                    padding="md"
+                    :loading="loading"
+                    :ui="{
+                        rounded: 'rounded-full',
+                        font: 'font-semibold',
+                    }"
+                    @click="handleLogin"
+                >
                     Sign in
                 </UButton>
             </div>

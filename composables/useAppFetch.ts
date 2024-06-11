@@ -1,16 +1,20 @@
 import type { UseFetchOptions } from '#app'
-import { defu } from "defu";
+import { defu } from 'defu'
 
 export default function useAppFetch<T>(
     url: string,
     _options: UseFetchOptions<T> = {}
 ) {
-	// grab essential data, urls, access token etc
+    const { $customFetch } = useNuxtApp()
+
+    const config = useRuntimeConfig()
     const tokensRefreshUrl = useEndpoints('refreshTokenUrl')
-    const accessToken = useStorage('access_token')
+
+    const authStore = useAuthStore()
+    const { accessToken, refreshToken } = storeToRefs(authStore)
 
     const defaults: UseFetchOptions<T> = {
-        baseURL: '',
+        baseURL: config.public.apiBaseURL,
         key: url,
         headers: {
             Accept: 'application/json',
@@ -20,44 +24,35 @@ export default function useAppFetch<T>(
                 // Set the request headers
                 options.headers = {
                     ...options.headers,
-                    Authorization: `Bearer ${accessToken}`,
+                    Authorization: `Bearer ${accessToken.value}`,
                 }
             }
         },
         onResponse: async ({ response, options }) => {
-            if (response.status === 401 && response.url !== tokensRefreshUrl) {
-                const refresh_token = '123456765' // from a cookie
-				const newAccessToken = await getRefreshedToken(refresh_token)
-				// save this new token to local storage
-				// if new refresh token, save it to httpOnly cookie
-				options.headers = {
+            console.log('res: ', response)
+            if (
+                response.status === 401 &&
+                response.url !== tokensRefreshUrl &&
+                refreshToken.value
+            ) {
+                const newAccessToken = await authStore.getRefreshedToken()
+                // save this new token to local storage
+                // if new refresh token, save it to httpOnly cookie
+                options.headers = {
                     Authorization: `Bearer ${newAccessToken}`,
-				}
-				// retry request
-				useFetch(url, options as UseFetchOptions<T>)
+                }
+                // retry request
+                useFetch(url, {
+                    ...(options as UseFetchOptions<T>),
+                    $fetch: $customFetch,
+                })
             }
         },
-	}
-	
-	const params = defu(_options, defaults)
-    return useFetch(url, params)
-}
+    }
 
-async function getRefreshedToken(refreshToken: string) {
-    const tokensRefreshUrl = useEndpoints('refreshTokenUrl')
-
-    try {
-        const { data, status } = await useFetch<{ access_token: string }>(
-            tokensRefreshUrl,
-            {
-                method: 'POST',
-                body: {
-                    refreshToken,
-                },
-            }
-        )
-		return data.value?.access_token
-	} catch {
-		throw new Error('Failed to refresh token. Please try again.')
-	}
+    const params = defu(_options, defaults)
+    return useFetch(url, {
+        ...params,
+        $fetch: $customFetch,
+    })
 }
