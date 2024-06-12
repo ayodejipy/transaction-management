@@ -20,12 +20,12 @@ export const useAuthStore = defineStore('auth', () => {
     )
 
     // actions
-    function setTokens(token: string | null, refreshT: string | null) {
+    function setTokens(token: string | null, refreshT: string | null): void {
         accessToken.value = token
         refreshToken.value = refreshT
     }
 
-    async function getRefreshedToken() {
+    async function getRefreshedToken(): Promise<IAuthData> {
         const router = useRouter()
         const { $customFetch } = useNuxtApp()
         const tokensRefreshUrl = useEndpoints('refreshTokenUrl')
@@ -54,9 +54,10 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    function handleLogout() {
+    function handleLogout(): void {
         const router = useRouter()
         setTokens(null, null)
+        user.value = null
         router.push('/auth/login')
     }
 

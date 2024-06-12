@@ -11,10 +11,8 @@ export default defineNuxtPlugin(() => {
             Accept: 'application/json',
         },
         onRequest: async ({ options }) => {
-            // console.log({ options })
 
             if (accessToken.value) {
-                // Set the request headers
                 options.headers = {
                     ...options.headers,
                     Authorization: `Bearer ${accessToken.value}`,
