@@ -12,12 +12,14 @@ const userStore = useUserStore()
 const authStore = useAuthStore()
 const { user } = storeToRefs(userStore)
 
-const fullname = computed<string>(() => user.value?.firstName + ' ' + user.value?.lastName)
+const fullname = computed<string>(
+    () => user.value?.firstName + ' ' + user.value?.lastName
+)
 
 const items = [
     [
         {
-            label: 'opabid@gmail.com',
+            label: `${user.value?.email}`,
             slot: 'account',
             disabled: true,
         },
@@ -29,7 +31,6 @@ const items = [
         },
     ],
 ]
-
 </script>
 
 <template>
@@ -70,65 +71,75 @@ const items = [
                     </button>
 
                     <div class="relative flex items-center">
-                        <UDropdown
-                            :items="items"
-                            :ui="{
-                                item: { disabled: 'cursor-text select-text' },
-                            }"
-                            :popper="{ placement: 'bottom-start' }"
-                        >
-                            <button
-                                type="button"
-                                class="flex items-center gap-1.5"
+                        <ClientOnly>
+                            <UDropdown
+                                :items="items"
+                                :ui="{
+                                    item: {
+                                        disabled: 'cursor-text select-text',
+                                    },
+                                }"
+                                :popper="{ placement: 'bottom-start' }"
                             >
-                                <UAvatar
-                                    src="https://avatars.githubusercontent.com/u/739984?v=4"
-                                    size="md"
-                                    :ui="{
-                                        rounded:
-                                            'rounded-full ring-1 ring-green-500',
-                                    }"
-                                />
-
-                                <span
-                                    class="hidden lg:flex lg:flex-col lg:items-start"
+                                <button
+                                    type="button"
+                                    class="flex items-center gap-1.5"
                                 >
-                                    <p
-                                        class="font-medium leading-6 text-brand-gray"
-                                    >
-                                       {{ fullname }}
-                                    </p>
+                                    <UAvatar
+                                        src="https://avatars.githubusercontent.com/u/739984?v=4"
+                                        size="md"
+                                        :ui="{
+                                            rounded:
+                                                'rounded-full ring-1 ring-green-500',
+                                        }"
+                                    />
+
                                     <span
-                                        class="text-sm font-normal leading-6 text-gray-500"
-                                        aria-hidden="true"
+                                        class="hidden lg:flex lg:flex-col lg:items-start"
                                     >
-                                        Admin
+                                        <p
+                                            class="font-medium leading-6 text-brand-gray"
+                                        >
+                                            {{ fullname }}
+                                        </p>
+                                        <span
+                                            class="text-sm font-normal leading-6 text-gray-500"
+                                            aria-hidden="true"
+                                        >
+                                            Admin
+                                        </span>
                                     </span>
-                                </span>
-                            </button>
+                                </button>
 
-                            <template #account="{ item }">
-                                <div class="text-left">
-                                    <p>Signed in as</p>
-                                    <p
-                                        class="truncate font-medium text-gray-900 dark:text-white"
+                                <template #account="{ item }">
+                                    <div class="text-left">
+                                        <p>Signed in as</p>
+                                        <p
+                                            class="truncate font-medium text-gray-900 dark:text-white"
+                                        >
+                                            {{ item.label }}
+                                        </p>
+                                    </div>
+                                </template>
+
+                                <template #item="{ item }">
+                                    <UButton
+                                        color="primary"
+                                        variant="ghost"
+                                        @click="authStore.handleLogout"
                                     >
-                                        {{ item.label }}
-                                    </p>
-                                </div>
-                            </template>
+                                        <span class="truncate">{{
+                                            item.label
+                                        }}</span>
 
-                            <template #item="{ item }">
-                                  <UButton color="primary" variant="ghost" @click="authStore.handleLogout">
-                                      <span class="truncate">{{ item.label }}</span>
-      
-                                      <UIcon
-                                          :name="item.icon"
-                                          class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto"
-                                      />
-                                  </UButton>
-                            </template>
-                        </UDropdown>
+                                        <UIcon
+                                            :name="item.icon"
+                                            class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto"
+                                        />
+                                    </UButton>
+                                </template>
+                            </UDropdown>
+                        </ClientOnly>
                     </div>
                 </div>
             </div>

@@ -19,4 +19,5 @@ export interface IAuth extends ITokenData {
     user: IUser
 }
 export type TSchema = z.output<typeof acceptInviteSchema>
+
 export interface IAuthData extends IDataResponse<IAuth> {}

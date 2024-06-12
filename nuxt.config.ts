@@ -40,6 +40,7 @@ export default defineNuxtConfig({
     modules: [
         '@nuxt/eslint',
         '@pinia/nuxt',
+        '@pinia-plugin-persistedstate/nuxt',
         '@nuxt/ui',
         '@nuxtjs/color-mode',
         '@nuxtjs/tailwindcss',

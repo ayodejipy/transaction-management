@@ -34,7 +34,7 @@ const columns = [
     {
         key: 'description',
         label: 'Description',
-    }
+    },
 ]
 
 const categories = [
@@ -70,11 +70,6 @@ const categories = [
     },
 ]
 
-const onCloseModal = () => {
-    isOpen.value = !isOpen.value
-
-    // for (const property in form) { form[property] = ''};
-}
 </script>
 
 <template>
@@ -141,84 +136,6 @@ const onCloseModal = () => {
             <AppTable :columns :data="categories" />
         </section>
 
-        <UModal
-            v-model="isOpen"
-            :ui="{
-                width: 'sm:max-w-2xl',
-            }"
-        >
-            <UCard
-                :ui="{
-                    ring: '',
-                    divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-                    body: {
-                        padding: 'sm:p-8',
-                    },
-                    header: {
-                        padding: 'sm:px-8 sm:pt-8',
-                    },
-                    footer: {
-                        padding: 'sm:px-8 sm:pb-10',
-                    },
-                }"
-            >
-                <template #header>
-                    <div class="space-y-2">
-                        <h3 class="text-brand-gray text-2xl font-semibold">
-                            Add New Category
-                        </h3>
-                        <p class="text-dark-gray font-light">
-                            Add a new category for transactions.
-                        </p>
-                    </div>
-                </template>
-
-                <div class="space-y-6">
-                    <UFormGroup size="xl" label="Name">
-                        <UInput
-                            placeholder="Category name"
-                            v-model="form.name"
-                        />
-                    </UFormGroup>
-
-                    <UFormGroup size="xl" label="Description">
-                        <UTextarea
-                            variant="outline"
-                            placeholder=""
-                            v-model="form.description"
-                        />
-                    </UFormGroup>
-                </div>
-
-                <template #footer>
-                    <div class="flex justify-between items-center">
-                        <UButton
-                            size="xl"
-                            color="gray"
-                            variant="outline"
-                            padding="md"
-                            :ui="{
-                                rounded: 'rounded-lg',
-                                font: 'font-semibold',
-                            }"
-                            @click="onCloseModal"
-                        >
-                            Cancel
-                        </UButton>
-
-                        <UButton
-                            size="xl"
-                            padding="md"
-                            :ui="{
-                                rounded: 'rounded-lg',
-                                font: 'font-semibold',
-                            }"
-                        >
-                            Create category
-                        </UButton>
-                    </div>
-                </template>
-            </UCard>
-        </UModal>
+        <ModalsAddCategory v-model="isOpen" />
     </section>
 </template>

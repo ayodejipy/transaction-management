@@ -5,6 +5,8 @@ export default function useAppFetch<T>(
     url: string,
     _options: UseFetchOptions<T> = {}
 ) {
+    const router = useRouter()
+    const { setTokens } = useAuthStore()
     const { $customFetch } = useNuxtApp()
 
     const config = useRuntimeConfig()
@@ -29,13 +31,11 @@ export default function useAppFetch<T>(
             }
         },
         onResponse: async ({ response, options }) => {
-            console.log('res: ', response)
             if (response.status === 401 && refreshToken.value) {
                 console.log('after failed condition')
                 const newAccessToken = await authStore.getRefreshedToken()
+                
                 // save this new token to local storage
-
-                // if new refresh token, save it to httpOnly cookie
                 options.headers = {
                     Authorization: `Bearer ${newAccessToken}`,
                 }

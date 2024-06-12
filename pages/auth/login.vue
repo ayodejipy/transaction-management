@@ -10,9 +10,8 @@ const router = useRouter()
 
 const { $customFetch } = useNuxtApp()
 
-const userStore = useUserStore()
+const { user } = storeToRefs(useUserStore())
 const authStore = useAuthStore()
-const { user } = storeToRefs(userStore)
 
 const loading = ref<boolean>(false)
 const form = reactive({
@@ -29,8 +28,9 @@ async function handleLogin() {
             method: 'POST',
             body: form,
         })
-        
+
         authStore.setTokens(data.content.token, data.content.refreshToken)
+
         user.value = data.content.user
         router.push('/')
 
@@ -52,7 +52,6 @@ async function handleLogin() {
         loading.value = !loading.value
     }
 }
-
 </script>
 
 <template>

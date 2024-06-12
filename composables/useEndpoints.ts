@@ -9,6 +9,10 @@ export default function useEndpoints(key: string) {
 		'userInviteAcceptUrl': '/users/invites/accept',
 		'categoriesUrl': '/categories',
 		'typesUrl': '/types',
+		'totalStatsUrl': '/stats/totals',
+		'monthlyStatsUrl': '/stats/monthly-totals',
+		'totalRevenueUrl': '/stats/total-revenue',
+		'percentageStatsUrl': '/stats/credits-debits-percentage',
 	}
 
 	if(!apiUrls[key]) {

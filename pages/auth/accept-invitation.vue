@@ -8,9 +8,8 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
-const userStore = useUserStore()
 const { accessToken, refreshToken } = storeToRefs(authStore)
-const { user } = storeToRefs(userStore)
+const { user } = storeToRefs(useUserStore())
 
 const router = useRouter()
 const route = useRoute()

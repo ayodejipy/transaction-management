@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import type { TransactionPercentageType } from '~/types'
+
+const props = defineProps<{
+    series: number[]
+}>()
+
 const options = reactive({
     chart: {
         id: 'transaction-summary',
@@ -25,9 +31,12 @@ const options = reactive({
                         show: true,
                         // @ts-ignore
                         formatter: function (w) {
-                            const totalSum = w.globals.seriesTotals.reduce((a: number, b: number) => {
-                                return a + b
-                            }, 0)
+                            const totalSum = w.globals.seriesTotals.reduce(
+                                (a: number, b: number) => {
+                                    return a + b
+                                },
+                                0
+                            )
 
                             return totalSum + '%'
                         },
@@ -45,7 +54,7 @@ const options = reactive({
     legend: { show: false },
 })
 
-const series = ref([70, 30])
+const series = computed<number[]>(() => props.series)
 </script>
 
 <template>

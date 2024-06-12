@@ -1,34 +1,63 @@
 <script setup lang="ts">
+import type {
+    IMonthlyTotal,
+    ITotalTransaction,
+    ITransactionPercentage,
+    TransactionPercentageType,
+} from '~/types'
+
 definePageMeta({
     title: 'Reports',
-    middleware: 'auth'
+    middleware: 'auth',
 })
+
 const isOpenAddTransaction = ref<boolean>(false)
 
-const categoriesUrl = useEndpoints('categoriesUrl')
+const totalStatsUrl = useEndpoints('totalStatsUrl')
+const monthlyStatsUrl = useEndpoints('monthlyStatsUrl')
+const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
 
-const { data } = await useAppFetch(categoriesUrl)
+const { data: total } = await useAppFetch<ITotalTransaction>(totalStatsUrl)
+console.log('total-stats: ', total.value)
 
-console.log('app-data: ', data.value)
-
-const statistics = [
+const statistics = computed(() => [
     {
         title: 'All Transactions',
-        figure: '100',
+        figure: total.value?.content.totalTransactions || 0,
     },
     {
         title: 'Credit Transactions',
-        figure: '$20,206.20',
+        figure: total.value?.content.totalCredits || 0,
     },
     {
         title: 'Debit Transactions',
-        figure: '$20,206.20',
+        figure: total.value?.content.totalDebits || 0,
     },
     {
         title: 'Net Amount',
-        figure: '$40,206.20',
+        figure: total.value?.content.netTotal || 0,
     },
-]
+])
+
+const { data: totalPercentile } = await useAppFetch<ITransactionPercentage>(
+    creditDebitPercentageUrl
+)
+console.log('cred-debit-%: ', totalPercentile.value)
+
+const series = computed(() => [
+    totalPercentile.value?.content.totalCreditsPercentage || 0,
+    totalPercentile.value?.content.totalDebitsPercentage || 0,
+])
+
+const { data: totalPerMonth } =
+    await useAppFetch<IMonthlyTotal>(monthlyStatsUrl)
+
+const monthsSeries = computed(() =>
+    totalPerMonth.value?.content.map((month) => month.monthName)
+)
+const amountsSeries = computed(() =>
+    totalPerMonth.value?.content.map((month) => month.netTotal.toString())
+)
 
 const columns = [
     {
@@ -231,7 +260,7 @@ const uiConfig = computed(() => ({
                     </div>
                 </template>
 
-                <ChartsTransactionAnalytics />
+                <ChartsTransactionAnalytics :categories="monthsSeries" :series="amountsSeries" />
             </UCard>
 
             <UCard
@@ -249,12 +278,12 @@ const uiConfig = computed(() => ({
                 </template>
 
                 <div class="mb-4">
-                    <ChartsTransactionSummary />
+                    <ChartsTransactionSummary :series />
                 </div>
-                
+
                 <template #footer>
                     <div class="flex flex-col gap-4">
-                        <UMeter color="black" :value="30" :max="100">
+                        <UMeter color="black" :value="series[0]" :max="100">
                             <template #indicator="{ percent }">
                                 <div
                                     class="flex items-center justify-between text-sm text-right"
@@ -264,7 +293,7 @@ const uiConfig = computed(() => ({
                                 </div>
                             </template>
                         </UMeter>
-                        <UMeter :value="70" :max="100">
+                        <UMeter :value="series[1]" :max="100">
                             <template #indicator="{ percent }">
                                 <div
                                     class="flex items-center justify-between text-sm text-right"

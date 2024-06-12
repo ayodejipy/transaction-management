@@ -4,6 +4,7 @@ import type { IDaysOptionFilter } from '~/types';
 
 definePageMeta({
     title: 'Transactions',
+    middleware: 'auth'
 })
 
 const { $dayjs } = useNuxtApp()

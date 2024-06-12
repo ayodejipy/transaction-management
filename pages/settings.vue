@@ -3,7 +3,8 @@ const route = useRoute()
 
 definePageMeta({
     key: (route) => route.fullPath,
-    title: 'Settings'
+    title: 'Settings',
+    middleware: 'auth'
 })
 
 const links = [

@@ -16,3 +16,11 @@ export const acceptInviteSchema = z
         message: "Passwords don't match",
         path: ['confirmPassword'],
     })
+
+
+export const TransactionTypeSchema = z
+    .object({
+        name: z.string(),
+        description: z
+            .string().optional(),
+    })
