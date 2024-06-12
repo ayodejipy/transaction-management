@@ -25,7 +25,8 @@
     "pinia": "^2.1.7",
     "v-calendar": "next",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@ckeditor/ckeditor5-vue": "^5.1.0",

@@ -8,6 +8,12 @@ withDefaults(
     }
 )
 
+const userStore = useUserStore()
+const authStore = useAuthStore()
+const { user } = storeToRefs(userStore)
+
+const fullname = computed<string>(() => user.value?.firstName + ' ' + user.value?.lastName)
+
 const items = [
     [
         {
@@ -23,6 +29,7 @@ const items = [
         },
     ],
 ]
+
 </script>
 
 <template>
@@ -89,7 +96,7 @@ const items = [
                                     <p
                                         class="font-medium leading-6 text-brand-gray"
                                     >
-                                        Opawole Olawabiyi
+                                       {{ fullname }}
                                     </p>
                                     <span
                                         class="text-sm font-normal leading-6 text-gray-500"
@@ -112,12 +119,14 @@ const items = [
                             </template>
 
                             <template #item="{ item }">
-                                <span class="truncate">{{ item.label }}</span>
-
-                                <UIcon
-                                    :name="item.icon"
-                                    class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto"
-                                />
+                                  <UButton color="primary" variant="ghost" @click="authStore.handleLogout">
+                                      <span class="truncate">{{ item.label }}</span>
+      
+                                      <UIcon
+                                          :name="item.icon"
+                                          class="flex-shrink-0 h-4 w-4 text-gray-400 dark:text-gray-500 ms-auto"
+                                      />
+                                  </UButton>
                             </template>
                         </UDropdown>
                     </div>

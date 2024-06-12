@@ -1,11 +1,18 @@
 <script setup lang="ts">
+import type { IAuthData } from '~/types'
+
 definePageMeta({
     layout: false,
 })
 
 const toast = useToast()
+const router = useRouter()
 
 const { $customFetch } = useNuxtApp()
+
+const userStore = useUserStore()
+const authStore = useAuthStore()
+const { user } = storeToRefs(userStore)
 
 const loading = ref<boolean>(false)
 const form = reactive({
@@ -18,12 +25,21 @@ async function handleLogin() {
     loading.value = true
     const authUrl = useEndpoints('authUrl')
     try {
-        const data = await $customFetch(authUrl, {
+        const data = await $customFetch<IAuthData>(authUrl, {
             method: 'POST',
             body: form,
         })
+        
+        authStore.setTokens(data.content.token, data.content.refreshToken)
+        user.value = data.content.user
+        router.push('/')
 
-        console.log({ data })
+        toast.add({
+            title: 'Login Successful',
+            color: 'green',
+            description: 'Email or password incorrect.',
+            icon: 'i-heroicons-outline-check-badge',
+        })
     } catch {
         toast.add({
             title: 'Login failed',
@@ -37,21 +53,6 @@ async function handleLogin() {
     }
 }
 
-// onMounted(() => {
-//     toast.add({
-//         id: 'update_downloaded',
-//         title: 'Update downloaded.',
-//         description: 'It will be installed on restart. Restart now?',
-//         icon: 'i-octicon-desktop-download-24',
-//         timeout: 0,
-//         actions: [
-//             {
-//                 label: 'Restart',
-//                 click: () => {},
-//             },
-//         ],
-//     })
-// })
 </script>
 
 <template>
@@ -76,14 +77,14 @@ async function handleLogin() {
             </div>
 
             <div class="mt-6 space-y-6">
-                <UFormGroup size="xl" label="Email">
+                <UFormGroup size="xl" label="Email" name="email">
                     <UInput
                         placeholder="Enter your email"
                         v-model="form.email"
                     />
                 </UFormGroup>
 
-                <UFormGroup size="xl" label="Password">
+                <UFormGroup size="xl" label="Password" name="label">
                     <UInput
                         type="password"
                         placeholder="Enter your password"
@@ -100,7 +101,7 @@ async function handleLogin() {
                         }"
                     />
                     <ULink
-                        to="/auth/resetpassword"
+                        to="/"
                         active-class="text-primary"
                         inactive-class="text-sm text-green-500 font-semibold dark:text-gray-400 hover:text-green-600 dark:hover:text-gray-200"
                     >

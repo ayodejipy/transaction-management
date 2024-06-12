@@ -1,8 +1,15 @@
 <script setup lang="ts">
 definePageMeta({
     title: 'Reports',
+    middleware: 'auth'
 })
 const isOpenAddTransaction = ref<boolean>(false)
+
+const categoriesUrl = useEndpoints('categoriesUrl')
+
+const { data } = await useAppFetch(categoriesUrl)
+
+console.log('app-data: ', data.value)
 
 const statistics = [
     {

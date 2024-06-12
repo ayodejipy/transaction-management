@@ -1,8 +1,10 @@
-<script setup>
+<script setup lang="ts">
+import { ReportIcon, NuxtIcon} from '#components'
+
 const links = [
     {
         label: 'Reports',
-        icon: 'i-hugeicons-presentation-bar-chart-01',
+        icon: 'ReportIcon',
         to: '/',
     },
     {
@@ -37,11 +39,14 @@ const sidebarOpen = ref(false)
             class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4"
         >
             <div class="flex h-16 shrink-0 items-center">
-                <img
+                <!-- <img
                     class="h-8 w-auto"
                     src="https://tailwindui.com/img/logos/mark.svg?color=green&shade=600"
                     alt="Your Company"
-                />
+                /> -->
+                <ClientOnly>
+                    <Icon name="NuxtIcon" size="64" />
+                </ClientOnly>
             </div>
             <div class="flex flex-1 flex-col pt-6">
                 <UVerticalNavigation

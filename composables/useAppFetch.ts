@@ -19,8 +19,8 @@ export default function useAppFetch<T>(
         headers: {
             Accept: 'application/json',
         },
-        onRequest: async ({ request, options }) => {
-            if (accessToken) {
+        onRequest: async ({ options }) => {
+            if (accessToken.value) {
                 // Set the request headers
                 options.headers = {
                     ...options.headers,
@@ -30,17 +30,16 @@ export default function useAppFetch<T>(
         },
         onResponse: async ({ response, options }) => {
             console.log('res: ', response)
-            if (
-                response.status === 401 &&
-                response.url !== tokensRefreshUrl &&
-                refreshToken.value
-            ) {
+            if (response.status === 401 && refreshToken.value) {
+                console.log('after failed condition')
                 const newAccessToken = await authStore.getRefreshedToken()
                 // save this new token to local storage
+
                 // if new refresh token, save it to httpOnly cookie
                 options.headers = {
                     Authorization: `Bearer ${newAccessToken}`,
                 }
+
                 // retry request
                 useFetch(url, {
                     ...(options as UseFetchOptions<T>),

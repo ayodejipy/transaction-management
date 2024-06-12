@@ -1,39 +1,58 @@
 import { useStorage } from '@vueuse/core'
+import type { IAuthData } from '~/types'
 
 export const useAuthStore = defineStore('auth', () => {
-    const { $customFetch } = useNuxtApp()
-
     const accessToken = useStorage(
         'x-accessToken',
-        '1234567890A.BCDEFERTITOMIUYGH'
+        ''
     )
-    const refreshToken = useCookie('xs-rft')
+    const refreshToken = useCookie('XS-TM-RFT', {
+        httpOnly: true,
+    })
 
-    refreshToken.value = 'proper-refresh-token-from-server'
-
+    const isAuthenticated = computed<boolean>(() => !!accessToken.value)
+    
     // actions
+    function setTokens(token: string | null, refreshT: string | null) {
+        accessToken.value = token
+        refreshToken.value = refreshT
+    }
     async function getRefreshedToken() {
+        const { $customFetch } = useNuxtApp()
         const tokensRefreshUrl = useEndpoints('refreshTokenUrl')
 
         try {
-            const data = await $customFetch<{ access_token: string }>(
+            const data = await $customFetch<IAuthData>(
                 tokensRefreshUrl,
                 {
                     method: 'POST',
                     body: {
-                        refreshToken,
+                        refreshToken: refreshToken.value,
                     },
                 }
             )
-            return data.access_token
+
+            console.log('...WRITING TO STORAGE...')
+            setTokens(data.content.token, data.content.refreshToken)
+
+            return data
         } catch {
             throw new Error('Failed to refresh token. Please try again.')
         }
     }
 
+    function handleLogout() {
+        const router = useRouter()
+        setTokens(null, null)
+        router.push('/auth/login')
+    }
+
     return {
         accessToken,
         refreshToken,
+        isAuthenticated,
+        setTokens,
         getRefreshedToken,
+        handleLogout,
     }
 })
