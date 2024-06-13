@@ -9,7 +9,7 @@ const pageTitle = computed<string>(() => route.meta.title as string)
         <AppSidebar />
 
         <div class="w-full flex-1">
-            <AppHeader :pageTitle />
+            <AppHeader :page-title />
             <main class="py-10">
                 <div class="px-4 sm:px-6">
                     <slot />

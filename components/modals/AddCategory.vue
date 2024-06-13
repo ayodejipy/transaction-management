@@ -94,8 +94,8 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
 				>
                     <UFormGroup size="xl" label="Name" name="name">
                         <UInput
-                            placeholder="Category name"
                             v-model="form.name"
+                            placeholder="Category name"
                         />
                     </UFormGroup>
 
@@ -106,9 +106,9 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
                         hint="Optional"
                     >
                         <UTextarea
+                            v-model="form.description"
                             variant="outline"
                             placeholder=""
-                            v-model="form.description"
                         />
                     </UFormGroup>
 

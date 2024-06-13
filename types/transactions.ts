@@ -1,5 +1,5 @@
-import { z } from 'zod'
-import { Dayjs } from 'dayjs'
+import type { z } from 'zod'
+import type { Dayjs } from 'dayjs'
 
 import type { IDataResponse } from './api'
 

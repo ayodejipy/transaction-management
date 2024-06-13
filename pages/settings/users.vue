@@ -254,23 +254,23 @@ const onCloseModal = () => {
                 <div class="space-y-6">
                     <UFormGroup size="xl" label="Full Name">
                         <UInput
-                            placeholder="Enter user name"
                             v-model="form.fullname"
+                            placeholder="Enter user name"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Email Address">
                         <UInput
-                            placeholder="Enter user email address"
                             v-model="form.email"
+                            placeholder="Enter user email address"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Set User Password">
                         <UInput
+                            v-model="form.password"
                             type="password"
                             placeholder="Enter user password"
-                            v-model="form.password"
                         />
                     </UFormGroup>
                 </div>

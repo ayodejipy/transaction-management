@@ -64,7 +64,7 @@ async function handleLogin() {
                     class="w-16 h-16"
                     src="~/assets/logo.svg"
                     alt="application logo"
-                />
+                >
             </div>
             <div class="text-center space-y-3">
                 <h3 class="text-brand-gray text-3xl font-semibold">
@@ -78,16 +78,16 @@ async function handleLogin() {
             <div class="mt-6 space-y-6">
                 <UFormGroup size="xl" label="Email" name="email">
                     <UInput
-                        placeholder="Enter your email"
                         v-model="form.email"
+                        placeholder="Enter your email"
                     />
                 </UFormGroup>
 
                 <UFormGroup size="xl" label="Password" name="label">
                     <UInput
+                        v-model="form.password"
                         type="password"
                         placeholder="Enter your password"
-                        v-model="form.password"
                     />
                 </UFormGroup>
 

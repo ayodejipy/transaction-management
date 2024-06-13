@@ -57,8 +57,8 @@ const onCloseSlide = () => {
                 <div class="space-y-4">
                     <UFormGroup size="xl" label="Amount">
                         <UInput
-                            placeholder="Enter amount"
                             v-model="transaction.amount"
+                            placeholder="Enter amount"
                         />
                     </UFormGroup>
 
@@ -78,17 +78,17 @@ const onCloseSlide = () => {
 
                     <UFormGroup size="xl" label="Date">
                         <UInput
+                            v-model="transaction.date"
                             type="date"
                             placeholder=""
-                            v-model="transaction.date"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Description">
                         <UTextarea
+                            v-model="transaction.description"
                             variant="outline"
                             placeholder=""
-                            v-model="transaction.description"
                         />
                     </UFormGroup>
                 </div>

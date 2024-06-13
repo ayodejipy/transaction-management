@@ -59,6 +59,6 @@ const series = computed<number[]>(() => props.series)
 
 <template>
     <div>
-        <apexchart type="donut" :options="options" :series="series"></apexchart>
+        <apexchart type="donut" :options="options" :series="series"/>
     </div>
 </template>

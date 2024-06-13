@@ -65,10 +65,10 @@ const rows = computed(() => {
             class="w-full flex px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
         >
             <UPagination
+                v-model="page"
                 :ui="{
                     wrapper: 'w-full flex items-center',
                 }"
-                v-model="page"
                 :page-count="pageCount"
                 :total="data.length"
             >

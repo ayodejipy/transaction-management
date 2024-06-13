@@ -87,5 +87,5 @@ const series = ref([
         height="350"
         :options="options"
         :series="series"
-    ></apexchart>
+    />
 </template>

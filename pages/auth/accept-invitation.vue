@@ -85,7 +85,7 @@ onMounted(() => {
                     class="w-16 h-16"
                     src="~/assets/logo.svg"
                     alt="application logo"
-                />
+                >
             </div>
             <div class="text-center space-y-3">
                 <h3 class="text-brand-gray text-3xl font-semibold">
@@ -105,24 +105,24 @@ onMounted(() => {
                 >
                     <UFormGroup size="xl" label="Email" name="email">
                         <UInput
-                            placeholder="Enter your email"
                             v-model="form.email"
+                            placeholder="Enter your email"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Password" name="password">
                         <UInput
+                            v-model="form.password"
                             type="password"
                             placeholder="Enter your password"
-                            v-model="form.password"
                         />
                     </UFormGroup>
 
                     <UFormGroup size="xl" label="Confirm Password" name="confirmPassword">
                         <UInput
+                            v-model="form.confirmPassword"
                             type="password"
                             placeholder="Confirm your password"
-                            v-model="form.confirmPassword"
                         />
                     </UFormGroup>
 

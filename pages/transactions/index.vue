@@ -211,11 +211,11 @@ const handleExport = () => {
                         placeholder="Search..."
                     />
                     <USelect
+                        v-model="daysOption"
                         icon="i-heroicons-calendar"
                         color="white"
                         size="lg"
                         padding="lg"
-                        v-model="daysOption"
                         :options="daysOptionFilter"
                         placeholder="Past 30 days"
                         :ui="uiConfig"

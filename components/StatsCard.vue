@@ -15,7 +15,7 @@ defineProps<{
                 class="w-full h-full object-cover"
                 src="~/assets/looper_bg.svg"
                 alt="background illustration"
-            />
+            >
         </div>
         <div class="flex">
             <div class="min-w-0 flex-1 space-y-3.5">
