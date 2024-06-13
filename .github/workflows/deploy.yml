@@ -1,44 +1,43 @@
 name: transaction-management app
-
 on: 
-	pull_request:
-		branches:
-			- staging
+  pull_request:
+   branches:
+    - staging
 
 jobs:
-    formatting-branch:
-        runs-on: ubuntu-latest
-        steps:
-			- run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-            - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-            - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+  formatting-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
-			- name: Check out repository code
-              uses: actions/checkout@v4
-            - run: echo "💡 The ${{ github.ref }} repository has been cloned to the runner."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.ref }} repository has been cloned to the runner."
 
-			- name: Installing Dependencies
-              run: bun install
-            - run: echo "💡 Installing dependencies in ${{ github.ref }}"
+      - name: Installing Dependencies
+        run: bun install
+      - run: echo "💡 Installing dependencies in ${{ github.ref }}"
 
-			- name: Lint
-              run: bun lint
-            - run: echo "💡 Running lint and fix on all files within the branch ${{ github.ref }}"
+      - name: Lint
+        run: bun lint
+      - run: echo "💡 Running lint and fix on all files within the branch ${{ github.ref }}"
 
-            - name: Format
-              run: bun format
-            - run: echo "💡 Running format on all files within the branch ${{ github.ref }}"
+      - name: Format
+        run: bun format
+      - run: echo "💡 Running format on all files within the branch ${{ github.ref }}"
 
-			 - name: Build
-              run: bun build
-            - run: echo "🍏 Building app"
-
-			- run: echo "🎉 This job's status is ${{ job.status }}."
-			
-			- name: Deploy to netlify  
-			uses: netlify/actions/cli@master  
-			env:  
-				NETLIFY_AUTH_TOKEN: ${{ secrets.TRANSACTION_TRACKER_NETLIFY_TOKEN }}  
-				NETLIFY_SITE_ID:  ${{ secrets.TRANSACTION_TRACKER_SITE_ID }} 
-			with:  
-			args: deploy
+      - name: Build
+        run: bun build
+      - run: echo "🍏 Building app"
+     
+      - name: Deploy to netlify  
+        uses: netlify/actions/cli@master  
+        env:  
+          NETLIFY_AUTH_TOKEN: ${{ secrets.TRANSACTION_TRACKER_NETLIFY_TOKEN }}  
+          NETLIFY_SITE_ID:  ${{ secrets.TRANSACTION_TRACKER_SITE_ID }} 
+        with:  
+          args: deploy
+        
+      - run: echo "🎉 This job's status is ${{ job.status }}."
