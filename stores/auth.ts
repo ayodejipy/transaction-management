@@ -1,13 +1,6 @@
 import { useStorage } from '@vueuse/core'
 import type { IAuthData } from '~/types'
 
-function getErrorObject(error: any) {
-    if (error.hasOwnProperty('data') && typeof error.data === 'object') {
-        const errorData = error.data as { status?: number; title?: string }
-
-        return errorData
-    }
-}
 
 export const useAuthStore = defineStore('auth', () => {
     const { user } = storeToRefs(useUserStore())
