@@ -1,8 +1,8 @@
 name: transaction-management app
 on: 
-  pull_request:
+  push:
    branches:
-    - staging
+    - main
 
 jobs:
   formatting-branch:

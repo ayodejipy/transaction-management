@@ -1,5 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    nitro: {
+        preset: 'netlify',
+    },
     runtimeConfig: {
         public: {
             apiBaseURL: process.env.NUXT_PUBLIC_API_BASE, 
