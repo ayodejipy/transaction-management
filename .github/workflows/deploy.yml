@@ -18,7 +18,7 @@ jobs:
 
       - name: Installing Dependencies
         uses: oven-sh/setup-bun@v1
-      - run: bun run install
+      - run: bun install
       - run: echo "💡 Installing dependencies in ${{ github.ref }}"
 
       - name: Lint
