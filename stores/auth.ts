@@ -1,13 +1,27 @@
 import { useStorage } from '@vueuse/core'
 import type { IAuthData } from '~/types'
 
-
 export const useAuthStore = defineStore('auth', () => {
+    const TOKEN_KEY: string = 'x-accessToken'
     const { user } = storeToRefs(useUserStore())
-    
-    const accessToken = useStorage('x-accessToken', '')
+
+    const accessToken = useStorage(TOKEN_KEY, '')
+
+    // const computedToken = computed<string>({
+    //     get: () => {
+    //         if (import.meta.client) {
+    //             const defaultValue = localStorage.getItem(TOKEN_KEY)
+    //             accessToken.value = defaultValue
+    //             return accessToken as unknown as string
+    //         }
+    //     },
+    //     set: (value: string) => {
+    //         accessToken.value = value
+    //     },
+    // })
+
     const refreshToken = useCookie('XS-TM-RFT')
-    
+
     const isAuthenticated = computed<boolean>(
         () => !!(accessToken.value && refreshToken.value)
     )
@@ -35,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
             setTokens(data.content.token, data.content.refreshToken)
 
             return data
-        } catch (error: any) {
+        } catch (error) {
             const errorData = getErrorObject(error)
             if (errorData?.status === 500 && errorData?.title === 'Timeout') {
                 user.value = null
@@ -55,6 +69,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
+        TOKEN_KEY,
         accessToken,
         refreshToken,
         isAuthenticated,

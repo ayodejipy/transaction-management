@@ -28,7 +28,6 @@ async function handleLogin() {
             method: 'POST',
             body: form,
         })
-
         authStore.setTokens(data.content.token, data.content.refreshToken)
 
         user.value = data.content.user

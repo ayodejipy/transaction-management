@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type {
+    IDataResponse,
     IMonthlyTotal,
     ITotalTransaction,
     ITransactionPercentage,
-    TransactionPercentageType,
 } from '~/types'
 
 definePageMeta({
@@ -13,12 +13,24 @@ definePageMeta({
 
 const isOpenAddTransaction = ref<boolean>(false)
 
+const categoryStore = useCategoryStore()
+const typeStore = useTypeStore()
+
+const revenueUrl = useEndpoints('totalRevenueUrl')
 const totalStatsUrl = useEndpoints('totalStatsUrl')
 const monthlyStatsUrl = useEndpoints('monthlyStatsUrl')
 const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
 
+// Total revenue
+const { data: revenue } =
+    await useAppFetch<IDataResponse<number | undefined>>(revenueUrl)
+const totalRevenue = computed(() => {
+    const amount = revenue.value?.content
+    return amount ? formatCurrency(amount) : 0
+})
+
+// Totals e.g; credit, debit
 const { data: total } = await useAppFetch<ITotalTransaction>(totalStatsUrl)
-console.log('total-stats: ', total.value)
 
 const statistics = computed(() => [
     {
@@ -27,28 +39,29 @@ const statistics = computed(() => [
     },
     {
         title: 'Credit Transactions',
-        figure: total.value?.content.totalCredits || 0,
+        figure: formatCurrency(total.value?.content.totalCredits!) || 0,
     },
     {
         title: 'Debit Transactions',
-        figure: total.value?.content.totalDebits || 0,
+        figure: formatCurrency(total.value?.content.totalDebits!) || 0,
     },
     {
         title: 'Net Amount',
-        figure: total.value?.content.netTotal || 0,
+        figure: formatCurrency(total.value?.content.netTotal!) || 0,
     },
 ])
 
+// Credit OR Debit transactions percentage (20%, 80%)
 const { data: totalPercentile } = await useAppFetch<ITransactionPercentage>(
     creditDebitPercentageUrl
 )
-console.log('cred-debit-%: ', totalPercentile.value)
 
 const series = computed(() => [
     totalPercentile.value?.content.totalCreditsPercentage || 0,
     totalPercentile.value?.content.totalDebitsPercentage || 0,
 ])
 
+// Total transactions per month: Jan, Feb...
 const { data: totalPerMonth } =
     await useAppFetch<IMonthlyTotal>(monthlyStatsUrl)
 
@@ -58,6 +71,10 @@ const monthsSeries = computed(() =>
 const amountsSeries = computed(() =>
     totalPerMonth.value?.content.map((month) => month.netTotal.toString())
 )
+
+// transaction categories and types
+await categoryStore.getCategories()
+await typeStore.getTypes()
 
 const columns = [
     {
@@ -205,7 +222,7 @@ const uiConfig = computed(() => ({
                     >Your total revenue</span
                 >
                 <p class="text-4xl font-inter font-semibold text-brand-green">
-                    $80,000.00
+                    {{ totalRevenue }}
                 </p>
             </div>
             <button
@@ -260,7 +277,10 @@ const uiConfig = computed(() => ({
                     </div>
                 </template>
 
-                <ChartsTransactionAnalytics :categories="monthsSeries" :series="amountsSeries" />
+                <ChartsTransactionAnalytics
+                    :categories="monthsSeries"
+                    :series="amountsSeries"
+                />
             </UCard>
 
             <UCard

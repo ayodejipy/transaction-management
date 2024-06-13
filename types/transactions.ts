@@ -8,6 +8,14 @@ export interface IDaysOptionFilter {
     value: string | Date | Dayjs
 }
 
+export interface ITransaction {
+    description: string
+    amount: number
+    typeId: number
+    categoryId: number
+    transactionDate: string
+}
+
 export interface ITypes {
     id?: number
     name: string
@@ -41,6 +49,9 @@ export interface MonthlyTotalType {
 }
 
 export type TransactionTypeSchemaType = z.output<typeof TransactionTypeSchema>
+export type AddTransactionSchemaType = z.output<typeof AddTransactionSchema>
+
+export interface ITransactionData extends IDataResponse<ITransaction> {}
 
 export interface TCategoryData extends IDataResponse<ICategory> {}
 
@@ -50,6 +61,6 @@ export interface ITotalTransaction
     extends IDataResponse<TotalTransactionType> {}
 
 export interface ITransactionPercentage
-	extends IDataResponse<TransactionPercentageType> { }
-	
+    extends IDataResponse<TransactionPercentageType> {}
+
 export interface IMonthlyTotal extends IDataResponse<MonthlyTotalType[]> {}

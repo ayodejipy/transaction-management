@@ -1,15 +1,13 @@
-import type { IAuthData, ICategory, TCategoryData } from '~/types'
+import type { ICategory, TCategoryData } from '~/types'
 
 export const useCategoryStore = defineStore('category', () => {
 	const categoriesUrl = useEndpoints('categoriesUrl')
     const categories = ref<ICategory[]>([])
 
-	async function getCategories(body: ICategory) {
+	async function getCategories() {
 		const { $customFetch } = useNuxtApp()
 		
-		const data = await $customFetch<TCategoryData>(categoriesUrl, {
-            body,
-        })
+		const data = await $customFetch<TCategoryData>(categoriesUrl)
 
 		if (data.success) {
 			categories.value = data.content as unknown as ICategory[]

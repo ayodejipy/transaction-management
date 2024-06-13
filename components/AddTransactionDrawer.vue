@@ -1,22 +1,65 @@
 <script setup lang="ts">
+import type { FormSubmitEvent } from '#ui/types'
+import type { AddTransactionSchemaType, ICategory, ITypes } from '~/types'
+
 const isOpen = defineModel({ type: Boolean, default: false })
 
-// type
-const transactionTypes = ['Project', 'Pledge', 'Offering']
+const { categories } = storeToRefs(useCategoryStore())
+const { types } = storeToRefs(useTypeStore())
 
-// category
-const transactionCategories = ['Income', 'Expenditure']
+const toast = useToast()
 
-const transaction = reactive({
+// types
+const transactionTypes = computed(() =>
+    types.value.map((type: ITypes) => ({ label: type.name, value: type?.id }))
+)
+
+// categories
+const transactionCategories = computed(() =>
+    categories.value.map((category: ICategory) => ({
+        label: category.name,
+        value: category?.id,
+    }))
+)
+
+const loading = ref<boolean>(false)
+const form = reactive({
     amount: '',
-    type: transactionTypes[2],
-    category: transactionCategories[0],
+    type: transactionTypes.value[2],
+    category: transactionCategories.value[0],
     date: '',
     description: '',
 })
 
 const onCloseSlide = () => {
     isOpen.value = !isOpen.value
+}
+
+async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
+    loading.value = true
+    console.log({event})
+    // try {
+    // 	const data = await addCategory(event.data)
+
+    // 	if (data.success) {
+    // 		toast.add({
+    // 			title: 'Transaction upload Successfully',
+    // 			color: 'green',
+    // 			description: "You've successfully uploaded a new transaction",
+    // 			icon: 'i-heroicons-outline-check-badge',
+    // 		})
+    // 	}
+    // } catch {
+    //     toast.add({
+    //         title: 'Category Creation Failed',
+    //         color: 'red',
+    //         description: 'Unable to create your category at this moment.',
+    //         icon: 'i-heroicons-outline-exclaimation-circle',
+    //     })
+    //     // throw new Error('Failed authenticate user. Please try again.')
+    // } finally {
+    //     loading.value = !loading.value
+    // }
 }
 </script>
 
@@ -55,73 +98,87 @@ const onCloseSlide = () => {
                 </template>
 
                 <div class="space-y-4">
-                    <UFormGroup size="xl" label="Amount">
-                        <UInput
-                            v-model="transaction.amount"
-                            placeholder="Enter amount"
-                        />
-                    </UFormGroup>
+                    <UForm
+                        ref="formElement"
+                        :schema="AddTransactionSchema"
+                        :state="form"
+                        class="space-y-6"
+                        @submit="onSubmit"
+                    >
+                        <UFormGroup size="xl" label="Amount" name="amount">
+                            <UInput
+                                v-model="form.amount"
+                                placeholder="Enter amount"
+                            />
+                        </UFormGroup>
 
-                    <UFormGroup size="xl" label="Type">
-                        <USelect
-                            v-model="transaction.type"
-                            :options="transactionTypes"
-                        />
-                    </UFormGroup>
+                        <UFormGroup size="xl" label="Type" name="type">
+                            <USelect
+                                v-model="form.type"
+                                :options="transactionTypes"
+                            />
+                        </UFormGroup>
 
-                    <UFormGroup size="xl" label="Category">
-                        <USelect
-                            v-model="transaction.category"
-                            :options="transactionCategories"
-                        />
-                    </UFormGroup>
+                        <UFormGroup size="xl" label="Category" name="category">
+                            <USelect
+                                v-model="form.category"
+                                :options="transactionCategories"
+                            />
+                        </UFormGroup>
 
-                    <UFormGroup size="xl" label="Date">
-                        <UInput
-                            v-model="transaction.date"
-                            type="date"
-                            placeholder=""
-                        />
-                    </UFormGroup>
+                        <UFormGroup size="xl" label="Date" name="date">
+                            <UInput
+                                v-model="form.date"
+                                type="date"
+                                placeholder=""
+                            />
+                        </UFormGroup>
 
-                    <UFormGroup size="xl" label="Description">
-                        <UTextarea
-                            v-model="transaction.description"
-                            variant="outline"
-                            placeholder=""
-                        />
-                    </UFormGroup>
+                        <UFormGroup
+                            size="xl"
+                            label="Description"
+                            name="description"
+                        >
+                            <UTextarea
+                                v-model="form.description"
+                                variant="outline"
+                                placeholder=""
+                            />
+                        </UFormGroup>
+
+                        <div
+                            class="sm:mt-8 sm:pt-4 border-t border-gray-200 flex justify-between items-center"
+                        >
+                            <UButton
+                                size="xl"
+                                color="gray"
+                                variant="outline"
+                                padding="md"
+                                :ui="{
+                                    rounded: 'rounded-lg',
+                                    font: 'font-semibold',
+                                }"
+                                @click="onCloseSlide"
+                            >
+                                Cancel
+                            </UButton>
+
+                            <UButton
+                                type="submit"
+                                size="xl"
+                                padding="md"
+                                :loading
+                                :ui="{
+                                    base: 'bg-brand-green',
+                                    rounded: 'rounded-lg',
+                                    font: 'font-semibold',
+                                }"
+                            >
+                                Upload
+                            </UButton>
+                        </div>
+                    </UForm>
                 </div>
-
-                <template #footer>
-                    <div class="flex justify-between items-center">
-                        <UButton
-                            size="xl"
-                            color="gray"
-                            variant="outline"
-                            padding="md"
-                            :ui="{
-                                rounded: 'rounded-lg',
-                                font: 'font-semibold',
-                            }"
-                            @click="onCloseSlide"
-                        >
-                            Cancel
-                        </UButton>
-
-                        <UButton
-                            size="xl"
-                            padding="md"
-                            :ui="{
-                                base: 'bg-brand-green',
-                                rounded: 'rounded-lg',
-                                font: 'font-semibold',
-                            }"
-                        >
-                            Upload
-                        </UButton>
-                    </div>
-                </template>
             </UCard>
         </USlideover>
     </div>

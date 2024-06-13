@@ -1,16 +1,14 @@
-import type { IAuthData, ITypes, TTypeData } from '~/types'
+import type { ITypes, TTypeData } from '~/types'
 
 export const useTypeStore = defineStore('type', () => {
 	const typesUrl = useEndpoints('typesUrl')
 	const type = ref<ITypes | null>(null)
 	const types = ref<ITypes[]>([])
 
-	async function getTypes(body: ITypes) {
+	async function getTypes() {
         const { $customFetch } = useNuxtApp()
 
-        const data = await $customFetch<TTypeData>(typesUrl, {
-            body,
-        })
+        const data = await $customFetch<TTypeData>(typesUrl)
 
         if (data.success) {
             types.value = data.content as unknown as ITypes[]

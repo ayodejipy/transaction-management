@@ -65,13 +65,11 @@ const options = reactive({
     tooltip: {
         y: {
             formatter: function (val: number) {
-                return '$' + val
+                return formatCurrency(val)
             },
         },
     },
 })
-
-const categories = computed(() => (options.xaxis.categories = props.categories))
 
 const series = ref([
     {

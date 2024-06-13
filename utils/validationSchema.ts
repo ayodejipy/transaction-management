@@ -24,3 +24,12 @@ export const TransactionTypeSchema = z
         description: z
             .string().optional(),
     })
+
+
+export const AddTransactionSchema = z.object({
+    amount: z.string(),
+    type: z.string(),
+    category: z.string(),
+    date: z.string(),
+    description: z.string(),
+})

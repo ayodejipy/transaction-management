@@ -1,7 +1,34 @@
-import type { IAuthData } from '~/types'
+import type { ITransaction, ITransactionData } from '~/types'
 
 export const useTransactionStore = defineStore('transaction', () => {
-    const transactions = ref<[]>([])
+    const transactionUrl = useEndpoints('transactionUrl')
+    const transactions = ref<ITransaction[]>([])
 
-    return {}
+    async function getTransactions(): Promise<ITransactionData> {
+        const { $customFetch } = useNuxtApp()
+
+        const data = await $customFetch<ITransactionData>(transactionUrl)
+
+        if (data.success) {
+            transactions.value = data.content as unknown as ITransaction[]
+        }
+
+        return data
+    }
+
+    async function AddTransaction(body: ITransaction): Promise<ITransactionData> {
+        const { $customFetch } = useNuxtApp()
+
+        const data = await $customFetch<ITransactionData>(transactionUrl, {
+            method: 'POST',
+            body,
+        })
+
+        return data
+    }
+
+    return {
+        getTransactions,
+        AddTransaction,
+    }
 })
