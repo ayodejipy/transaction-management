@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ReportIcon, NuxtIcon} from '#components'
-
 const links = [
     {
         label: 'Reports',
@@ -24,12 +22,12 @@ const links = [
     },
 ]
 
-const userNavigation = [
-    { name: 'Your profile', href: '#' },
-    { name: 'Sign out', href: '#' },
-]
+// const userNavigation = [
+//     { name: 'Your profile', href: '#' },
+//     { name: 'Sign out', href: '#' },
+// ]
 
-const sidebarOpen = ref(false)
+// const sidebarOpen = ref(false)
 </script>
 
 <template>

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { TransactionPercentageType } from '~/types'
-
 const props = defineProps<{
     series: number[]
 }>()

@@ -16,11 +16,11 @@ const props = withDefaults(defineProps<IProps>(), {
 // Pagination
 const page = ref<number>(1)
 const pageCount = ref<number>(5)
-const pageTotal = ref<number>(20) // This value should be dynamic coming from the API
-const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
-const pageTo = computed(() =>
-    Math.min(page.value * pageCount.value, pageTotal.value)
-)
+// const pageTotal = ref<number>(20) // This value should be dynamic coming from the API
+// const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
+// const pageTo = computed(() =>
+//     Math.min(page.value * pageCount.value, pageTotal.value)
+// )
 
 const rows = computed(() => {
     return props.data.slice(
