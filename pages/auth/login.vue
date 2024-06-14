@@ -36,7 +36,7 @@ async function handleLogin() {
         toast.add({
             title: 'Login Successful',
             color: 'green',
-            description: 'Email or password incorrect.',
+            description: 'Welcome, you will be redirected soon...',
             icon: 'i-heroicons-outline-check-badge',
         })
     } catch {

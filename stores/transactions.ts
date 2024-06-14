@@ -16,7 +16,9 @@ export const useTransactionStore = defineStore('transaction', () => {
         return data
     }
 
-    async function AddTransaction(body: ITransaction): Promise<ITransactionData> {
+    async function addTransaction(
+        body: ITransaction
+    ): Promise<ITransactionData> {
         const { $customFetch } = useNuxtApp()
 
         const data = await $customFetch<ITransactionData>(transactionUrl, {
@@ -29,6 +31,6 @@ export const useTransactionStore = defineStore('transaction', () => {
 
     return {
         getTransactions,
-        AddTransaction,
+        addTransaction,
     }
 })

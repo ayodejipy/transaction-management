@@ -27,9 +27,9 @@ export const TransactionTypeSchema = z
 
 
 export const AddTransactionSchema = z.object({
-    amount: z.string(),
-    type: z.string(),
-    category: z.string(),
-    date: z.string(),
+    amount: z.number(),
+    typeId: z.number(),
+    categoryId: z.number(),
+    transactionDate: z.string(),
     description: z.string(),
 })

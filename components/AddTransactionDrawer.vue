@@ -1,65 +1,82 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '#ui/types'
-import type { AddTransactionSchemaType, ICategory, ITypes } from '~/types'
+import type {
+    AddTransactionSchemaType,
+    ICategory,
+    ITransaction,
+    ITypes,
+} from '~/types'
 
 const isOpen = defineModel({ type: Boolean, default: false })
+
+const transactionStore = useTransactionStore()
 
 const { categories } = storeToRefs(useCategoryStore())
 const { types } = storeToRefs(useTypeStore())
 
 const toast = useToast()
 
+const formElement = ref(null)
+
 // types
 const transactionTypes = computed(() =>
-    types.value.map((type: ITypes) => ({ label: type.name, value: type?.id }))
+    types.value.map((type: ITypes) => ({ label: type.name, value: type.id }))
 )
 
 // categories
 const transactionCategories = computed(() =>
     categories.value.map((category: ICategory) => ({
         label: category.name,
-        value: category?.id,
+        value: category.id,
     }))
 )
 
 const loading = ref<boolean>(false)
-const form = reactive({
-    amount: '',
-    type: transactionTypes.value[2],
-    category: transactionCategories.value[0],
-    date: '',
+const defaultFormState: ITransaction = {
+    amount: 0,
+    typeId: 0,
+    categoryId: 0,
+    transactionDate: '',
     description: '',
-})
+}
+const form: ITransaction = reactive({...defaultFormState })
+
+const resetForm = () => {
+  Object.assign(form, defaultFormState);
+};
 
 const onCloseSlide = () => {
+    console.log('__form elem:___ ', formElement.value)
+    resetForm()
     isOpen.value = !isOpen.value
 }
 
 async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
-    loading.value = true
-    console.log({event})
-    // try {
-    // 	const data = await addCategory(event.data)
+    // loading.value = true
+    console.log({ event })
 
-    // 	if (data.success) {
-    // 		toast.add({
-    // 			title: 'Transaction upload Successfully',
-    // 			color: 'green',
-    // 			description: "You've successfully uploaded a new transaction",
-    // 			icon: 'i-heroicons-outline-check-badge',
-    // 		})
-    // 	}
-    // } catch {
-    //     toast.add({
-    //         title: 'Category Creation Failed',
-    //         color: 'red',
-    //         description: 'Unable to create your category at this moment.',
-    //         icon: 'i-heroicons-outline-exclaimation-circle',
-    //     })
-    //     // throw new Error('Failed authenticate user. Please try again.')
-    // } finally {
-    //     loading.value = !loading.value
-    // }
+    try {
+        // const data = await addTransaction(event.data)
+
+        // if (data.success) {
+        //     toast.add({
+        //         title: 'Transaction upload Successfully',
+        //         color: 'green',
+        //         description: "You've successfully uploaded a new transaction",
+        //         icon: 'i-heroicons-outline-check-badge',
+        //     })
+        // }
+    } catch {
+        toast.add({
+            title: 'Transaction Upload Failed',
+            color: 'red',
+            description: 'Sorry, we are unable to upload your transaction at this moment.',
+            icon: 'i-heroicons-outline-exclaimation-circle',
+        })
+        throw new Error('Failed add a ew transaction. Please try again.')
+    } finally {
+        loading.value = !loading.value
+    }
 }
 </script>
 
@@ -108,27 +125,30 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
                         <UFormGroup size="xl" label="Amount" name="amount">
                             <UInput
                                 v-model="form.amount"
+                                type="number"
                                 placeholder="Enter amount"
                             />
                         </UFormGroup>
 
                         <UFormGroup size="xl" label="Type" name="type">
                             <USelect
-                                v-model="form.type"
+                                v-model="form.typeId"
                                 :options="transactionTypes"
+                                placeholder="Select transaction type"
                             />
                         </UFormGroup>
 
                         <UFormGroup size="xl" label="Category" name="category">
                             <USelect
-                                v-model="form.category"
+                                v-model="form.categoryId"
                                 :options="transactionCategories"
+                                placeholder="Select transaction category"
                             />
                         </UFormGroup>
 
                         <UFormGroup size="xl" label="Date" name="date">
                             <UInput
-                                v-model="form.date"
+                                v-model="form.transactionDate"
                                 type="date"
                                 placeholder=""
                             />

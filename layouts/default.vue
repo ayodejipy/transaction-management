@@ -2,14 +2,6 @@
 const route = useRoute()
 
 const pageTitle = computed<string>(() => route.meta.title as string)
-
-const { accessToken, TOKEN_KEY } = storeToRefs(useAuthStore())
-
-if (import.meta.client) {
-    const tokenKey = unref(TOKEN_KEY)
-    const defaultValue = localStorage.getItem(tokenKey) as string
-    accessToken.value = defaultValue
-}
 </script>
 
 <template>

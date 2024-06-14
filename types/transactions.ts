@@ -17,14 +17,14 @@ export interface ITransaction {
 }
 
 export interface ITypes {
-    id?: number
+    id: number
     name: string
-    description?: string
-    toSubtract?: boolean
-    isDeleted?: boolean
+    description: string
+    toSubtract: boolean
+    isDeleted: boolean
 }
 export interface ICategory {
-    id?: number
+    id: number
     name: string
     description?: string
     isDeleted?: boolean

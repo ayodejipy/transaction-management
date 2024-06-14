@@ -2,25 +2,16 @@ import { useStorage } from '@vueuse/core'
 import type { IAuthData } from '~/types'
 
 export const useAuthStore = defineStore('auth', () => {
-    const TOKEN_KEY: string = 'x-accessToken'
+    const TOKEN_KEY: string = 'opabid-accessToken'
     const { user } = storeToRefs(useUserStore())
 
-    const accessToken = useStorage(TOKEN_KEY, '')
+    // const defaultToken = ref<string>('')
+    // const accessToken = useStorage(TOKEN_KEY, '')
 
-    // const computedToken = computed<string>({
-    //     get: () => {
-    //         if (import.meta.client) {
-    //             const defaultValue = localStorage.getItem(TOKEN_KEY)
-    //             accessToken.value = defaultValue
-    //             return accessToken as unknown as string
-    //         }
-    //     },
-    //     set: (value: string) => {
-    //         accessToken.value = value
-    //     },
-    // })
-
-    const refreshToken = useCookie('XS-TM-RFT')
+    const accessToken = useCookie('opabid-access', {
+        maxAge: 60 * 60,
+    })
+    const refreshToken = useCookie('opabid-refresh')
 
     const isAuthenticated = computed<boolean>(
         () => !!(accessToken.value && refreshToken.value)

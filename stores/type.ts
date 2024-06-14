@@ -17,7 +17,7 @@ export const useTypeStore = defineStore('type', () => {
         return data
     }
 	
-	async function addType(body: ITypes): Promise<TTypeData> {
+	async function addType(body: Partial<ITypes>): Promise<TTypeData> {
         const { $customFetch } = useNuxtApp()
 
         const data = await $customFetch<TTypeData>(typesUrl, {
