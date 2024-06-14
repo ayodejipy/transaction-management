@@ -39,15 +39,15 @@ const statistics = computed(() => [
     },
     {
         title: 'Credit Transactions',
-        figure: formatCurrency(total.value?.content.totalCredits!) || 0,
+        figure: formatCurrency(total.value?.content.totalCredits || 0),
     },
     {
         title: 'Debit Transactions',
-        figure: formatCurrency(total.value?.content.totalDebits!) || 0,
+        figure: formatCurrency(total.value?.content.totalDebits || 0),
     },
     {
         title: 'Net Amount',
-        figure: formatCurrency(total.value?.content.netTotal!) || 0,
+        figure: formatCurrency(total.value?.content.netTotal || 0),
     },
 ])
 

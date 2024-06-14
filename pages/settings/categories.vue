@@ -1,26 +1,6 @@
 <script setup lang="ts">
-const route = useRoute()
-
 const isOpen = ref<boolean>(false)
 
-const form = reactive({
-    name: '',
-    description: '',
-})
-
-const uiConfig = computed(() => ({
-    placeholder: 'text-icon-gray dark:text-gray-500',
-    rounded: 'rounded-full',
-    color: {
-        white: {
-            outline:
-                'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
-        },
-    },
-    icon: {
-        base: 'text-icon-gray dark:text-gray-500',
-    },
-}))
 
 const columns = [
     {

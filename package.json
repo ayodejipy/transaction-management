@@ -9,7 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "bun lint -- --fix",
     "format": "prettier --write \"**/*.{js,ts,vue,json,md}\""
   },
   "dependencies": {

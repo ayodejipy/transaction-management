@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const route = useRoute()
-
 const isOpen = ref<boolean>(false)
 
 const form = reactive({

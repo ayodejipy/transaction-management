@@ -5,12 +5,9 @@ export default function useAppFetch<T>(
     url: string,
     _options: UseFetchOptions<T> = {}
 ) {
-    const router = useRouter()
-    const { setTokens } = useAuthStore()
     const { $customFetch } = useNuxtApp()
 
     const config = useRuntimeConfig()
-    const tokensRefreshUrl = useEndpoints('refreshTokenUrl')
 
     const authStore = useAuthStore()
     const { accessToken, refreshToken } = storeToRefs(authStore)
@@ -41,10 +38,11 @@ export default function useAppFetch<T>(
                 }
 
                 // retry request
-                useFetch(url, {
-                    ...(options as UseFetchOptions<T>),
-                    $fetch: $customFetch,
-                })
+                $customFetch(url)
+                // useFetch(url, {
+                //     ...(options as UseFetchOptions<T>),
+                //     $fetch: $customFetch,
+                // })
             }
         },
     }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const route = useRoute()
+// const route = useRoute()
 
 definePageMeta({
     key: (route) => route.fullPath,
