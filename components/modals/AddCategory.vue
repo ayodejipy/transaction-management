@@ -12,15 +12,20 @@ const { addCategory } = useCategoryStore()
 const loading = ref<boolean>(false)
 
 const formElement = ref<HTMLFormElement | null>(null)
-const form: Partial<ITypes> = reactive({
-    name: '',
+const defaultFormState: Partial<ITypes> = {
+     name: '',
     description: '',
-})
+}
+const form: Partial<ITypes> = reactive({...defaultFormState })
 
 const isEnabled = computed<boolean>(() => !!form.name)
 
+const $resetForm = () => {
+    Object.assign(form, defaultFormState)
+}
+
 const onCloseModal = () => {
-    formElement.value?.clear()
+    $resetForm()
     isOpen.value = !isOpen.value
 }
 
@@ -37,6 +42,8 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
 				icon: 'i-heroicons-outline-check-badge',
 			})
 		}
+        // close and reset
+        onCloseModal()
     } catch {
         toast.add({
             title: 'Category Creation Failed',

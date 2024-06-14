@@ -1,14 +1,21 @@
 <script setup lang="ts">
+const route = useRoute()
+
+console.log({ route })
+
+const ADMIN_PATH = '/admin'
+const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PATH : '')
+
 const links = [
     {
         label: 'Reports',
         icon: 'ReportsIcon',
-        to: '/',
+        to: `${appendedUrl.value}`,
     },
     {
         label: 'Transactions',
         icon: 'TransactionsIcon',
-        to: '/transactions',
+        to: `${appendedUrl.value}/transactions`,
     },
     // {
     //     label: 'User Management',
@@ -18,7 +25,7 @@ const links = [
     {
         label: 'Settings',
         icon: 'SettingsIcon',
-        to: '/settings',
+        to: `${appendedUrl.value}/settings`,
     },
 ]
 

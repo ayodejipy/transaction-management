@@ -1,12 +1,8 @@
-// import { useStorage } from '@vueuse/core'
 import type { IAuthData } from '~/types'
 
 export const useAuthStore = defineStore('auth', () => {
     const TOKEN_KEY: string = 'opabid-accessToken'
     const { user } = storeToRefs(useUserStore())
-
-    // const defaultToken = ref<string>('')
-    // const accessToken = useStorage(TOKEN_KEY, '')
 
     const accessToken = useCookie('opabid-access', {
         maxAge: 60 * 60,
@@ -41,7 +37,7 @@ export const useAuthStore = defineStore('auth', () => {
 
             return data
         } catch (error) {
-            const errorData = getErrorObject(error)
+            const errorData = getErrorObject(error as Error)
             if (errorData?.status === 500 && errorData?.title === 'Timeout') {
                 user.value = null
                 setTokens(null, null)

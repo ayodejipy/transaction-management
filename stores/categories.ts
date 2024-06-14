@@ -4,19 +4,19 @@ export const useCategoryStore = defineStore('category', () => {
 	const categoriesUrl = useEndpoints('categoriesUrl')
     const categories = ref<ICategory[]>([])
 
-	async function getCategories() {
-		const { $customFetch } = useNuxtApp()
-		
-		const data = await $customFetch<TCategoryData>(categoriesUrl)
+	async function getCategories(): Promise<TCategoryData> {
+        const { $customFetch } = useNuxtApp()
 
-		if (data.success) {
-			categories.value = data.content as unknown as ICategory[]
-		}
+        const data = await $customFetch<TCategoryData>(categoriesUrl)
 
-       return data
-	}
+        if (data.success) {
+            categories.value = data.content as unknown as ICategory[]
+        }
+
+        return data
+    }
 	
-	async function addCategory(body: ICategory) {
+	async function addCategory(body: Partial<ICategory>): Promise<TCategoryData> {
         const { $customFetch } = useNuxtApp()
 
 		const data = await $customFetch<TCategoryData>(categoriesUrl, {

@@ -1,14 +1,7 @@
 import type { z } from 'zod'
 import type { IDataResponse } from "./api"
+import type { IUser } from './user'
 
-export interface IUser {
-	uid: string
-	type: string
-	email: string
-	firstName: string
-	lastName: string
-	phone: string
-}
 export interface ITokenData {
     token: string
     refreshToken: string

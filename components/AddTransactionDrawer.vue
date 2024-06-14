@@ -9,7 +9,7 @@ import type {
 
 const isOpen = defineModel({ type: Boolean, default: false })
 
-// const transactionStore = useTransactionStore()
+const { addTransaction } = useTransactionStore()
 
 const { categories } = storeToRefs(useCategoryStore())
 const { types } = storeToRefs(useTypeStore())
@@ -56,16 +56,16 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
     console.log({ event })
 
     try {
-        // const data = await addTransaction(event.data)
+        const data = await addTransaction(event.data)
 
-        // if (data.success) {
-        //     toast.add({
-        //         title: 'Transaction upload Successfully',
-        //         color: 'green',
-        //         description: "You've successfully uploaded a new transaction",
-        //         icon: 'i-heroicons-outline-check-badge',
-        //     })
-        // }
+        if (data.success) {
+            toast.add({
+                title: 'Transaction upload Successfully',
+                color: 'green',
+                description: "You've successfully uploaded a new transaction",
+                icon: 'i-heroicons-outline-check-badge',
+            })
+        }
     } catch {
         toast.add({
             title: 'Transaction Upload Failed',

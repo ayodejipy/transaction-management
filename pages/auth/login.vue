@@ -10,7 +10,6 @@ const router = useRouter()
 
 const { $customFetch } = useNuxtApp()
 
-const { user } = storeToRefs(useUserStore())
 const authStore = useAuthStore()
 
 const loading = ref<boolean>(false)
@@ -29,8 +28,6 @@ async function handleLogin() {
             body: form,
         })
         authStore.setTokens(data.content.token, data.content.refreshToken)
-
-        user.value = data.content.user
         router.push('/')
 
         toast.add({

@@ -9,7 +9,6 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const { accessToken, refreshToken } = storeToRefs(authStore)
-const { user } = storeToRefs(useUserStore())
 
 const router = useRouter()
 const route = useRoute()
@@ -43,7 +42,6 @@ async function handleAcceptInvite(event: FormSubmitEvent<TSchema>) {
             method: 'POST',
             body,
         })
-        user.value = data.content.user
 		accessToken.value = data.content.token
 		refreshToken.value = data.content.refreshToken
 
@@ -53,8 +51,6 @@ async function handleAcceptInvite(event: FormSubmitEvent<TSchema>) {
             description: 'Welcome onboard! Your account is ready',
             icon: 'i-heroicons-outline-check-badge',
 		})
-		
-		console.log({ data })
 		
 		router.push('/')
     } catch {
