@@ -2,12 +2,12 @@
 const links = [
     {
         label: 'Reports',
-        icon: 'ReportIcon',
+        icon: 'ReportsIcon',
         to: '/',
     },
     {
         label: 'Transactions',
-        icon: 'i-heroicons-chart-bar',
+        icon: 'TransactionsIcon',
         to: '/transactions',
     },
     // {
@@ -17,7 +17,7 @@ const links = [
     // },
     {
         label: 'Settings',
-        icon: 'i-heroicons-cog-8-tooth',
+        icon: 'SettingsIcon',
         to: '/settings',
     },
 ]
@@ -63,7 +63,11 @@ const links = [
                                 'text-icon-gray/80 dark:text-gray-500 group-hover:text-white/80 dark:group-hover:text-gray-200',
                         },
                     }"
-                />
+                >
+                    <template #icon="{ link }">
+                        <Icon class="w-5 h-6 text-icon-gray/80 dark:text-gray-500 group-hover:text-white/80 dark:group-hover:text-gray-200" :name="link.icon" />
+                    </template>
+                </UVerticalNavigation>
 
                 <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li

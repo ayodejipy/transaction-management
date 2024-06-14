@@ -23,14 +23,19 @@ const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
 
 // Total revenue
 const { data: revenue } =
-    await useAppFetch<IDataResponse<number | undefined>>(revenueUrl)
+    await useAppFetch<IDataResponse<number | undefined>>(revenueUrl, {
+        pick: [ 'content' ]
+    })
+
 const totalRevenue = computed(() => {
     const amount = revenue.value?.content
     return amount ? formatCurrency(amount) : 0
 })
 
 // Totals e.g; credit, debit
-const { data: total } = await useAppFetch<ITotalTransaction>(totalStatsUrl)
+const { data: total } = await useAppFetch<ITotalTransaction>(totalStatsUrl, {
+    pick: [ 'content' ]
+})
 
 const statistics = computed(() => [
     {
@@ -71,10 +76,6 @@ const monthsSeries = computed(() =>
 const amountsSeries = computed(() =>
     totalPerMonth.value?.content.map((month) => month.netTotal.toString())
 )
-
-// transaction categories and types
-await categoryStore.getCategories()
-await typeStore.getTypes()
 
 const columns = [
     {
@@ -212,6 +213,12 @@ const uiConfig = computed(() => ({
         padding: 'px-0 sm:px-6',
     },
 }))
+
+onMounted(async () => {
+    // transaction categories and types
+    await categoryStore.getCategories()
+    await typeStore.getTypes()
+})
 </script>
 
 <template>

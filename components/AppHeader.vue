@@ -86,8 +86,8 @@ const items = [
                                     class="flex items-center gap-1.5"
                                 >
                                     <UAvatar
-                                        src="https://avatars.githubusercontent.com/u/739984?v=4"
                                         size="md"
+                                        :alt="fullname"
                                         :ui="{
                                             rounded:
                                                 'rounded-full ring-1 ring-green-500',
