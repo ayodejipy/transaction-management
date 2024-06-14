@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent, FormErrorEvent } from '#ui/types'
+import type { FormSubmitEvent } from '#ui/types'
 
 import type { ITypes, TransactionTypeSchemaType } from '~/types'
 

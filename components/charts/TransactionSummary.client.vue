@@ -27,7 +27,6 @@ const options = reactive({
                     total: {
                         showAlways: true,
                         show: true,
-                        // @ts-ignore
                         formatter: function (w) {
                             const totalSum = w.globals.seriesTotals.reduce(
                                 (a: number, b: number) => {

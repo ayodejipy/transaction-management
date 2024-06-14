@@ -9,7 +9,7 @@ import type {
 
 const isOpen = defineModel({ type: Boolean, default: false })
 
-const transactionStore = useTransactionStore()
+// const transactionStore = useTransactionStore()
 
 const { categories } = storeToRefs(useCategoryStore())
 const { types } = storeToRefs(useTypeStore())
