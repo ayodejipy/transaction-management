@@ -179,6 +179,6 @@ watch(
             </AppTable>
         </section>
 
-        <ModalsAddCategory v-model="isOpen" />
+        <ModalsAddCategory v-model="isOpen" :refresh />
     </section>
 </template>

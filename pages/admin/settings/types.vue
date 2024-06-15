@@ -32,39 +32,6 @@ const columns: IColumn[] = [
     },
 ]
 
-const categories = [
-    {
-        id: 1233,
-        name: 'Income',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1234,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-]
-
 const actionOptions = (row: TActiveType) => [
     {
         label: 'Edit',
@@ -76,7 +43,7 @@ const actionOptions = (row: TActiveType) => [
         label: 'Delete',
         color: 'red',
         icon: 'i-heroicons-trash-20-solid',
-        click: () => onDeleteCategory(row.id),
+        click: () => onDelete(row.id),
     },
 ]
 
@@ -85,7 +52,7 @@ function toggleEdit(item: TActiveType) {
     type.value = item
 }
 
-async function onDeleteCategory(id: number) {
+async function onDelete(id: number) {
     try {
         const data = await deleteType(id)
         if (data.success) {
@@ -159,7 +126,7 @@ watch(
                             rounded: 'rounded-full',
                         }"
                     >
-                        {{ categories.length }}
+                        {{ types.length }}
                     </UBadge>
                 </div>
                 <div class="flex items-center gap-2.5">

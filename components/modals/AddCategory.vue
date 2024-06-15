@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from '#ui/types'
-
 import type { ITypes, TransactionTypeSchemaType } from '~/types'
+
+const props = defineProps<{
+    refresh: () => Promise<void> | void
+}>()
 
 const isOpen = defineModel({ type: Boolean, default: false })
 
@@ -21,6 +24,7 @@ const defaultFormState: Partial<ITypes> = {
 const form: Partial<ITypes> = reactive({ ...defaultFormState })
 
 const isEnabled = computed<boolean>(() => !!form.name)
+const buttonText = computed(() => category.value?.id ? 'Edit category' : 'Create category')
 
 const $resetForm = () => {
     Object.assign(form, defaultFormState)
@@ -46,6 +50,7 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
                 icon: 'i-heroicons-outline-check-badge',
             })
 
+            await props.refresh()
             // close and reset
             onCloseModal()
         }
@@ -158,7 +163,7 @@ watch(category, (data) => {
                                 font: 'font-semibold',
                             }"
                         >
-                            Create category
+                            {{ buttonText }}
                         </UButton>
                     </div>
                 </UForm>

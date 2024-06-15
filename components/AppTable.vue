@@ -1,9 +1,17 @@
-<script setup lang="ts">
+<script
+    setup
+    lang="ts"
+    generic="
+        T extends {
+            [key: string]: any
+        }[]
+    "
+>
 import type { IColumn } from '~/types'
 
 interface IProps {
     columns: IColumn[]
-    data: []
+    data: T[]
     loading: boolean
     paginate?: boolean
 }
