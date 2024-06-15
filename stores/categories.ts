@@ -2,7 +2,9 @@ import type { ICategory, TCategoryData } from '~/types'
 
 export const useCategoryStore = defineStore('category', () => {
 	const categoriesUrl = useEndpoints('categoriesUrl')
-    const categories = ref<ICategory[]>([])
+    const categories = ref<Omit<ICategory, 'isDeleted'>[]>([])
+
+    const category = ref<Omit<ICategory, 'isDeleted'> | null>(null)
 
 	async function getCategories(): Promise<TCategoryData> {
         const { $customFetch } = useNuxtApp()
@@ -27,9 +29,37 @@ export const useCategoryStore = defineStore('category', () => {
        return data
     }
 
+	async function updateCategory(
+        id: number,
+        body: Partial<ICategory>
+    ): Promise<TCategoryData> {
+        const { $customFetch } = useNuxtApp()
+
+        const data = await $customFetch<TCategoryData>(
+            `${categoriesUrl}/${id}/update`,
+            {
+                method: 'POST',
+                body,
+            }
+        )
+
+        return data
+    }
+
+	async function deleteCategory(id: number): Promise<TCategoryData> {
+        const { $customFetch } = useNuxtApp()
+
+		const data = await $customFetch<TCategoryData>(`${categoriesUrl}/${id}/remove`)
+
+       return data
+    }
+
 	return {
+        category,
         categories,
-		getCategories,
+        getCategories,
         addCategory,
+        updateCategory,
+        deleteCategory,
     }
 })

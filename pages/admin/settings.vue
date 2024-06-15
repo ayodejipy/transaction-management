@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// const route = useRoute()
+const route = useRoute()
 
 definePageMeta({
     key: (route) => route.fullPath,
@@ -7,26 +7,29 @@ definePageMeta({
     middleware: 'auth'
 })
 
+const ADMIN_PATH = '/admin'
+const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PATH : '')
+
 const links = [
     {
         label: 'Account',
         icon: 'i-heroicons-home',
-        to: '/settings',
+        to: `${appendedUrl.value}/settings`,
     },
     {
         label: 'User Management',
         icon: 'i-heroicons-chart-bar',
-        to: '/settings/users',
+        to: `${appendedUrl.value}/settings/users`,
     },
     {
         label: 'Categories',
         icon: 'i-heroicons-chart-bar',
-        to: '/settings/categories',
+        to: `${appendedUrl.value}/settings/categories`,
     },
     {
         label: 'Types',
         icon: 'i-heroicons-chart-bar',
-        to: '/settings/types',
+        to: `${appendedUrl.value}/settings/types`,
     },
 ]
 </script>

@@ -6,17 +6,19 @@ import type { ITypes, TransactionTypeSchemaType } from '~/types'
 const isOpen = defineModel({ type: Boolean, default: false })
 
 const toast = useToast()
-const { addCategory } = useCategoryStore()
+const categoryStore = useCategoryStore()
+const { addCategory, updateCategory } = categoryStore
+const { category } = storeToRefs(categoryStore)
 
 // const isError = ref<boolean>(false)
 const loading = ref<boolean>(false)
 
 const formElement = ref<HTMLFormElement | null>(null)
 const defaultFormState: Partial<ITypes> = {
-     name: '',
+    name: '',
     description: '',
 }
-const form: Partial<ITypes> = reactive({...defaultFormState })
+const form: Partial<ITypes> = reactive({ ...defaultFormState })
 
 const isEnabled = computed<boolean>(() => !!form.name)
 
@@ -30,20 +32,23 @@ const onCloseModal = () => {
 }
 
 async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
-	loading.value = true 
-	try {
-		const data = await addCategory(event.data)
+    loading.value = true
+    const categoryId = category.value?.id
+    try {
+        const data = categoryId ? await updateCategory(categoryId, event.data) : await addCategory(event.data)
 
-		if (data.success) {
-			toast.add({
-				title: 'Category created Successfully',
-				color: 'green',
-				description: "You've successfully added a new transaction category",
-				icon: 'i-heroicons-outline-check-badge',
-			})
-		}
-        // close and reset
-        onCloseModal()
+        if (data.success) {
+            toast.add({
+                title: 'Category created Successfully',
+                color: 'green',
+                description:
+                    "You've successfully added a new transaction category",
+                icon: 'i-heroicons-outline-check-badge',
+            })
+
+            // close and reset
+            onCloseModal()
+        }
     } catch {
         toast.add({
             title: 'Category Creation Failed',
@@ -56,6 +61,12 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
         loading.value = !loading.value
     }
 }
+
+watch(category, (data) => {
+    if (data) {
+        Object.assign(form, data)
+    }
+})
 </script>
 
 <template>
@@ -92,13 +103,13 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
             </template>
 
             <div class="w-full">
-				<UForm
-					ref="formElement"
-					:schema="TransactionTypeSchema"
-					:state="form"
-					class="space-y-6"
-					@submit="onSubmit"
-				>
+                <UForm
+                    ref="formElement"
+                    :schema="TransactionTypeSchema"
+                    :state="form"
+                    class="space-y-6"
+                    @submit="onSubmit"
+                >
                     <UFormGroup size="xl" label="Name" name="name">
                         <UInput
                             v-model="form.name"
@@ -119,35 +130,37 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
                         />
                     </UFormGroup>
 
-					 <div class="sm:mt-8 sm:pt-4 border-t border-gray-200 flex justify-between items-center">
-						<UButton
-							size="xl"
-							color="gray"
-							variant="outline"
-							padding="md"
-							:ui="{
-								rounded: 'rounded-lg',
-								font: 'font-semibold',
-							}"
-							@click="onCloseModal"
-						>
-							Cancel
-						</UButton>
+                    <div
+                        class="sm:mt-8 sm:pt-4 border-t border-gray-200 flex justify-between items-center"
+                    >
+                        <UButton
+                            size="xl"
+                            color="gray"
+                            variant="outline"
+                            padding="md"
+                            :ui="{
+                                rounded: 'rounded-lg',
+                                font: 'font-semibold',
+                            }"
+                            @click="onCloseModal"
+                        >
+                            Cancel
+                        </UButton>
 
-						<UButton
-							type="submit"
-							:loading
-							size="xl"
-							padding="md"
-							:disabled="!isEnabled"
-							:ui="{
-								rounded: 'rounded-lg',
-								font: 'font-semibold',
-							}"
-						>
-							Create category
-						</UButton>
-					</div>
+                        <UButton
+                            type="submit"
+                            :loading
+                            size="xl"
+                            padding="md"
+                            :disabled="!isEnabled"
+                            :ui="{
+                                rounded: 'rounded-lg',
+                                font: 'font-semibold',
+                            }"
+                        >
+                            Create category
+                        </UButton>
+                    </div>
                 </UForm>
             </div>
 

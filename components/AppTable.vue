@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import type { IColumn } from '~/types';
+import type { IColumn } from '~/types'
 
 interface IProps {
     columns: IColumn[]
     data: []
+    loading: boolean
     paginate?: boolean
 }
 
 const props = withDefaults(defineProps<IProps>(), {
     columns: () => [],
     data: () => [],
+    loading: false,
     paginate: true,
 })
 
@@ -42,6 +44,7 @@ const rows = computed(() => {
         <UTable
             :columns
             :rows
+            :loading
             class="w-full"
             :ui="{
                 th: {
@@ -58,7 +61,11 @@ const rows = computed(() => {
                     size: 'text-sm',
                 },
             }"
-        />
+        >
+            <template v-if="$slots.actions" #actions-data="{ row }">
+                <slot name="actions" :row="row" />
+            </template>
+        </UTable>
 
         <div
             v-if="paginate"

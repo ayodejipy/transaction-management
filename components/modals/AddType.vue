@@ -1,12 +1,17 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from '#ui/types'
-
 import type { ITypes, TransactionTypeSchemaType } from '~/types'
+
+const props = defineProps<{
+    refreshTypes: () => Promise<void> | void
+}>()
 
 const isOpen = defineModel({ type: Boolean, default: false })
 
 const toast = useToast()
-const { addType } = useTypeStore()
+const typeStore = useTypeStore()
+const { addType, updateType } = typeStore
+const { type } = storeToRefs(typeStore)
 
 // const isError = ref<boolean>(false)
 const loading = ref<boolean>(false)
@@ -18,30 +23,34 @@ const form: Partial<ITypes> = reactive({
 })
 
 const isEnabled = computed<boolean>(() => !!form.name)
+const buttonText = computed(() => type.value?.id ? 'Edit type' : 'Create type')
 
 const onCloseModal = () => {
     formElement.value?.clear()
+    Object.assign(form, {name: '', description: ''})
     isOpen.value = !isOpen.value
 }
 
 async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
-	loading.value = true 
+	loading.value = true
+    const typeId = type.value?.id
 	try {
-		const data = await addType(event.data)
+		const data = typeId ? await updateType(typeId, event.data) : await addType(event.data)
 
 		if (data.success) {
 			toast.add({
-				title: 'Type created Successfully',
+				title: `Type ${typeId ? 'updated': 'created'} Successfully`,
 				color: 'green',
-				description: "You've successfully added a new transaction type",
 				icon: 'i-heroicons-outline-check-badge',
-			})
+            })
+
+            await props.refreshTypes();
+            onCloseModal()
 		}
     } catch {
         toast.add({
             title: 'Failed',
             color: 'red',
-            description: 'Unable to create your type at this moment.',
             icon: 'i-heroicons-outline-exclaimation-circle',
         })
         // throw new Error('Failed authenticate user. Please try again.')
@@ -49,6 +58,12 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
         loading.value = !loading.value
     }
 }
+
+watch(type, (data) => {
+    if (data) {
+        Object.assign(form, data)
+    }
+})
 </script>
 
 <template>
@@ -138,7 +153,7 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
 								font: 'font-semibold',
 							}"
 						>
-							Create type
+							{{ buttonText }}
 						</UButton>
 					</div>
                 </UForm>

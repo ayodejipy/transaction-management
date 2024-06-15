@@ -1,8 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
 
-console.log({ route })
-
 const ADMIN_PATH = '/admin'
 const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PATH : '')
 

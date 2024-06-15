@@ -1,11 +1,11 @@
-import type { ITypes, TTypeData } from '~/types'
+import type { ITypes, TActiveType, TTypeData } from '~/types'
 
 export const useTypeStore = defineStore('type', () => {
-	const typesUrl = useEndpoints('typesUrl')
-	const type = ref<ITypes | null>(null)
-	const types = ref<ITypes[]>([])
+    const typesUrl = useEndpoints('typesUrl')
+    const type = ref<TActiveType | null>(null)
+    const types = ref<TActiveType[]>([])
 
-	async function getTypes() {
+    async function getTypes() {
         const { $customFetch } = useNuxtApp()
 
         const data = await $customFetch<TTypeData>(typesUrl)
@@ -16,8 +16,8 @@ export const useTypeStore = defineStore('type', () => {
 
         return data
     }
-	
-	async function addType(body: Partial<ITypes>): Promise<TTypeData> {
+
+    async function addType(body: Partial<ITypes>): Promise<TTypeData> {
         const { $customFetch } = useNuxtApp()
 
         const data = await $customFetch<TTypeData>(typesUrl, {
@@ -28,10 +28,34 @@ export const useTypeStore = defineStore('type', () => {
         return data
     }
 
-	return {
-		type,
+    async function updateType(
+        id: number,
+        body: Partial<ITypes>
+    ): Promise<TTypeData> {
+        const { $customFetch } = useNuxtApp()
+
+        const data = await $customFetch<TTypeData>(`${typesUrl}/${id}/update`, {
+            method: 'POST',
+            body,
+        })
+
+        return data
+    }
+
+    async function deleteType(id: number): Promise<TTypeData> {
+        const { $customFetch } = useNuxtApp()
+
+        const data = await $customFetch<TTypeData>(`${typesUrl}/${id}/remove`)
+
+        return data
+    }
+
+    return {
+        type,
         types,
-		getTypes,
+        getTypes,
         addType,
+        updateType,
+        deleteType,
     }
 })

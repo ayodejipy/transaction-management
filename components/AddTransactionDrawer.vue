@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '#ui/types'
+
 import type {
     AddTransactionSchemaType,
     ICategory,
@@ -9,14 +10,11 @@ import type {
 
 const isOpen = defineModel({ type: Boolean, default: false })
 
+const toast = useToast()
 const { addTransaction } = useTransactionStore()
 
 const { categories } = storeToRefs(useCategoryStore())
 const { types } = storeToRefs(useTypeStore())
-
-const toast = useToast()
-
-const formElement = ref(null)
 
 // types
 const transactionTypes = computed(() =>
@@ -39,24 +37,25 @@ const defaultFormState: ITransaction = {
     transactionDate: '',
     description: '',
 }
-const form: ITransaction = reactive({...defaultFormState })
+const form: ITransaction = reactive({ ...defaultFormState })
 
-const resetForm = () => {
-  Object.assign(form, defaultFormState);
-};
+const $resetForm = () => {
+    Object.assign(form, defaultFormState)
+}
 
 const onCloseSlide = () => {
-    console.log('__form elem:___ ', formElement.value)
-    resetForm()
+    $resetForm()
     isOpen.value = !isOpen.value
 }
 
 async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
-    // loading.value = true
+    loading.value = true
     console.log({ event })
 
     try {
         const data = await addTransaction(event.data)
+
+        console.log({ data })
 
         if (data.success) {
             toast.add({
@@ -65,12 +64,15 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
                 description: "You've successfully uploaded a new transaction",
                 icon: 'i-heroicons-outline-check-badge',
             })
+
+            onCloseSlide()
         }
     } catch {
         toast.add({
             title: 'Transaction Upload Failed',
             color: 'red',
-            description: 'Sorry, we are unable to upload your transaction at this moment.',
+            description:
+                'Sorry, we are unable to upload your transaction at this moment.',
             icon: 'i-heroicons-outline-exclaimation-circle',
         })
         throw new Error('Failed add a ew transaction. Please try again.')
@@ -116,7 +118,6 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
 
                 <div class="space-y-4">
                     <UForm
-                        ref="formElement"
                         :schema="AddTransactionSchema"
                         :state="form"
                         class="space-y-6"
@@ -185,9 +186,9 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
 
                             <UButton
                                 type="submit"
+                                :loading
                                 size="xl"
                                 padding="md"
-                                :loading
                                 :ui="{
                                     base: 'bg-brand-green',
                                     rounded: 'rounded-lg',

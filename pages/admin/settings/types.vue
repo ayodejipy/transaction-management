@@ -1,22 +1,20 @@
 <script setup lang="ts">
+import type { IColumn, ITypes, TActiveType, ITypesData } from '~/types'
+
 const isOpen = ref<boolean>(false)
 
+const toast = useToast()
+const typesUrl = useEndpoints('typesUrl')
 
-// const uiConfig = computed(() => ({
-//     placeholder: 'text-icon-gray dark:text-gray-500',
-//     rounded: 'rounded-full',
-//     color: {
-//         white: {
-//             outline:
-//                 'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
-//         },
-//     },
-//     icon: {
-//         base: 'text-icon-gray dark:text-gray-500',
-//     },
-// }))
+const typeStore = useTypeStore()
+const { deleteType } = typeStore
+const { types, type } = storeToRefs(typeStore)
 
-const columns = [
+const { data, pending, refresh } = await useAppFetch<ITypesData>(typesUrl, {
+    pick: ['content', 'status'],
+})
+
+const columns: IColumn[] = [
     {
         key: 'id',
         label: 'ID',
@@ -28,6 +26,9 @@ const columns = [
     {
         key: 'description',
         label: 'Description',
+    },
+    {
+        key: 'actions',
     },
 ]
 
@@ -64,6 +65,67 @@ const categories = [
     },
 ]
 
+const actionOptions = (row: TActiveType) => [
+    {
+        label: 'Edit',
+        icon: 'i-heroicons-pencil-square-20-solid',
+        color: 'gray',
+        click: () => toggleEdit(row),
+    },
+    {
+        label: 'Delete',
+        color: 'red',
+        icon: 'i-heroicons-trash-20-solid',
+        click: () => onDeleteCategory(row.id),
+    },
+]
+
+function toggleEdit(item: TActiveType) {
+    isOpen.value = !isOpen.value
+    type.value = item
+}
+
+async function onDeleteCategory(id: number) {
+    try {
+        const data = await deleteType(id)
+        if (data.success) {
+            toast.add({
+                title: 'Type deleted Successfully',
+                color: 'green',
+                icon: 'i-heroicons-outline-check-badge',
+            })
+            await refresh()
+        }
+    } catch {
+        toast.add({
+            title: 'Deletion Failed.',
+            color: 'red',
+            icon: 'i-heroicons-outline-exclaimation-circle',
+        })
+    }
+}
+
+function getActiveTypes(toFilterTypes: ITypes[]) {
+    types.value = toFilterTypes
+        .filter((type: ITypes) => !type.isDeleted)
+        .map((type: ITypes) => ({
+            id: type.id,
+            name: type.name,
+            description: type.description,
+        }))
+}
+
+watch(
+    data,
+    async (newData) => {
+        if (newData && newData.content) {
+            getActiveTypes(newData.content)
+        } else {
+            await refresh()
+        }
+    },
+    { immediate: true }
+)
 </script>
 
 <template>
@@ -127,9 +189,27 @@ const categories = [
                 </div>
             </div>
 
-            <AppTable :columns :data="categories" />
+            <AppTable :loading="pending" :columns :data="types">
+                <template #actions="{ row }">
+                    <div class="flex items-center gap-2">
+                        <UButton
+                            v-for="{
+                                label,
+                                color,
+                                icon,
+                                click,
+                            } in actionOptions(row)"
+                            :key="label"
+                            :color
+                            variant="ghost"
+                            :icon
+                            @click="click"
+                        />
+                    </div>
+                </template>
+            </AppTable>
         </section>
 
-        <ModalsAddType v-model="isOpen" />
+        <ModalsAddType v-model="isOpen" :refresh-types="refresh" />
     </section>
 </template>

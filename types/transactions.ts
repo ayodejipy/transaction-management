@@ -23,11 +23,14 @@ export interface ITypes {
     toSubtract: boolean
     isDeleted: boolean
 }
+
+export type TActiveType = Omit<ITypes, 'isDeleted' | 'toSubtract'>
+
 export interface ICategory {
     id: number
     name: string
-    description?: string
-    isDeleted?: boolean
+    description: string
+    isDeleted: boolean
 }
 
 export interface TotalTransactionType {
@@ -54,8 +57,10 @@ export type AddTransactionSchemaType = z.output<typeof AddTransactionSchema>
 export interface ITransactionData extends IDataResponse<ITransaction> {}
 
 export interface TCategoryData extends IDataResponse<ICategory> {}
+export interface ICategoriesData extends IDataResponse<ICategory[]> {}
 
 export interface TTypeData extends IDataResponse<ITypes> {}
+export interface ITypesData extends IDataResponse<ITypes[]> {}
 
 export interface ITotalTransaction
     extends IDataResponse<TotalTransactionType> {}

@@ -1,8 +1,25 @@
 <script setup lang="ts">
+import type { ICategoriesData, ICategory, IColumn } from '~/types'
+
+const toast = useToast()
+
 const isOpen = ref<boolean>(false)
+const activeCategories = ref<Omit<ICategory, 'isDeleted'>[]>([])
 
+const categoriesUrl = useEndpoints('categoriesUrl')
 
-const columns = [
+const categoryStore = useCategoryStore()
+const { deleteCategory } = categoryStore
+const { category } = storeToRefs(categoryStore)
+
+const { data, pending, refresh } = await useAppFetch<ICategoriesData>(
+    categoriesUrl,
+    {
+        pick: ['content', 'status'],
+    }
+)
+
+const columns: IColumn[] = [
     {
         key: 'id',
         label: 'ID',
@@ -15,41 +32,77 @@ const columns = [
         key: 'description',
         label: 'Description',
     },
-]
-
-const categories = [
     {
-        id: 1233,
-        name: 'Income',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1234,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        name: 'Expenditure',
-        description: 'Books and stationery supplies',
+        key: 'actions',
     },
 ]
 
+const actionOptions = (row: Omit<ICategory, 'isDeleted'>) => [
+    [
+        {
+            label: 'Edit',
+            icon: 'i-heroicons-pencil-square-20-solid',
+            click: () => toggleEdit(row),
+        },
+    ],
+    [
+        {
+            label: 'Delete',
+            icon: 'i-heroicons-trash-20-solid',
+            click: () => onDeleteCategory(row.id),
+        },
+    ],
+]
+
+async function onDeleteCategory(id: number) {
+    try{
+        const data = await deleteCategory(id)
+        if (data.success) {
+            toast.add({
+                title: 'Category deleted Successfully',
+                color: 'green',
+                description:
+                    "You've successfully removed a transaction category",
+                icon: 'i-heroicons-outline-check-badge',
+            })
+            await refresh()
+        }
+    } catch {
+        toast.add({
+            title: 'Deletion Failed.',
+            color: 'red',
+            description: 'Unable to delete your category at this moment.',
+            icon: 'i-heroicons-outline-exclaimation-circle',
+        })
+    }
+}
+
+function toggleEdit(item: Omit<ICategory, 'isDeleted'>) {
+    isOpen.value = !isOpen.value
+    category.value = item
+}
+
+function getActiveCategories(categories: ICategory[]) {
+    activeCategories.value = categories
+        .filter((category: ICategory) => !category.isDeleted)
+        .map((category: ICategory) => ({
+            id: category.id,
+            name: category.name,
+            description: category.description,
+        }))
+}
+
+watch(
+    data,
+    async (newData) => {
+        if (newData && newData.content) {
+            getActiveCategories(newData.content)
+        } else {
+            await refresh()
+        }
+    },
+    { immediate: true }
+)
 </script>
 
 <template>
@@ -83,7 +136,7 @@ const categories = [
                             rounded: 'rounded-full',
                         }"
                     >
-                        {{ categories.length }}
+                        {{ activeCategories.length }}
                     </UBadge>
                 </div>
                 <div class="flex items-center gap-2.5">
@@ -113,7 +166,17 @@ const categories = [
                 </div>
             </div>
 
-            <AppTable :columns :data="categories" />
+            <AppTable :loading="pending" :columns :data="activeCategories">
+                <template #actions="{ row }">
+                    <UDropdown :items="actionOptions(row)">
+                        <UButton
+                            color="gray"
+                            variant="ghost"
+                            icon="i-heroicons-ellipsis-horizontal-20-solid"
+                        />
+                    </UDropdown>
+                </template>
+            </AppTable>
         </section>
 
         <ModalsAddCategory v-model="isOpen" />
