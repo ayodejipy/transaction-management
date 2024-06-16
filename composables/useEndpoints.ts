@@ -1,6 +1,7 @@
 export default function useEndpoints(key: string) {
 	const apiUrls: Record<string, string> = {
-		'authUrl': '/auth/token',
+		'authUrl': '/auth',
+		'loginUrl': '/auth/token',
 		'refreshTokenUrl': '/auth/refresh-token',
 		'forgotPasswordUrl': '/auth/forgot-password',
 		'resetPasswordUrl': '/auth/reset-password',

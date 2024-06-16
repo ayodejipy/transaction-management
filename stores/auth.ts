@@ -1,7 +1,7 @@
 import type { IAuthData } from '~/types'
 
 export const useAuthStore = defineStore('auth', () => {
-    const TOKEN_KEY: string = 'opabid-accessToken'
+    // const TOKEN_KEY: string = 'opabid-accessToken'
     const { user } = storeToRefs(useUserStore())
 
     const accessToken = useCookie('opabid-access', {
@@ -48,15 +48,20 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    function handleLogout(): void {
+    async function handleLogout() {
         const router = useRouter()
+        // const { $customFetch } = useNuxtApp()
+        // const authUrl = useEndpoints('authUrl')
+
+        // const data = await $customFetch<IAuthData>(
+        //     `${authUrl}/${ref}/logout`
+        // )
         setTokens(null, null)
         user.value = null
         router.push('/auth/login')
     }
 
     return {
-        TOKEN_KEY,
         accessToken,
         refreshToken,
         isAuthenticated,

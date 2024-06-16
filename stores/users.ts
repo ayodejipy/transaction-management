@@ -6,6 +6,8 @@ export const useUserStore = defineStore(
         const userProfileUrl = useEndpoints('userProfileUrl')
         const user = ref<IUser | null>(null)
 
+        const isAdmin = computed(() => user.value?.type === 'admin')
+
         async function getProfile(): Promise<IUserData> {
             const { $customFetch } = useNuxtApp()
 
@@ -18,7 +20,7 @@ export const useUserStore = defineStore(
             return data
         }
 
-        return { user, getProfile }
+        return { user, isAdmin, getProfile }
     },
     {
         persist: {

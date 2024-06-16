@@ -2,9 +2,7 @@
     setup
     lang="ts"
     generic="
-        T extends {
-            [key: string]: any
-        }[]
+        T extends Record<string, string | number>
     "
 >
 import type { IColumn } from '~/types'
@@ -12,7 +10,7 @@ import type { IColumn } from '~/types'
 interface IProps {
     columns: IColumn[]
     data: T[]
-    loading: boolean
+    loading?: boolean
     paginate?: boolean
 }
 

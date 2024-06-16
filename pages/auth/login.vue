@@ -21,14 +21,14 @@ const form = reactive({
 
 async function handleLogin() {
     loading.value = true
-    const authUrl = useEndpoints('authUrl')
+    const loginUrl = useEndpoints('loginUrl')
     try {
-        const data = await $customFetch<IAuthData>(authUrl, {
+        const data = await $customFetch<IAuthData>(loginUrl, {
             method: 'POST',
             body: form,
         })
         authStore.setTokens(data.content.token, data.content.refreshToken)
-        router.push('/')
+        router.push('/admin')
 
         toast.add({
             title: 'Login Successful',

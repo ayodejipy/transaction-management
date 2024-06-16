@@ -1,4 +1,8 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
+    const LOGIN_PATH = '/auth/login'
+    // const ADMIN_PATH = '/admin'
+    // const USER_PATH = '/'
+
     const authStore = useAuthStore()
     const { isAuthenticated } = storeToRefs(authStore)
 
@@ -12,10 +16,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
 
     console.log('from: ', from)
-
-    const LOGIN_PATH = '/auth/login'
-
+        
     if (to.path !== LOGIN_PATH && !isAuthenticated.value) {
         return navigateTo(LOGIN_PATH)
-    }
+    } 
 })

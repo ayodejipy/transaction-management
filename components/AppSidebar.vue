@@ -1,31 +1,44 @@
 <script setup lang="ts">
-const route = useRoute()
+// const route = useRoute()
+
+const { isAdmin } = storeToRefs(useUserStore())
 
 const ADMIN_PATH = '/admin'
-const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PATH : '')
+const appendedUrl = computed(() => (isAdmin.value ? ADMIN_PATH : ''))
 
-const links = [
-    {
-        label: 'Reports',
-        icon: 'ReportsIcon',
-        to: `${appendedUrl.value}`,
-    },
-    {
-        label: 'Transactions',
-        icon: 'TransactionsIcon',
-        to: `${appendedUrl.value}/transactions`,
-    },
-    // {
-    //     label: 'User Management',
-    //     icon: 'i-ph-users-three-light',
-    //     to: '/components/command-palette',
-    // },
-    {
-        label: 'Settings',
-        icon: 'SettingsIcon',
-        to: `${appendedUrl.value}/settings`,
-    },
-]
+const roleBasedLinks = computed(() => {
+    if (isAdmin.value) {
+        return [
+            {
+                label: 'Reports',
+                icon: 'ReportsIcon',
+                to: `${appendedUrl.value}`,
+            },
+            {
+                label: 'Transactions',
+                icon: 'TransactionsIcon',
+                to: `${appendedUrl.value}/transactions`,
+            },
+            {
+                label: 'Settings',
+                icon: 'SettingsIcon',
+                to: `${appendedUrl.value}/settings`,
+            },
+        ]
+    }
+    return [
+        {
+            label: 'Dashboard',
+            icon: 'i-ph-users-three-light',
+            to: '/',
+        },
+        {
+            label: 'Transactions',
+            icon: 'TransactionsIcon',
+            to: '/transactions',
+        },
+    ]
+})
 
 // const userNavigation = [
 //     { name: 'Your profile', href: '#' },
@@ -52,27 +65,17 @@ const links = [
                 </ClientOnly>
             </div>
             <div class="flex flex-1 flex-col pt-6">
-                <UVerticalNavigation
-                    :links="links"
-                    :ui="{
-                        base: 'flex items-center gap-2.5 mb-4',
-                        padding: 'px-2.5 py-2.5',
-                        active: 'text-white/80 dark:text-white before:bg-brand-green dark:before:bg-gray-800',
-                        inactive:
-                            'text-gray-600 dark:text-gray-400 hover:text-gray-100 dark:hover:text-white hover:before:bg-brand-green dark:hover:before:bg-green-800/50',
-                        label: 'truncate relative font-semibold',
-                        size: 'text-base',
-                        icon: {
-                            active: 'text-white/80 dark:text-gray-200',
-                            inactive:
-                                'text-icon-gray/80 dark:text-gray-500 group-hover:text-white/80 dark:group-hover:text-gray-200',
-                        },
-                    }"
-                >
-                    <template #icon="{ link }">
-                        <Icon class="w-5 h-6 text-icon-gray/80 dark:text-gray-500 group-hover:text-white/80 dark:group-hover:text-gray-200" :name="link.icon" />
+                <ClientOnly fallback-tag="div">
+                    <NavigationLinks :links="roleBasedLinks" />
+
+                    <template #fallback>
+                        <div class="space-y-6">
+                            <USkeleton class="h-8 w-40" />
+                            <USkeleton class="h-8 w-40" />
+                            <USkeleton class="h-8 w-40" />
+                        </div>
                     </template>
-                </UVerticalNavigation>
+                </ClientOnly>
 
                 <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li

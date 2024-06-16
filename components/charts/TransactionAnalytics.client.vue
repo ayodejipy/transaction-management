@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{
-    categories: string[]
-    series: string[]
+    categories: string[] | undefined
+    series: string[] | undefined
 }>()
 
 const DEFAULT_CATEGORIES = [
@@ -45,7 +45,7 @@ const options = reactive({
         title: {
             text: 'Month',
         },
-        categories: props.categories || DEFAULT_CATEGORIES
+        categories: props.categories ?? DEFAULT_CATEGORIES
     },
     yaxis: {
         title: {
@@ -74,7 +74,7 @@ const options = reactive({
 const series = ref([
     {
         name: 'Transactions',
-        data: props.series || DEFAULT_SERIES,
+        data: props.series ?? DEFAULT_SERIES,
     },
 ])
 </script>
