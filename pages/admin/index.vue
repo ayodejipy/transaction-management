@@ -68,7 +68,7 @@ const series = computed(() => [
 ])
 
 // Total transactions per month: Jan, Feb...
-const { pending: loadingTransactions, data: totalPerMonth } =
+const { pending: loadingTotalPerMonth, data: totalPerMonth } =
     await useAppFetch<IMonthlyTotal>(monthlyStatsUrl, { lazy: true })
 
 const monthsSeries = computed(() =>
@@ -83,7 +83,7 @@ const isLoading = computed(
         loadingRevenue.value ||
         loadingStats.value ||
         loadingPercentage.value ||
-        loadingTransactions.value
+        loadingTotalPerMonth.value
 )
 
 const columns = [

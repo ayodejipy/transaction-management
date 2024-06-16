@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { sub, format } from 'date-fns'
-import type { IDaysOptionFilter } from '~/types';
+import type { IDaysOptionFilter, ITransaction, ITransactionData } from '~/types';
 
 definePageMeta({
     title: 'Transactions',
@@ -8,6 +8,13 @@ definePageMeta({
 })
 
 const { $dayjs } = useNuxtApp()
+
+const { transactions } = storeToRefs(useTransactionStore())
+
+const transactionUrl = useEndpoints('transactionUrl')
+const { pending: loading, data, refresh } = await useAppFetch<ITransactionData>(transactionUrl, {
+    pick: ['content', 'status'],
+})
 
 const columns = [
     {
@@ -36,104 +43,104 @@ const columns = [
     },
 ]
 
-const transactions = [
-    {
-        id: 1233,
-        type: 'Income',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1234,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-]
+// const transactions = [
+//     {
+//         id: 1233,
+//         type: 'Income',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1234,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1235,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1236,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1235,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1236,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1235,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1236,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1235,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1236,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1235,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+//     {
+//         id: 1236,
+//         type: 'Expenditure',
+//         category: 'Charity',
+//         date: '13/05/2024',
+//         amount: '$10,000',
+//         description: 'Books and stationery supplies',
+//     },
+// ]
 
 // datepicker range selector
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
@@ -171,10 +178,21 @@ const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
 ])
 
 // Transactions filter i.e: Income, Expenditure
-
 const handleExport = () => {
     console.log('click')
 }
+
+watch(
+    data,
+    async (newData) => {
+        if (newData && newData.content) {
+            transactions.value = newData.content as ITransaction[]
+        } else {
+            await refresh()
+        }
+    },
+    { immediate: true }
+)
 </script>
 
 <template>
@@ -278,7 +296,7 @@ const handleExport = () => {
                 </div>
             </div>
 
-            <AppTable :columns :data="transactions" />
+            <AppTable :loading :columns :data="transactions" />
         </section>
     </section>
 </template>

@@ -4,9 +4,13 @@ import type { FormSubmitEvent } from '#ui/types'
 import type {
     AddTransactionSchemaType,
     ICategory,
-    ITransaction,
-    ITypes,
+    ITransactionForm,
+    TActiveType,
 } from '~/types'
+
+// const props = defineProps<{
+//     refresh: () => Promise<void> | void
+// }>()
 
 const isOpen = defineModel({ type: Boolean, default: false })
 
@@ -18,26 +22,29 @@ const { types } = storeToRefs(useTypeStore())
 
 // types
 const transactionTypes = computed(() =>
-    types.value.map((type: ITypes) => ({ label: type.name, value: type.id }))
+    types.value.map((type: TActiveType) => ({
+        label: type.name,
+        value: type.id,
+    }))
 )
 
 // categories
 const transactionCategories = computed(() =>
-    categories.value.map((category: ICategory) => ({
+    categories.value.map((category: Omit<ICategory, 'isDeleted'>) => ({
         label: category.name,
         value: category.id,
     }))
 )
 
 const loading = ref<boolean>(false)
-const defaultFormState: ITransaction = {
+const defaultFormState: ITransactionForm = {
     amount: 0,
     typeId: 0,
     categoryId: 0,
     transactionDate: '',
     description: '',
 }
-const form: ITransaction = reactive({ ...defaultFormState })
+const form: ITransactionForm = reactive({ ...defaultFormState })
 
 const $resetForm = () => {
     Object.assign(form, defaultFormState)
@@ -50,21 +57,18 @@ const onCloseSlide = () => {
 
 async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
     loading.value = true
-    console.log({ event })
 
     try {
         const data = await addTransaction(event.data)
 
-        console.log({ data })
-
         if (data.success) {
             toast.add({
-                title: 'Transaction upload Successfully',
+                title: 'Transaction uploaded successfully',
                 color: 'green',
                 description: "You've successfully uploaded a new transaction",
                 icon: 'i-heroicons-outline-check-badge',
             })
-
+            await props.refresh()
             onCloseSlide()
         }
     } catch {
@@ -133,7 +137,7 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
 
                         <UFormGroup size="xl" label="Type" name="type">
                             <USelect
-                                v-model="form.typeId"
+                                v-model.number="form.typeId"
                                 :options="transactionTypes"
                                 placeholder="Select transaction type"
                             />
@@ -141,7 +145,7 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
 
                         <UFormGroup size="xl" label="Category" name="category">
                             <USelect
-                                v-model="form.categoryId"
+                                v-model.number="form.categoryId"
                                 :options="transactionCategories"
                                 placeholder="Select transaction category"
                             />

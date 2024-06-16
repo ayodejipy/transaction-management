@@ -139,6 +139,13 @@ const items = [
                                     </UButton>
                                 </template>
                             </UDropdown>
+
+                            <template #fallback>
+                                <div class="flex items-center space-x-4">
+                                    <USkeleton class="h-10 w-10" :ui="{ rounded: 'rounded-full' }"/>
+                                    <USkeleton class="h-8 w-28" />
+                                </div>
+                            </template>
                         </ClientOnly>
                     </div>
                 </div>

@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { sub, format } from 'date-fns'
-import type { IDaysOptionFilter } from '~/types';
+import type { IDaysOptionFilter, ITransaction, ITransactionData } from '~/types'
 
 definePageMeta({
     title: 'Transactions',
-    middleware: 'auth'
+    middleware: 'auth',
 })
 
 const { $dayjs } = useNuxtApp()
+
+const { transactions } = storeToRefs(useTransactionStore())
+
+const transactionUrl = useEndpoints('transactionUrl')
+const {
+    pending: loading,
+    data,
+    refresh,
+} = await useAppFetch<ITransactionData>(transactionUrl, {
+    pick: ['content', 'status'],
+})
 
 const columns = [
     {
@@ -15,15 +26,15 @@ const columns = [
         label: 'Transaction ID',
     },
     {
-        key: 'type',
+        key: 'typeName',
         label: 'Transaction Type',
     },
     {
-        key: 'category',
+        key: 'categoryName',
         label: 'Transaction Category',
     },
     {
-        key: 'date',
+        key: 'transactionDateUtc',
         label: 'Transaction Date',
     },
     {
@@ -36,108 +47,7 @@ const columns = [
     },
 ]
 
-const transactions = [
-    {
-        id: 1233,
-        type: 'Income',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1234,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-]
-
-// datepicker range selector
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
-
 
 const uiConfig = computed(() => ({
     placeholder: 'text-icon-gray dark:text-gray-500',
@@ -171,10 +81,32 @@ const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
 ])
 
 // Transactions filter i.e: Income, Expenditure
-
 const handleExport = () => {
     console.log('click')
 }
+
+function transformCategories(data: ITransaction[]) {
+    transactions.value = data.map((transaction: ITransaction) => ({
+        id: transaction.typeId,
+        typeName: transaction.typeName,
+        categoryName: transaction.categoryName,
+        transactionDateUtc: $dayjs(transaction.transactionDateUtc).format('DD/MM/YYYY'),
+        amount: formatCurrency(transaction.amount as number),
+        description: transaction.description
+    }))
+}
+
+watch(
+    data,
+    async (newData) => {
+        if (newData && newData.content) {
+           transformCategories(newData.content as ITransaction[])
+        } else {
+            await refresh()
+        }
+    },
+    { immediate: true }
+)
 </script>
 
 <template>
@@ -230,19 +162,24 @@ const handleExport = () => {
                     /> -->
 
                     <UPopover>
-                        <UButton 
-                            icon="i-heroicons-calendar-days-20-solid" 
+                        <UButton
+                            icon="i-heroicons-calendar-days-20-solid"
                             trailing
                             size="lg"
                             color="white"
                             variant="outline"
                             :ui="{ rounded: 'rounded-full' }"
                         >
-                            {{ format(selected.start, 'd MMM, yyy') }} - {{ format(selected.end, 'd MMM, yyy') }}
+                            {{ format(selected.start, 'd MMM, yyy') }} -
+                            {{ format(selected.end, 'd MMM, yyy') }}
                         </UButton>
 
                         <template #panel="{ close }">
-                            <DatePicker v-model="selected" is-required @close="close" />
+                            <DatePicker
+                                v-model="selected"
+                                is-required
+                                @close="close"
+                            />
                         </template>
                     </UPopover>
 
@@ -278,7 +215,7 @@ const handleExport = () => {
                 </div>
             </div>
 
-            <AppTable :columns :data="transactions" />
+            <AppTable :loading :columns :data="transactions" />
         </section>
     </section>
 </template>
