@@ -33,12 +33,17 @@ jobs:
         run: bun run build
       - run: echo "🍏 Building app"
      
-      - name: Deploy to netlify  
-        uses: netlify/actions/cli@master
-        if: success()
+      - name: Deploy to netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: './dist'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deployed from GitHub Actions"
+          enable-pull-request-comment: false
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
         env:  
           NETLIFY_AUTH_TOKEN: ${{ secrets.TRANSACTION_TRACKER_NETLIFY_TOKEN }}  
-          NETLIFY_SITE_ID:  ${{ secrets.TRANSACTION_TRACKER_SITE_ID }} 
-          NETLIFY_BUILD_HOOK_URL:  ${{ secrets.TRANSACTION_TRACKER_NETLIFY_HOOK }} 
-      - run: curl -X POST -d '{}' NETLIFY_BUILD_HOOK_URL
+          NETLIFY_SITE_ID:  ${{ secrets.TRANSACTION_TRACKER_SITE_ID }}
       - run: echo "🎉 This job's status is ${{ job.status }}."
