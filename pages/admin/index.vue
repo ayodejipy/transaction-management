@@ -22,10 +22,11 @@ const monthlyStatsUrl = useEndpoints('monthlyStatsUrl')
 const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
 
 // Total revenue
-const { pending: loadingRevenue, data: revenue } = await useAppFetch<
-    IDataResponse<number | undefined>
->(revenueUrl, {
-    lazy: true,
+const {
+    pending: loadingRevenue,
+    data: revenue,
+    refresh,
+} = await useAppFetch<IDataResponse<number | undefined>>(revenueUrl, {
     pick: ['content'],
 })
 const totalRevenue = computed(() => formatCurrency(revenue.value?.content || 0))
@@ -34,7 +35,6 @@ const totalRevenue = computed(() => formatCurrency(revenue.value?.content || 0))
 const { pending: loadingStats, data: total } =
     await useAppFetch<ITotalTransaction>(totalStatsUrl, {
         pick: ['content'],
-        lazy: true,
     })
 
 const statistics = computed(() => [
@@ -58,9 +58,7 @@ const statistics = computed(() => [
 
 // Credit OR Debit transactions percentage (20%, 80%)
 const { pending: loadingPercentage, data: totalPercentile } =
-    await useAppFetch<ITransactionPercentage>(creditDebitPercentageUrl, {
-        lazy: true,
-    })
+    await useAppFetch<ITransactionPercentage>(creditDebitPercentageUrl, {})
 
 const series = computed(() => [
     totalPercentile.value?.content.totalCreditsPercentage || 0,
@@ -69,7 +67,7 @@ const series = computed(() => [
 
 // Total transactions per month: Jan, Feb...
 const { pending: loadingTotalPerMonth, data: totalPerMonth } =
-    await useAppFetch<IMonthlyTotal>(monthlyStatsUrl, { lazy: true })
+    await useAppFetch<IMonthlyTotal>(monthlyStatsUrl)
 
 const monthsSeries = computed(() =>
     totalPerMonth.value?.content.map((month) => month.monthName)
@@ -367,6 +365,6 @@ onMounted(async () => {
             </div>
         </template>
 
-        <AddTransactionDrawer v-model="isOpenAddTransaction" />
+        <AddTransactionDrawer v-model="isOpenAddTransaction" :refresh />
     </section>
 </template>

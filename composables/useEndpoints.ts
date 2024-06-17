@@ -14,7 +14,7 @@ export default function useEndpoints(key: string) {
 		'monthlyStatsUrl': '/stats/monthly-totals',
 		'totalRevenueUrl': '/stats/total-revenue',
 		'percentageStatsUrl': '/stats/credits-debits-percentage',
-		'transactionUrl': '/transactions'
+		'transactionsUrl': '/transactions'
 	}
 
 	if(!apiUrls[key]) {

@@ -1,10 +1,16 @@
 <script setup lang="ts">
+import type { IColumn, IInvitedUsersData, InvitedUserInterface } from '~/types';
+
+const toast = useToast()
 const isOpen = ref<boolean>(false)
 
-const form = reactive({
-    fullname: '',
-    email: '',
-    password: '',
+const inviteStore = useInviteStore()
+const { resendInvite } = inviteStore
+const { invitedUsers } = storeToRefs(inviteStore)
+
+const usersInvitedUrl = useEndpoints('userInviteUrl')
+const { pending: loading, data, refresh } = await useAppFetch<IInvitedUsersData>(usersInvitedUrl, {
+    pick: ['content', 'status'],
 })
 
 const uiConfig = computed(() => ({
@@ -21,136 +27,86 @@ const uiConfig = computed(() => ({
     },
 }))
 
-const columns = [
+const columns: IColumn[] = [
     {
         key: 'id',
-        label: 'Transaction ID',
+        label: 'ID',
     },
     {
-        key: 'type',
-        label: 'Transaction Type',
+        key: 'email',
+        label: 'Email',
     },
     {
-        key: 'category',
-        label: 'Transaction Category',
+        key: 'firstName',
+        label: 'First Name',
     },
     {
-        key: 'date',
-        label: 'Transaction Date',
+        key: 'lastName',
+        label: 'Last Name',
     },
     {
-        key: 'amount',
-        label: 'Amount',
+        key: 'phone',
+        label: 'Phone',
     },
     {
-        key: 'description',
-        label: 'Description',
-    },
-]
-const transactions = [
-    {
-        id: 1233,
-        type: 'Income',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
+        key: 'isAccepted',
+        label: 'Registered',
     },
     {
-        id: 1234,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
+        key: 'actions',
     },
 ]
 
-const onCloseModal = () => {
-    isOpen.value = !isOpen.value
+const actionsOption = (row: InvitedUserInterface) => [
+    [
+        {
+            label: 'Resend invite',
+            icon: 'i-heroicons-arrow-path',
+            click: () => onResendInvite(row),
+        },
+    ],
+    // [
+    //     {
+    //         label: 'Delete',
+    //         icon: 'i-heroicons-trash-20-solid',
+    //         click: () => onDeleteCategory(row.id),
+    //     },
+    // ],
+]
 
-    // for (const property in form) { form[property] = ''};
+async function onResendInvite({ id, email }: InvitedUserInterface) {
+    try{
+        const data = await resendInvite(id)
+        if (data.success) {
+
+            toast.add({
+                title: "Invite resent successful",
+                color: 'green',
+                description: `Invite successfully sent to ${email}`,
+                icon: 'i-heroicons-outline-check-badge',
+            })
+            await refresh()
+        }
+    } catch {
+        toast.add({
+            title: `Failed to send invite to ${email}`,
+            color: 'red',
+            icon: 'i-heroicons-outline-exclaimation-circle',
+        })
+    }
 }
+
+watch(
+    data,
+    async (newData) => {
+        if (newData && newData.content) {
+            invitedUsers.value = newData.content
+        } else {
+            await refresh()
+        }
+    },
+    { immediate: true }
+)
 </script>
 
 <template>
@@ -184,7 +140,7 @@ const onCloseModal = () => {
                             rounded: 'rounded-full',
                         }"
                     >
-                        {{ transactions.length }}
+                        {{ invitedUsers.length }}
                     </UBadge>
                 </div>
                 <div class="flex items-center gap-2.5">
@@ -214,94 +170,19 @@ const onCloseModal = () => {
                 </div>
             </div>
 
-            <AppTable :columns :data="transactions" />
+            <AppTable :loading :columns :data="invitedUsers">
+                <template #actions="{ row }">
+                    <UDropdown :items="actionsOption(row)">
+                        <UButton
+                            color="gray"
+                            variant="ghost"
+                            icon="i-heroicons-ellipsis-horizontal-20-solid"
+                        />
+                    </UDropdown>
+                </template>
+            </AppTable>    
         </section>
 
-        <UModal
-            v-model="isOpen"
-            :ui="{
-                width: 'sm:max-w-2xl',
-            }"
-        >
-            <UCard
-                :ui="{
-                    ring: '',
-                    divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-                    body: {
-                        padding: 'sm:p-8',
-                    },
-                    header: {
-                        padding: 'sm:px-8 sm:pt-8',
-                    },
-                    footer: {
-                        padding: 'sm:px-8 sm:pb-10',
-                    },
-                }"
-            >
-                <template #header>
-                    <div class="space-y-2">
-                        <h3 class="text-brand-gray text-2xl font-semibold">
-                            Add New User
-                        </h3>
-                        <p class="text-dark-gray font-light">
-                            Add new user for transaction upload.
-                        </p>
-                    </div>
-                </template>
-
-                <div class="space-y-6">
-                    <UFormGroup size="xl" label="Full Name">
-                        <UInput
-                            v-model="form.fullname"
-                            placeholder="Enter user name"
-                        />
-                    </UFormGroup>
-
-                    <UFormGroup size="xl" label="Email Address">
-                        <UInput
-                            v-model="form.email"
-                            placeholder="Enter user email address"
-                        />
-                    </UFormGroup>
-
-                    <UFormGroup size="xl" label="Set User Password">
-                        <UInput
-                            v-model="form.password"
-                            type="password"
-                            placeholder="Enter user password"
-                        />
-                    </UFormGroup>
-                </div>
-
-                <template #footer>
-                    <div class="flex justify-between items-center">
-                        <UButton
-                            size="xl"
-                            color="gray"
-                            variant="outline"
-                            padding="md"
-                            :ui="{
-                                rounded: 'rounded-lg',
-                                font: 'font-semibold',
-                            }"
-                            @click="onCloseModal"
-                        >
-                            Cancel
-                        </UButton>
-
-                        <UButton
-                            size="xl"
-                            padding="md"
-                            :ui="{
-                                rounded: 'rounded-lg',
-                                font: 'font-semibold',
-                            }"
-                        >
-                            Create user
-                        </UButton>
-                    </div>
-                </template>
-            </UCard>
-        </UModal>
+        <ModalsAddUser v-model="isOpen" :refresh-data="refresh" />
     </section>
 </template>

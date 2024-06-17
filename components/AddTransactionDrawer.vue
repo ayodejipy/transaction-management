@@ -8,9 +8,9 @@ import type {
     TActiveType,
 } from '~/types'
 
-// const props = defineProps<{
-//     refresh: () => Promise<void> | void
-// }>()
+const props = defineProps<{
+    refresh: () => Promise<void> | void
+}>()
 
 const isOpen = defineModel({ type: Boolean, default: false })
 

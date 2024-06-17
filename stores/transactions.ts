@@ -3,13 +3,13 @@ import type { ITransaction, ITransactionData } from '~/types'
 type TTransaction = Omit<ITransaction, 'categoryId' | 'typeId' | 'createdAtUtc'>
 
 export const useTransactionStore = defineStore('transaction', () => {
-    const transactionUrl = useEndpoints('transactionUrl')
+    const transactionsUrl = useEndpoints('transactionsUrl')
     const transactions = ref<TTransaction[]>([])
 
     async function getTransactions(): Promise<ITransactionData> {
         const { $customFetch } = useNuxtApp()
 
-        const data = await $customFetch<ITransactionData>(transactionUrl)
+        const data = await $customFetch<ITransactionData>(transactionsUrl)
 
         if (data.success) {
             transactions.value = data.content as ITransaction[]
@@ -23,7 +23,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     ): Promise<ITransactionData> {
         const { $customFetch } = useNuxtApp()
 
-        const data = await $customFetch<ITransactionData>(transactionUrl, {
+        const data = await $customFetch<ITransactionData>(transactionsUrl, {
             method: 'POST',
             body,
         })

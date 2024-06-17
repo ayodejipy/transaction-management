@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { sub, format } from 'date-fns'
-import type { IDaysOptionFilter, ITransaction, ITransactionData } from '~/types'
+import type {
+    IColumn,
+    IDaysOptionFilter,
+    ITransaction,
+    ITransactionData,
+} from '~/types'
 
 definePageMeta({
     title: 'Transactions',
@@ -11,16 +16,19 @@ const { $dayjs } = useNuxtApp()
 
 const { transactions } = storeToRefs(useTransactionStore())
 
-const transactionUrl = useEndpoints('transactionUrl')
+const transactionsUrl = useEndpoints('transactionsUrl')
 const {
     pending: loading,
     data,
     refresh,
-} = await useAppFetch<ITransactionData>(transactionUrl, {
-    pick: ['content', 'status'],
+} = await useAppFetch<ITransactionData>(transactionsUrl, {
+    pick: ['content', 'paging', 'status'],
 })
 
-const columns = [
+// const hasPagination = computed(() => !!data.value?.paging)
+const isOpenAddTransaction = ref<boolean>(false)
+
+const columns: IColumn[] = [
     {
         key: 'id',
         label: 'Transaction ID',
@@ -90,9 +98,11 @@ function transformCategories(data: ITransaction[]) {
         id: transaction.typeId,
         typeName: transaction.typeName,
         categoryName: transaction.categoryName,
-        transactionDateUtc: $dayjs(transaction.transactionDateUtc).format('DD/MM/YYYY'),
+        transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
+            'DD/MM/YYYY'
+        ),
         amount: formatCurrency(transaction.amount as number),
-        description: transaction.description
+        description: transaction.description,
     }))
 }
 
@@ -100,7 +110,7 @@ watch(
     data,
     async (newData) => {
         if (newData && newData.content) {
-           transformCategories(newData.content as ITransaction[])
+            transformCategories(newData.content as ITransaction[])
         } else {
             await refresh()
         }
@@ -111,7 +121,18 @@ watch(
 
 <template>
     <section class="w-full">
-        <!-- recent transaction table -->
+        <section class="flex justify-end items-center">
+            <button
+                type="button"
+                class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
+                @click="isOpenAddTransaction = true"
+            >
+                <Icon name="i-mage-file-upload" />
+                Upload new transaction
+            </button>
+        </section>
+
+        <!-- transactions table -->
         <section
             class="bg-white rounded-lg border border-gray-100 mt-6 space-y-3"
         >
@@ -217,5 +238,7 @@ watch(
 
             <AppTable :loading :columns :data="transactions" />
         </section>
+
+        <AddTransactionDrawer v-model="isOpenAddTransaction" :refresh />
     </section>
 </template>

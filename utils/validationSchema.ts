@@ -33,3 +33,11 @@ export const AddTransactionSchema = z.object({
     transactionDate: z.string(),
     description: z.string(),
 })
+
+
+export const InviteUserSchema = z.object({
+    email: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    phone: z.string(),
+})

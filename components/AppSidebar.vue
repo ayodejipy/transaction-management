@@ -29,7 +29,7 @@ const roleBasedLinks = computed(() => {
     return [
         {
             label: 'Dashboard',
-            icon: 'i-ph-users-three-light',
+            icon: 'DashboardIcon',
             to: '/',
         },
         {

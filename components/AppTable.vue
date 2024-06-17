@@ -2,7 +2,7 @@
     setup
     lang="ts"
     generic="
-        T extends Record<string, string | number>
+        T extends Record<string, string | number | boolean>
     "
 >
 import type { IColumn } from '~/types'

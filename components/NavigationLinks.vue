@@ -25,8 +25,8 @@ const ui = {
 }
 
 const isExactLink = (to: string) => {
-	if(to.includes('/admin/settings')) return false
-	return true
+    if (to.includes('/admin/settings')) return false
+    return true
 }
 </script>
 
@@ -47,7 +47,7 @@ const isExactLink = (to: string) => {
                     ]"
                     :exact="isExactLink(to)"
                     active-class="text-white/80 dark:text-white before:bg-brand-green dark:before:bg-gray-800"
-                    inactive-class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:before:bg-brand-green dark:hover:before:bg-green-800/50"
+                    inactive-class="text-gray-600 dark:text-gray-400 hover:text-white/80 dark:hover:text-white hover:before:bg-brand-green dark:hover:before:bg-green-800/50"
                 >
                     <Icon
                         class="relative w-5 h-5 text-icon-gray/80 dark:text-gray-500 group-hover:text-white/80 dark:group-hover:text-gray-200"
