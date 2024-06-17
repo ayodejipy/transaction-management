@@ -2,6 +2,7 @@
 .output
 .data
 .nuxt
+.netlify
 .nitro
 .cache
 dist
