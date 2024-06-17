@@ -34,13 +34,11 @@ jobs:
       - run: echo "🍏 Building app"
      
       - name: Deploy to netlify  
-        uses: netlify/actions/cli@master  
+        uses: netlify/actions/cli@master
+        if: success()
         env:  
           NETLIFY_AUTH_TOKEN: ${{ secrets.TRANSACTION_TRACKER_NETLIFY_TOKEN }}  
           NETLIFY_SITE_ID:  ${{ secrets.TRANSACTION_TRACKER_SITE_ID }} 
           NETLIFY_BUILD_HOOK_URL:  ${{ secrets.TRANSACTION_TRACKER_NETLIFY_HOOK }} 
-        with:  
-          args: deploy --dir=build --prod
-          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
-      - run: curl -X POST -d '{}' <NETLIFY_BUILD_HOOK_URL>
+      - run: curl -X POST -d '{}' $NETLIFY_BUILD_HOOK_URL
       - run: echo "🎉 This job's status is ${{ job.status }}."
