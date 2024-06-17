@@ -2,7 +2,7 @@
 definePageMeta({
     key: (route) => route.fullPath,
     title: 'Reports',
-    middleware: ['auth', 'admin']
+    middleware: ['auth']
 })
 
 </script>

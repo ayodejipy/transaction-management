@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import type { ITotalTransaction } from '~/types'
 
+useHead({
+    title: 'Dashboard'
+})
+
 definePageMeta({
     title: 'Dashboard',
-    middleware: 'auth',
+    middleware: ['auth'],
 })
 
 const isOpenAddTransaction = ref<boolean>(false)
@@ -182,6 +186,6 @@ const transactions = [
             <AppTable :columns :data="transactions" />
         </section>
 
-        <AddTransactionDrawer :refresh v-model="isOpenAddTransaction" />
+        <AddTransactionDrawer v-model="isOpenAddTransaction" :refresh />
     </section>
 </template>

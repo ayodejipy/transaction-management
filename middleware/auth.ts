@@ -14,8 +14,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
             await userStore.getProfile()
         }
     }
-
-    console.log('from: ', from)
         
     if (to.path !== LOGIN_PATH && !isAuthenticated.value) {
         return navigateTo(LOGIN_PATH)

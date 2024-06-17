@@ -2,6 +2,10 @@
 import { sub, format } from 'date-fns'
 import type { IDaysOptionFilter, ITransaction, ITransactionData } from '~/types';
 
+useHead({
+    title: 'Transactions'
+})
+
 definePageMeta({
     title: 'Transactions',
     middleware: 'auth'
@@ -11,7 +15,7 @@ const { $dayjs } = useNuxtApp()
 
 const { transactions } = storeToRefs(useTransactionStore())
 
-const transactionUrl = useEndpoints('transactionUrl')
+const transactionUrl = useEndpoints('transactionsUrl')
 const { pending: loading, data, refresh } = await useAppFetch<ITransactionData>(transactionUrl, {
     pick: ['content', 'status'],
 })

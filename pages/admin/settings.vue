@@ -1,11 +1,15 @@
 <script setup lang="ts">
 const route = useRoute()
-const router = useRouter()
+// const router = useRouter()
+
+useHead({
+    title: 'Settings'
+})
 
 definePageMeta({
     key: (route) => route.fullPath,
     title: 'Settings',
-    middleware: 'auth'
+    middleware: ['auth']
 })
 
 const ADMIN_PATH = '/admin'
@@ -29,7 +33,7 @@ const links = [
     }
 ]
 
-onMounted(() => router.push(links[0].to))
+// onMounted(() => router.push(links[0].to))
 </script>
 
 <template>

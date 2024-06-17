@@ -7,6 +7,6 @@ export default defineNuxtRouteMiddleware(async () => {
     const {isAdmin } = storeToRefs(useUserStore())
 
     if (isAuthenticated.value && !isAdmin.value) {
-        return navigateTo(USER_PATH)
+        navigateTo(USER_PATH)
     }
 })

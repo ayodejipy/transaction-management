@@ -3,6 +3,10 @@ import type { FormSubmitEvent } from '#ui/types'
 import type { IAuthData, TSchema } from '~/types';
 import { acceptInviteSchema } from '~/utils'
 
+useHead({
+    title: 'Accept Invite'
+})
+
 definePageMeta({
     layout: false,
 })

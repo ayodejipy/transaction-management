@@ -6,9 +6,13 @@ import type {
     ITransactionPercentage,
 } from '~/types'
 
+useHead({
+    title: 'Admin Reports'
+})
+
 definePageMeta({
     title: 'Reports',
-    middleware: 'auth',
+    middleware: ['auth'],
 })
 
 const isOpenAddTransaction = ref<boolean>(false)

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { IAuthData } from '~/types'
 
+useHead({
+    title: 'User login'
+})
+
 definePageMeta({
     layout: false,
 })

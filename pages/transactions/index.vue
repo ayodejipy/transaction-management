@@ -7,6 +7,10 @@ import type {
     ITransactionData,
 } from '~/types'
 
+useHead({
+    title: 'Transactions'
+})
+
 definePageMeta({
     title: 'Transactions',
     middleware: 'auth',
