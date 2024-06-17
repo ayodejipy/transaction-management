@@ -126,7 +126,7 @@ const items = [
                                     <UButton
                                         color="primary"
                                         variant="ghost"
-                                        @click="authStore.handleLogout"
+                                        @click="authStore.handleLogout(user?.uid)"
                                     >
                                         <span class="truncate">{{
                                             item.label

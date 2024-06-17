@@ -2,6 +2,7 @@ import type { IAuthData } from '~/types'
 
 export const useAuthStore = defineStore('auth', () => {
     // const TOKEN_KEY: string = 'opabid-accessToken'
+    const LOGIN_PATH: string = '/auth/login'
     const { user } = storeToRefs(useUserStore())
 
     const accessToken = useCookie('opabid-access', {
@@ -41,24 +42,25 @@ export const useAuthStore = defineStore('auth', () => {
             if (errorData?.status === 500 && errorData?.title === 'Timeout') {
                 user.value = null
                 setTokens(null, null)
-                router.push('/auth/login')
+                router.push(LOGIN_PATH)
             }
 
             throw new Error('Failed to refresh token. Please try again.')
         }
     }
 
-    async function handleLogout() {
+    async function handleLogout(uid: string) {
         const router = useRouter()
-        // const { $customFetch } = useNuxtApp()
-        // const authUrl = useEndpoints('authUrl')
+        const { $customFetch } = useNuxtApp()
+        const authUrl = useEndpoints('authUrl')
 
-        // const data = await $customFetch<IAuthData>(
-        //     `${authUrl}/${ref}/logout`
-        // )
-        setTokens(null, null)
-        user.value = null
-        router.push('/auth/login')
+        const data = await $customFetch<IAuthData>(`${authUrl}/${uid}/logout`)
+
+        if (data.success) {
+            setTokens(null, null)
+            user.value = null
+            router.push(LOGIN_PATH)
+        }
     }
 
     return {
