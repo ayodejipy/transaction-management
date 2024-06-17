@@ -1,4 +1,4 @@
-import type { ITransaction, ITransactionData } from '~/types'
+import type { ITransaction, ITransactionData, ITransactionForm } from '~/types'
 
 type TTransaction = Omit<ITransaction, 'categoryId' | 'typeId' | 'createdAtUtc'>
 
@@ -19,7 +19,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     }
 
     async function addTransaction(
-        body: ITransaction
+        body: ITransactionForm
     ): Promise<ITransactionData> {
         const { $customFetch } = useNuxtApp()
 

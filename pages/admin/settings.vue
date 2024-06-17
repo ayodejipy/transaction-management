@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
+const router = useRouter()
 
 definePageMeta({
     key: (route) => route.fullPath,
@@ -12,16 +13,6 @@ const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PAT
 
 const links = [
     {
-        label: 'Account',
-        icon: 'i-heroicons-home',
-        to: `${appendedUrl.value}/settings`,
-    },
-    {
-        label: 'User Management',
-        icon: 'i-heroicons-chart-bar',
-        to: `${appendedUrl.value}/settings/users`,
-    },
-    {
         label: 'Categories',
         icon: 'i-heroicons-chart-bar',
         to: `${appendedUrl.value}/settings/categories`,
@@ -31,7 +22,14 @@ const links = [
         icon: 'i-heroicons-chart-bar',
         to: `${appendedUrl.value}/settings/types`,
     },
+    {
+        label: 'User Management',
+        icon: 'i-heroicons-chart-bar',
+        to: `${appendedUrl.value}/settings/users`,
+    }
 ]
+
+onMounted(() => router.push(links[0].to))
 </script>
 
 <template>
