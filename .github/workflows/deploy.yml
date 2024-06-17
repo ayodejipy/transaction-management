@@ -42,7 +42,5 @@ jobs:
         with:  
           args: deploy --dir=build --prod
           secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
-        if: success()
-        - run: curl -X POST -d '{}' <NETLIFY_BUILD_HOOK_URL>
-        
+      - run: curl -X POST -d '{}' <NETLIFY_BUILD_HOOK_URL>
       - run: echo "🎉 This job's status is ${{ job.status }}."
