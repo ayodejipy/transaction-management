@@ -55,14 +55,14 @@ const roleBasedLinks = computed(() => {
             class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4"
         >
             <div class="flex h-16 shrink-0 items-center">
-                <!-- <img
-                    class="h-8 w-auto"
-                    src="https://tailwindui.com/img/logos/mark.svg?color=green&shade=600"
-                    alt="Your Company"
-                /> -->
-                <ClientOnly>
+                <img
+                    class="h-10 w-auto"
+                    src="~/assets/logo.svg"
+                    alt="Opabid transaction management"
+                />
+                <!-- <ClientOnly>
                     <Icon name="NuxtIcon" size="64" />
-                </ClientOnly>
+                </ClientOnly> -->
             </div>
             <div class="flex flex-1 flex-col pt-6">
                 <ClientOnly fallback-tag="div">

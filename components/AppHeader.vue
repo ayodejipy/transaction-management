@@ -52,7 +52,7 @@ const items = [
                 </h1>
 
                 <div class="flex items-center gap-x-4 lg:gap-x-4">
-                    <button
+                    <!-- <button
                         type="button"
                         class="relative w-10 h-10 flex items-center justify-center flex-shrink-0 p-2.5 text-[#667085] font-medium hover:text-gray-500 rounded-full ring-1 ring-gray-300"
                     >
@@ -68,7 +68,7 @@ const items = [
                         >
                             5
                         </UBadge>
-                    </button>
+                    </button> -->
 
                     <div class="relative flex items-center">
                         <ClientOnly>
@@ -126,11 +126,15 @@ const items = [
                                     <UButton
                                         color="primary"
                                         variant="ghost"
-                                        @click="authStore.handleLogout(user?.uid)"
+                                        @click="
+                                            authStore.handleLogout(
+                                                user?.uid as string
+                                            )
+                                        "
                                     >
-                                        <span class="truncate">{{
-                                            item.label
-                                        }}</span>
+                                        <span class="truncate">
+                                            {{ item.label }}
+                                        </span>
 
                                         <UIcon
                                             :name="item.icon"
@@ -142,7 +146,10 @@ const items = [
 
                             <template #fallback>
                                 <div class="flex items-center space-x-4">
-                                    <USkeleton class="h-10 w-10" :ui="{ rounded: 'rounded-full' }"/>
+                                    <USkeleton
+                                        class="h-10 w-10"
+                                        :ui="{ rounded: 'rounded-full' }"
+                                    />
                                     <USkeleton class="h-8 w-28" />
                                 </div>
                             </template>

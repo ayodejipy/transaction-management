@@ -38,7 +38,9 @@ jobs:
         env:  
           NETLIFY_AUTH_TOKEN: ${{ secrets.TRANSACTION_TRACKER_NETLIFY_TOKEN }}  
           NETLIFY_SITE_ID:  ${{ secrets.TRANSACTION_TRACKER_SITE_ID }} 
+          NETLIFY_BUILD_HOOK:  ${{ secrets.TRANSACTION_TRACKER_NETLIFY_HOOK }} 
         with:  
-          args: deploy
+          args: deploy --dir=build --prod
+          secrets: '["NETLIFY_AUTH_TOKEN", "NETLIFY_SITE_ID"]'
         
       - run: echo "🎉 This job's status is ${{ job.status }}."

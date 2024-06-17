@@ -51,10 +51,10 @@ export const useAuthStore = defineStore('auth', () => {
 
     async function handleLogout(uid: string) {
         const router = useRouter()
-        // const { $customFetch } = useNuxtApp()
-        // const authUrl = useEndpoints('authUrl')
+        const { $customFetch } = useNuxtApp()
+        const authUrl = useEndpoints('authUrl')
 
-        // const data = await $customFetch<IAuthData>(`${authUrl}/${uid}/logout`)
+        await $customFetch<IAuthData>(`${authUrl}/${uid}/logout`)
 
         // if (data.success) {
         // }

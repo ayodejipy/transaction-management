@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
+export default defineNuxtRouteMiddleware(async (to) => {
     const LOGIN_PATH = '/auth/login'
     // const ADMIN_PATH = '/admin'
     // const USER_PATH = '/'

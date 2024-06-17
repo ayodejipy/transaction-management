@@ -15,7 +15,7 @@ const isOpenAddTransaction = ref<boolean>(false)
 const totalStatsUrl = useEndpoints('totalStatsUrl')
 
 // Totals e.g; credit, debit
-const { data: total, refresh } = await useAppFetch<ITotalTransaction>(totalStatsUrl, {
+const { refresh } = await useAppFetch<ITotalTransaction>(totalStatsUrl, {
     pick: ['content'],
 })
 
