@@ -13,4 +13,6 @@ export interface IAuth extends ITokenData {
 }
 export type TSchema = z.output<typeof acceptInviteSchema>
 
+export type TForgotPasswordSchema = z.output<typeof ForgotPasswordSchema>
+
 export interface IAuthData extends IDataResponse<IAuth> {}

@@ -2,6 +2,7 @@ interface CustomError extends Error {
     data?: {
         status?: number
         title?: string
+        message?: string
     }
 }
 
@@ -10,7 +11,7 @@ export function getErrorObject(error: CustomError) {
         Object.prototype.hasOwnProperty.call(error, 'data') &&
         typeof error?.data === 'object'
     ) {
-        const errorData = error.data as { status?: number; title?: string }
+        const errorData = error.data
 
         return errorData
     }

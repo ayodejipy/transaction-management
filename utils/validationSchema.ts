@@ -41,3 +41,8 @@ export const InviteUserSchema = z.object({
     lastName: z.string(),
     phone: z.string(),
 })
+
+
+export const ForgotPasswordSchema = z.object({
+    email: z.string().email(),
+})

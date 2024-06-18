@@ -1,9 +1,10 @@
-import type { IAuthData } from '~/types'
+import type { IAuthData, IDataResponse } from '~/types'
 
 export const useAuthStore = defineStore('auth', () => {
     // const TOKEN_KEY: string = 'opabid-accessToken'
     const LOGIN_PATH: string = '/auth/login'
     const { user } = storeToRefs(useUserStore())
+    const forgotPasswordUrl = useEndpoints('forgotPasswordUrl')
 
     const accessToken = useCookie('opabid-access', {
         maxAge: 60 * 60,
@@ -49,6 +50,19 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
+    async function forgotPassword(body: string) {
+        const { $customFetch } = useNuxtApp()
+
+        const data = await $customFetch<IDataResponse<string>>(
+            forgotPasswordUrl,
+            {
+                method: 'POST',
+                body,
+            }
+        )
+        return data
+    }
+
     async function handleLogout(uid: string) {
         const router = useRouter()
         const { $customFetch } = useNuxtApp()
@@ -69,6 +83,7 @@ export const useAuthStore = defineStore('auth', () => {
         isAuthenticated,
         setTokens,
         getRefreshedToken,
+        forgotPassword,
         handleLogout,
     }
 })

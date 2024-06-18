@@ -2,7 +2,7 @@
 import type { IAuthData } from '~/types'
 
 useHead({
-    title: 'User login'
+    title: 'Login'
 })
 
 definePageMeta({
@@ -100,7 +100,7 @@ async function handleLogin() {
                         }"
                     />
                     <ULink
-                        to="/"
+                        to="/auth/forgot-password"
                         active-class="text-primary"
                         inactive-class="text-sm text-green-500 font-semibold dark:text-gray-400 hover:text-green-600 dark:hover:text-gray-200"
                     >

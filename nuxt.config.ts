@@ -39,6 +39,15 @@ export default defineNuxtConfig({
             ],
         },
     },
+    hooks: {
+        'pages:extend'(pages) {
+            pages.push({
+                name: 'AdminTransactions',
+                path: '/admin/transactions',
+                file: '~/pages/transactions/index.vue'
+            })
+        }
+    },
     devtools: { enabled: true },
     modules: [
         '@nuxt/eslint',
