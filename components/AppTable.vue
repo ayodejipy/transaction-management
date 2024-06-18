@@ -5,7 +5,7 @@
         T extends Record<string, string | number | boolean>
     "
 >
-import type { IColumn } from '~/types'
+import type { IColumn, ITransaction } from '~/types'
 
 interface IProps {
     columns: IColumn[]
@@ -20,6 +20,10 @@ const props = withDefaults(defineProps<IProps>(), {
     loading: false,
     paginate: true,
 })
+
+const emit = defineEmits<{
+    (e: 'select', value: ITransaction): void
+}>()
 
 // Pagination
 const page = ref<number>(1)
@@ -36,6 +40,12 @@ const rows = computed(() => {
         page.value * pageCount.value
     )
 })
+
+function onSelect(row: ITransaction) {
+    emit('select', row)
+}
+
+// onUnmounted(() => window.removeEventListener('select', onSelect))
 </script>
 
 <template>
@@ -67,6 +77,7 @@ const rows = computed(() => {
                     size: 'text-sm',
                 },
             }"
+            @select="onSelect"
         >
             <template v-if="$slots.actions" #actions-data="{ row }">
                 <slot name="actions" :row="row" />

@@ -8,7 +8,7 @@ import type {
 } from '~/types'
 
 useHead({
-    title: 'Transactions'
+    title: 'Transactions',
 })
 
 definePageMeta({
@@ -18,7 +18,9 @@ definePageMeta({
 
 const { $dayjs } = useNuxtApp()
 
-const { transactions } = storeToRefs(useTransactionStore())
+// const { isAdmin } = storeToRefs(useUserStore())
+
+const { transactions, transaction } = storeToRefs(useTransactionStore())
 
 const transactionsUrl = useEndpoints('transactionsUrl')
 const {
@@ -31,6 +33,7 @@ const {
 
 // const hasPagination = computed(() => !!data.value?.paging)
 const isOpenAddTransaction = ref<boolean>(false)
+const isViewTransaction = ref<boolean>(false)
 
 const columns: IColumn[] = [
     {
@@ -57,9 +60,41 @@ const columns: IColumn[] = [
         key: 'description',
         label: 'Description',
     },
+    { key: 'actions' },
+]
+
+const actionsOption = (row: ITransaction) => [
+    [
+        {
+            label: 'Update Transaction',
+            icon: 'i-heroicons-arrow-path',
+            click: () => onUpdateTransaction(row),
+        },
+    ],
+    // [
+    //     {
+    //         label: 'Delete',
+    //         icon: 'i-heroicons-trash-20-solid',
+    //         click: () => onDeleteCategory(row.id),
+    //     },
+    // ],
 ]
 
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
+
+const searchTerm = ref<string>('')
+
+const filteredTransactions = computed(() => {
+    if (!searchTerm.value) return transactions.value
+
+    return transactions.value.filter((transaction) => {
+        return Object.values(transaction).some((value) => {
+            return String(value)
+                .toLowerCase()
+                .includes(searchTerm.value.toLowerCase())
+        })
+    })
+})
 
 const uiConfig = computed(() => ({
     placeholder: 'text-icon-gray dark:text-gray-500',
@@ -95,6 +130,17 @@ const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
 // Transactions filter i.e: Income, Expenditure
 const handleExport = () => {
     console.log('click')
+}
+
+function onUpdateTransaction(row: ITransaction) {
+    console.log({ row })
+    transaction.value = row
+    isOpenAddTransaction.value = true
+}
+
+function onSelect(row: ITransaction) {
+    transaction.value = row
+    isViewTransaction.value = true
 }
 
 function transformCategories(data: ITransaction[]) {
@@ -155,6 +201,7 @@ watch(
                 </div>
                 <div class="flex items-center gap-2.5">
                     <UInput
+                        v-model="searchTerm"
                         :ui="{
                             rounded: 'rounded-full',
                             icon: {
@@ -189,7 +236,6 @@ watch(
                     <UPopover>
                         <UButton
                             icon="i-heroicons-calendar-days-20-solid"
-                            trailing
                             size="lg"
                             color="white"
                             variant="outline"
@@ -240,9 +286,25 @@ watch(
                 </div>
             </div>
 
-            <AppTable :loading :columns :data="transactions" />
+            <AppTable
+                :loading
+                :columns
+                :data="filteredTransactions"
+                @select="onSelect"
+            >
+                <template #actions="{ row }">
+                    <UDropdown :items="actionsOption(row)">
+                        <UButton
+                            color="gray"
+                            variant="ghost"
+                            icon="i-heroicons-ellipsis-horizontal-20-solid"
+                        />
+                    </UDropdown>
+                </template>
+            </AppTable>
         </section>
 
         <AddTransactionDrawer v-model="isOpenAddTransaction" :refresh />
+        <TransactionDetailDrawer v-model="isViewTransaction" />
     </section>
 </template>

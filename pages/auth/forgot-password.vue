@@ -73,7 +73,7 @@ async function onSubmit(event: FormSubmitEvent<TForgotPasswordSchema>) {
                 </p>
             </div>
 
-            <div class="mt-8 sm:mt-16">
+            <div class="mt-6 sm:mt-12">
                 <UForm
                     :schema="ForgotPasswordSchema"
                     :state="form"
@@ -105,7 +105,7 @@ async function onSubmit(event: FormSubmitEvent<TForgotPasswordSchema>) {
             </div>
 
 			<div class="mx-auto mt-4">
-				<ULink to="/auth/login" class="text-gray-600 font-normal">
+				<ULink to="/auth/login" class="text-gray-600 font-normal transition hover:underline">
 					<Icon name="i-solar-login-line-duotone" />
 					Back to login
 				</ULink>
