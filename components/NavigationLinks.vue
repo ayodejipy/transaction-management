@@ -50,7 +50,7 @@ const isExactLink = (to: string) => {
                     inactive-class="text-gray-600 dark:text-gray-400 hover:text-white/80 dark:hover:text-white hover:before:bg-brand-green dark:hover:before:bg-green-800/50"
                 >
                     <Icon
-                        class="relative w-5 h-5 text-icon-gray/80 dark:text-gray-500 group-hover:text-white/80 dark:group-hover:text-gray-200"
+                        class="relative w-5 h-5"
                         :name="icon"
                     />
                     <span :class="[ui.label]">{{ label }} </span>

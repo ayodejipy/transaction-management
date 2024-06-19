@@ -9,7 +9,7 @@ useHead({
 definePageMeta({
     key: (route) => route.fullPath,
     title: 'Settings',
-    middleware: ['auth']
+    middleware: ['auth', 'admin']
 })
 
 const ADMIN_PATH = '/admin'

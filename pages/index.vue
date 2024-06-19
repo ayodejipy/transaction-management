@@ -1,122 +1,179 @@
 <script setup lang="ts">
-import type { ITotalTransaction } from '~/types'
-
-useHead({
-    title: 'Dashboard'
-})
+import { sub, format } from 'date-fns'
+import type {
+    IColumn,
+    IDaysOptionFilter,
+    ITransaction,
+    ITransactionsData,
+} from '~/types'
 
 definePageMeta({
-    title: 'Dashboard',
+    title: 'Transactions',
     middleware: ['auth'],
 })
 
-const isOpenAddTransaction = ref<boolean>(false)
+const { $dayjs } = useNuxtApp()
 
-const totalStatsUrl = useEndpoints('totalStatsUrl')
+const { isAdmin } = storeToRefs(useUserStore())
 
-// Totals e.g; credit, debit
-const { refresh } = await useAppFetch<ITotalTransaction>(totalStatsUrl, {
-    pick: ['content'],
+const correctPageTitle = computed(() => isAdmin.value ? 'Transactions' : 'Dashboard')
+
+useHead({
+    title: correctPageTitle,
 })
 
-const transactions = [
+
+const { transactions, transaction } = storeToRefs(useTransactionStore())
+
+const transactionsUrl = useEndpoints('transactionsUrl')
+const {
+    pending: loading,
+    data,
+    refresh,
+} = await useAppFetch<ITransactionsData>(transactionsUrl, {
+    pick: ['content', 'paging', 'status'],
+})
+
+const dataForTable = computed(() => data.value?.content.map((transaction: ITransaction) => ({
+        id: transaction.typeId,
+        typeName: transaction.typeName,
+        categoryName: transaction.categoryName,
+        transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
+            'DD/MM/YYYY'
+        ),
+        amount: formatCurrency(transaction.amount as number),
+        description: transaction.description,
+    })))
+
+// const hasPagination = computed(() => !!data.value?.paging)
+const isOpenAddTransaction = ref<boolean>(false)
+const isViewTransaction = ref<boolean>(false)
+
+const columns: IColumn[] = [
     {
-        id: 1233,
-        type: 'Income',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
+        key: 'id',
+        label: 'Transaction ID',
     },
     {
-        id: 1234,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
+        key: 'typeName',
+        label: 'Transaction Type',
     },
     {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
+        key: 'categoryName',
+        label: 'Transaction Category',
     },
     {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
+        key: 'transactionDateUtc',
+        label: 'Transaction Date',
     },
     {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
+        key: 'amount',
+        label: 'Amount',
     },
     {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
+        key: 'description',
+        label: 'Description',
     },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
+    { key: 'actions' },
 ]
+
+const actionsOption = (row: ITransaction) => [
+    [
+        {
+            label: 'Update Transaction',
+            icon: 'i-heroicons-arrow-path',
+            click: () => onUpdateTransaction(row),
+        },
+    ],
+]
+
+const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
+
+const searchTerm = ref<string>('')
+
+const searchedTransactions = computed(() => {
+    if (!searchTerm.value) return dataForTable.value
+
+    return transactions.value.filter((transaction) => {
+        return Object.values(transaction).some((value) => {
+            return String(value)
+                .toLowerCase()
+                .includes(searchTerm.value.toLowerCase())
+        })
+    })
+})
+
+const uiConfig = computed(() => ({
+    placeholder: 'text-icon-gray dark:text-gray-500',
+    rounded: 'rounded-full',
+    color: {
+        white: {
+            outline:
+                'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
+        },
+    },
+    icon: {
+        base: 'text-icon-gray dark:text-gray-500',
+    },
+}))
+
+// days filters i.e 'Past 30days'
+const daysOption = ref<string>('')
+const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
+    {
+        label: 'Past 30 days',
+        value: $dayjs().subtract(30, 'days'),
+    },
+    {
+        label: 'Past week',
+        value: $dayjs().subtract(7, 'days'),
+    },
+    {
+        label: 'Past 6 months',
+        value: $dayjs().subtract(6, 'months'),
+    },
+])
+
+// Transactions filter i.e: Income, Expenditure
+const handleExport = () => {
+    console.log('click')
+}
+
+function onUpdateTransaction(row: ITransaction) {
+    console.log({ row })
+    transaction.value = row
+    isOpenAddTransaction.value = true
+}
+
+function onSelect(row: ITransaction) {
+    transaction.value = row
+    isViewTransaction.value = true
+}
+
+// function transformCategories(data: ITransaction[]) {
+//     transactions.value = data.map((transaction: ITransaction) => ({
+//         id: transaction.typeId,
+//         typeName: transaction.typeName,
+//         categoryName: transaction.categoryName,
+//         transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
+//             'DD/MM/YYYY'
+//         ),
+//         amount: formatCurrency(transaction.amount as number),
+//         description: transaction.description,
+//     }))
+// }
+
+watch(
+    data,
+    async (newData) => {
+        if (newData && newData.content) {
+            transactions.value = newData.content as ITransaction[]
+        } else {
+            await refresh()
+        }
+    },
+    { immediate: true }
+)
 </script>
 
 <template>
@@ -132,11 +189,13 @@ const transactions = [
             </button>
         </section>
 
-        <!-- recent transaction table -->
-        <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
+        <!-- transactions table -->
+        <section
+            class="bg-white rounded-lg border border-gray-100 mt-6 space-y-3"
+        >
             <div class="flex justify-between items-center py-8 px-6">
                 <div class="flex items-center gap-2">
-                    <h3 class="font-semibold text-xl">Recent Transactions</h3>
+                    <h3 class="font-semibold text-xl">All Transactions</h3>
                     <UBadge
                         color="green"
                         variant="subtle"
@@ -144,21 +203,116 @@ const transactions = [
                             rounded: 'rounded-full',
                         }"
                     >
-                        10
+                        {{ transactions.length }}
                     </UBadge>
                 </div>
-                <ULink
-                    to="/transactions"
-                    active-class="text-primary"
-                    inactive-class="text-sm text-green-500 font-semibold dark:text-gray-400 hover:text-green-600 dark:hover:text-gray-200"
-                >
-                    View all
-                </ULink>
+                <div class="flex items-center gap-2.5">
+                    <UInput
+                        v-model="searchTerm"
+                        :ui="{
+                            rounded: 'rounded-full',
+                            icon: {
+                                base: 'text-icon-gray dark:text-gray-500',
+                            },
+                        }"
+                        icon="i-ri-search-2-line"
+                        size="lg"
+                        color="white"
+                        trailing
+                        placeholder="Search..."
+                    />
+                    <USelect
+                        v-model="daysOption"
+                        icon="i-heroicons-calendar"
+                        color="white"
+                        size="lg"
+                        padding="lg"
+                        :options="daysOptionFilter"
+                        placeholder="Past 30 days"
+                        :ui="uiConfig"
+                    />
+                    <!-- <USelect
+                        color="white"
+                        size="lg"
+                        padding="lg"
+                        :options="['United States', 'Canada', 'Mexico']"
+                        placeholder="Date Range"
+                        :ui="uiConfig"
+                    /> -->
+
+                    <UPopover>
+                        <UButton
+                            icon="i-heroicons-calendar-days-20-solid"
+                            size="lg"
+                            color="white"
+                            variant="outline"
+                            :ui="{ rounded: 'rounded-full' }"
+                        >
+                            {{ format(selected.start, 'd MMM, yyy') }} -
+                            {{ format(selected.end, 'd MMM, yyy') }}
+                        </UButton>
+
+                        <template #panel="{ close }">
+                            <DatePicker
+                                v-model="selected"
+                                is-required
+                                @close="close"
+                            />
+                        </template>
+                    </UPopover>
+
+                    <USelect
+                        trailing-icon="i-ci-filter-off-outline"
+                        color="white"
+                        size="lg"
+                        padding="lg"
+                        :options="['Charity', 'Expenditure', 'Income']"
+                        placeholder="All Transactions"
+                        :ui="uiConfig"
+                    />
+
+                    <UButton
+                        icon="i-lets-icons-arhive-alt-export-light"
+                        color="white"
+                        variant="outline"
+                        size="lg"
+                        :ui="{
+                            font: 'font-normal',
+                            rounded: 'rounded-full',
+                            color: {
+                                white: {
+                                    outline:
+                                        'shadow-sm bg-white dark:bg-gray-900 text-icon-gray dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
+                                },
+                            },
+                        }"
+                        @click="handleExport"
+                    >
+                        Export
+                    </UButton>
+                </div>
             </div>
 
-            <AppTable :columns :data="transactions" />
+            <AppTable
+                :loading
+                :columns
+                :data="searchedTransactions"
+                :selectable="true"
+                @select="onSelect"
+            >
+                <template #actions="{ row }">
+                    <UDropdown :items="actionsOption(row)">
+                        <UButton
+                            color="gray"
+                            variant="ghost"
+                            icon="i-heroicons-ellipsis-horizontal-20-solid"
+                        />
+                    </UDropdown>
+                </template>
+            </AppTable>
         </section>
 
         <AddTransactionDrawer v-model="isOpenAddTransaction" :refresh />
+        <TransactionDetailDrawer v-model="isViewTransaction" />
     </section>
 </template>

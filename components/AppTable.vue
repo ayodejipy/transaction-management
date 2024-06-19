@@ -1,9 +1,7 @@
 <script
     setup
     lang="ts"
-    generic="
-        T extends Record<string, string | number | boolean>
-    "
+    generic="T extends Record<string, string | number | boolean>"
 >
 import type { IColumn, ITransaction } from '~/types'
 
@@ -12,6 +10,7 @@ interface IProps {
     data: T[]
     loading?: boolean
     paginate?: boolean
+    selectable?: boolean
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -19,6 +18,7 @@ const props = withDefaults(defineProps<IProps>(), {
     data: () => [],
     loading: false,
     paginate: true,
+    selectable: false,
 })
 
 const emit = defineEmits<{
@@ -27,7 +27,7 @@ const emit = defineEmits<{
 
 // Pagination
 const page = ref<number>(1)
-const pageCount = ref<number>(5)
+const pageCount = ref<number>(15)
 // const pageTotal = ref<number>(20) // This value should be dynamic coming from the API
 // const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
 // const pageTo = computed(() =>
@@ -40,6 +40,22 @@ const rows = computed(() => {
         page.value * pageCount.value
     )
 })
+
+const tableUi = computed(() => ({
+    th: {
+        base: 'bg-[#F9FAFB]',
+        padding: 'px-8 py-3.5',
+        color: 'text-brand-gray dark:text-white',
+        font: 'font-medium',
+        size: 'text-sm',
+    },
+    td: {
+        padding: 'px-8 py-6',
+        color: 'text-gray-500 dark:text-gray-400',
+        font: 'font-light',
+        size: 'text-sm',
+    },
+}))
 
 function onSelect(row: ITransaction) {
     emit('select', row)
@@ -58,26 +74,25 @@ function onSelect(row: ITransaction) {
         }"
     >
         <UTable
+            v-if="props.selectable"
             :columns
             :rows
             :loading
             class="w-full"
-            :ui="{
-                th: {
-                    base: 'bg-[#F9FAFB]',
-                    padding: 'px-8 py-3.5',
-                    color: 'text-brand-gray dark:text-white',
-                    font: 'font-medium',
-                    size: 'text-sm',
-                },
-                td: {
-                    padding: 'px-8 py-6',
-                    color: 'text-gray-500 dark:text-gray-400',
-                    font: 'font-light',
-                    size: 'text-sm',
-                },
-            }"
+            :ui="tableUi"
             @select="onSelect"
+        >
+            <template v-if="$slots.actions" #actions-data="{ row }">
+                <slot name="actions" :row="row" />
+            </template>
+        </UTable>
+        <UTable
+            v-else
+            :columns
+            :rows
+            :loading
+            class="w-full"
+            :ui="tableUi"
         >
             <template v-if="$slots.actions" #actions-data="{ row }">
                 <slot name="actions" :row="row" />

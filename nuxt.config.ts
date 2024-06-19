@@ -44,7 +44,7 @@ export default defineNuxtConfig({
             pages.push({
                 name: 'AdminTransactions',
                 path: '/admin/transactions',
-                file: '~/pages/transactions/index.vue'
+                file: '~/pages/index.vue'
             })
         }
     },

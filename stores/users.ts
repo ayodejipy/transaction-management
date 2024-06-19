@@ -14,7 +14,7 @@ export const useUserStore = defineStore(
             const data = await $customFetch<IUserData>(userProfileUrl)
 
             if (data.success) {
-                user.value = { ...data.content, roles: ['User'] }
+                user.value = { ...data.content, roles: ['SuperAdmin'] }
             }
 
             return data

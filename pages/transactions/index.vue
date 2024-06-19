@@ -13,7 +13,7 @@ useHead({
 
 definePageMeta({
     title: 'Transactions',
-    middleware: 'auth',
+    middleware: ['auth'],
 })
 
 const { $dayjs } = useNuxtApp()
@@ -294,6 +294,7 @@ watch(
                 :loading
                 :columns
                 :data="searchedTransactions"
+                :selectable="true"
                 @select="onSelect"
             >
                 <template #actions="{ row }">
