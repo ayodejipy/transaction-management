@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const { isAuthenticated } = storeToRefs(authStore)
 
     const userStore = useUserStore()
-    const { user, isAdmin } = storeToRefs(userStore)
+    const { user } = storeToRefs(userStore)
 
     if (import.meta.client) {
         if (!user.value) {

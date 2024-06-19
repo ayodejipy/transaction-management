@@ -1,33 +1,9 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from '#ui/types'
-
-import type {
-    AddTransactionSchemaType,
-    ICategory,
-    ITransactionForm,
-    TActiveType,
-} from '~/types'
-
 const isOpen = defineModel({ type: Boolean, default: false })
 
 const { $dayjs } = useNuxtApp()
 
 const { transaction } = storeToRefs(useTransactionStore())
-
-// const loading = ref<boolean>(false)
-
-// const defaultFormState: ITransactionForm = {
-//     amount: 0,
-//     typeId: 0,
-//     categoryId: 0,
-//     transactionDate: '',
-//     description: '',
-// }
-// const form: ITransactionForm = reactive({ ...defaultFormState })
-
-// const $resetForm = () => {
-//     Object.assign(form, defaultFormState)
-// }
 
 const onCloseSlide = () => {
     transaction.value = null
@@ -46,7 +22,7 @@ const onCloseSlide = () => {
             <UCard
                 :ui="{
                     ring: '',
-					shadow: '',
+                    shadow: '',
                     divide: '',
                     body: {
                         padding: 'sm:p-8',
@@ -142,10 +118,9 @@ const onCloseSlide = () => {
                             <div>
                                 <span
                                     class="block text-xs uppercase text-gray-500 dark:text-neutral-500"
-                                    >
-									Amount paid:
-									</span
                                 >
+                                    Amount paid:
+                                </span>
                                 <span
                                     class="block text-sm font-medium text-gray-800 dark:text-neutral-200"
                                 >
@@ -163,7 +138,11 @@ const onCloseSlide = () => {
                                 <span
                                     class="block text-sm font-medium text-gray-800 dark:text-neutral-200"
                                 >
-                                    {{ $dayjs(transaction?.transactionDateUtc).format('MMMM DD, YYYY') }}
+                                    {{
+                                        $dayjs(
+                                            transaction?.transactionDateUtc
+                                        ).format('MMMM DD, YYYY')
+                                    }}
                                 </span>
                             </div>
 
@@ -171,18 +150,21 @@ const onCloseSlide = () => {
                         </div>
                         <!-- End Grid -->
 
-						<div class="mt-5 sm:mt-10" v-if="transaction?.description">
+                        <div
+                            v-if="transaction?.description"
+                            class="mt-5 sm:mt-10"
+                        >
                             <h4
                                 class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
                             >
                                 Description
                             </h4>
-							<p
+                            <p
                                 class="text-sm text-gray-500 dark:text-neutral-500"
                             >
                                 {{ transaction?.description }}
                             </p>
-						</div>
+                        </div>
 
                         <div class="mt-5 sm:mt-10">
                             <h4
@@ -226,10 +208,6 @@ const onCloseSlide = () => {
                                 </li>
                             </ul>
                         </div>
-
-                        
-
-                        
                     </div>
                     <!-- End Body -->
                 </div>
