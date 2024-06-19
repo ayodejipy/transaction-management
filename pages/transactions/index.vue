@@ -4,7 +4,7 @@ import type {
     IColumn,
     IDaysOptionFilter,
     ITransaction,
-    ITransactionData,
+    ITransactionsData,
 } from '~/types'
 
 useHead({
@@ -27,9 +27,20 @@ const {
     pending: loading,
     data,
     refresh,
-} = await useAppFetch<ITransactionData>(transactionsUrl, {
+} = await useAppFetch<ITransactionsData>(transactionsUrl, {
     pick: ['content', 'paging', 'status'],
 })
+
+const dataForTable = computed(() => data.value?.content.map((transaction: ITransaction) => ({
+        id: transaction.typeId,
+        typeName: transaction.typeName,
+        categoryName: transaction.categoryName,
+        transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
+            'DD/MM/YYYY'
+        ),
+        amount: formatCurrency(transaction.amount as number),
+        description: transaction.description,
+    })))
 
 // const hasPagination = computed(() => !!data.value?.paging)
 const isOpenAddTransaction = ref<boolean>(false)
@@ -71,21 +82,14 @@ const actionsOption = (row: ITransaction) => [
             click: () => onUpdateTransaction(row),
         },
     ],
-    // [
-    //     {
-    //         label: 'Delete',
-    //         icon: 'i-heroicons-trash-20-solid',
-    //         click: () => onDeleteCategory(row.id),
-    //     },
-    // ],
 ]
 
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
 
 const searchTerm = ref<string>('')
 
-const filteredTransactions = computed(() => {
-    if (!searchTerm.value) return transactions.value
+const searchedTransactions = computed(() => {
+    if (!searchTerm.value) return dataForTable.value
 
     return transactions.value.filter((transaction) => {
         return Object.values(transaction).some((value) => {
@@ -143,24 +147,24 @@ function onSelect(row: ITransaction) {
     isViewTransaction.value = true
 }
 
-function transformCategories(data: ITransaction[]) {
-    transactions.value = data.map((transaction: ITransaction) => ({
-        id: transaction.typeId,
-        typeName: transaction.typeName,
-        categoryName: transaction.categoryName,
-        transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
-            'DD/MM/YYYY'
-        ),
-        amount: formatCurrency(transaction.amount as number),
-        description: transaction.description,
-    }))
-}
+// function transformCategories(data: ITransaction[]) {
+//     transactions.value = data.map((transaction: ITransaction) => ({
+//         id: transaction.typeId,
+//         typeName: transaction.typeName,
+//         categoryName: transaction.categoryName,
+//         transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
+//             'DD/MM/YYYY'
+//         ),
+//         amount: formatCurrency(transaction.amount as number),
+//         description: transaction.description,
+//     }))
+// }
 
 watch(
     data,
     async (newData) => {
         if (newData && newData.content) {
-            transformCategories(newData.content as ITransaction[])
+            transactions.value = newData.content as ITransaction[]
         } else {
             await refresh()
         }
@@ -289,7 +293,7 @@ watch(
             <AppTable
                 :loading
                 :columns
-                :data="filteredTransactions"
+                :data="searchedTransactions"
                 @select="onSelect"
             >
                 <template #actions="{ row }">

@@ -19,33 +19,6 @@ const { refresh } = await useAppFetch<ITotalTransaction>(totalStatsUrl, {
     pick: ['content'],
 })
 
-const columns = [
-    {
-        key: 'id',
-        label: 'Transaction ID',
-    },
-    {
-        key: 'type',
-        label: 'Transaction Type',
-    },
-    {
-        key: 'category',
-        label: 'Transaction Category',
-    },
-    {
-        key: 'date',
-        label: 'Transaction Date',
-    },
-    {
-        key: 'amount',
-        label: 'Amount',
-    },
-    {
-        key: 'description',
-        label: 'Description',
-    },
-]
-
 const transactions = [
     {
         id: 1233,

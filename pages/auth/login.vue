@@ -32,7 +32,12 @@ async function handleLogin() {
             body: form,
         })
         authStore.setTokens(data.content.token, data.content.refreshToken)
-        router.push('/admin')
+        
+        if (data.content.roles[0] == 'SuperAdmin') {
+            router.push('/admin')
+        } else {
+            router.push('/')
+        }
 
         toast.add({
             title: 'Login Successful',

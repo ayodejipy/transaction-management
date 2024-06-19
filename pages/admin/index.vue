@@ -4,41 +4,85 @@ import type {
     IMonthlyTotal,
     ITotalTransaction,
     ITransactionPercentage,
+    ITransaction,
+    ITransactionsData,
 } from '~/types'
 
 useHead({
-    title: 'Admin Reports'
+    title: 'Admin Reports',
 })
 
 definePageMeta({
     title: 'Reports',
-    middleware: ['auth'],
+    middleware: ['auth', 'admin'],
 })
 
-const isOpenAddTransaction = ref<boolean>(false)
+const { $dayjs } = useNuxtApp()
 
-const categoryStore = useCategoryStore()
-const typeStore = useTypeStore()
+const isOpenAddTransaction = ref<boolean>(false)
 
 const revenueUrl = useEndpoints('totalRevenueUrl')
 const totalStatsUrl = useEndpoints('totalStatsUrl')
 const monthlyStatsUrl = useEndpoints('monthlyStatsUrl')
 const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
+const transactionsUrl = useEndpoints('transactionsUrl')
+
+// const { data: employees } = await useAppFetch<{ data: [] }>(
+//     'https://dummy.restapiexample.com/api/v1/employees'
+// )
+// console.log('EM: ', employees.value)
+
+// Access to the cached value of useFetch
+const { data: cachedTransactions } = useNuxtData(transactionsUrl)
+console.log('cached - transact:', cachedTransactions.value?.content)
+
+const {
+    pending: loadingTransactions,
+    data,
+    refresh,
+} = await useAppFetch<ITransactionsData>(transactionsUrl, {
+    pick: ['content'],
+    key: transactionsUrl,
+    default: () => cachedTransactions.value,
+})
+
+const transactions = computed(() =>
+    data.value?.content
+        .map((transaction: ITransaction) => ({
+            id: transaction.typeId,
+            typeName: transaction.typeName,
+            categoryName: transaction.categoryName,
+            transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
+                'DD/MM/YYYY'
+            ),
+            amount: formatCurrency(transaction.amount as number),
+            description: transaction.description,
+        }))
+        .slice(0, 10)
+)
 
 // Total revenue
-const {
-    pending: loadingRevenue,
-    data: revenue,
-    refresh,
-} = await useAppFetch<IDataResponse<number | undefined>>(revenueUrl, {
+const { data: cachedRevenue } = useNuxtData(revenueUrl)
+console.log('cached - revenue:', cachedRevenue.value?.content)
+
+const { pending: loadingRevenue, data: revenue } = await useAppFetch<
+    IDataResponse<number | undefined>
+>(revenueUrl, {
     pick: ['content'],
+    key: revenueUrl,
+    default: () => cachedRevenue.value,
 })
 const totalRevenue = computed(() => formatCurrency(revenue.value?.content || 0))
 
 // Totals e.g; credit, debit
+const { data: cachedTotalStats } = useNuxtData(totalStatsUrl)
+console.log('cached - stats:', cachedTotalStats.value)
+
 const { pending: loadingStats, data: total } =
     await useAppFetch<ITotalTransaction>(totalStatsUrl, {
         pick: ['content'],
+        key: totalStatsUrl,
+        default: () => cachedTotalStats.value,
     })
 
 const statistics = computed(() => [
@@ -61,8 +105,18 @@ const statistics = computed(() => [
 ])
 
 // Credit OR Debit transactions percentage (20%, 80%)
+const { data: cachedTotalPercentage } = useNuxtData(creditDebitPercentageUrl)
+console.log(
+    'cached - creditDebitPercentageUrl:',
+    cachedTotalPercentage.value?.content
+)
+
 const { pending: loadingPercentage, data: totalPercentile } =
-    await useAppFetch<ITransactionPercentage>(creditDebitPercentageUrl, {})
+    await useAppFetch<ITransactionPercentage>(creditDebitPercentageUrl, {
+        pick: ['content'],
+        key: creditDebitPercentageUrl,
+        default: () => cachedTotalPercentage.value,
+    })
 
 const series = computed(() => [
     totalPercentile.value?.content.totalCreditsPercentage || 0,
@@ -70,8 +124,15 @@ const series = computed(() => [
 ])
 
 // Total transactions per month: Jan, Feb...
+const { data: cachedTotalPerMonth } = useNuxtData(monthlyStatsUrl)
+console.log('cached - totalPM:', cachedTotalPerMonth.value?.content)
+
 const { pending: loadingTotalPerMonth, data: totalPerMonth } =
-    await useAppFetch<IMonthlyTotal>(monthlyStatsUrl)
+    await useAppFetch<IMonthlyTotal>(monthlyStatsUrl, {
+        pick: ['content'],
+        key: monthlyStatsUrl,
+        default: () => cachedTotalPerMonth.value,
+    })
 
 const monthsSeries = computed(() =>
     totalPerMonth.value?.content.map((month) => month.monthName)
@@ -82,137 +143,12 @@ const amountsSeries = computed(() =>
 
 const isLoading = computed(
     () =>
+        loadingTransactions.value ||
         loadingRevenue.value ||
         loadingStats.value ||
         loadingPercentage.value ||
         loadingTotalPerMonth.value
 )
-
-const columns = [
-    {
-        key: 'id',
-        label: 'Transaction ID',
-    },
-    {
-        key: 'type',
-        label: 'Transaction Type',
-    },
-    {
-        key: 'category',
-        label: 'Transaction Category',
-    },
-    {
-        key: 'date',
-        label: 'Transaction Date',
-    },
-    {
-        key: 'amount',
-        label: 'Amount',
-    },
-    {
-        key: 'description',
-        label: 'Description',
-    },
-]
-
-const transactions = [
-    {
-        id: 1233,
-        type: 'Income',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1234,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1235,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-    {
-        id: 1236,
-        type: 'Expenditure',
-        category: 'Charity',
-        date: '13/05/2024',
-        amount: '$10,000',
-        description: 'Books and stationery supplies',
-    },
-]
 
 const uiConfig = computed(() => ({
     divide: '',
@@ -224,12 +160,6 @@ const uiConfig = computed(() => ({
         padding: 'px-0 sm:px-6',
     },
 }))
-
-onMounted(async () => {
-    // transaction categories and types
-    await categoryStore.getCategories()
-    await typeStore.getTypes()
-})
 </script>
 
 <template>
@@ -290,7 +220,7 @@ onMounted(async () => {
                     </ULink>
                 </div>
 
-                <AppTable :columns :data="transactions" />
+                <AppTable :columns :data="transactions" :paginate="false" />
             </section>
 
             <!-- analysis section -->

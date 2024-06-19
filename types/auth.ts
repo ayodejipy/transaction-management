@@ -3,6 +3,7 @@ import type { IDataResponse } from "./api"
 import type { IUser } from './user'
 
 export interface ITokenData {
+    roles: string[]
     token: string
     refreshToken: string
     expiresAt: string

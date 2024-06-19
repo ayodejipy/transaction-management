@@ -68,7 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
         const { $customFetch } = useNuxtApp()
         const authUrl = useEndpoints('authUrl')
 
-        await $customFetch<IAuthData>(`${authUrl}/${uid}/logout`)
+        // await $customFetch<IAuthData>(`${authUrl}/${uid}/logout`)
 
         // if (data.success) {
         // }

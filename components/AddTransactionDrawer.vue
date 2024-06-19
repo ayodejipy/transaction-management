@@ -17,8 +17,11 @@ const isOpen = defineModel({ type: Boolean, default: false })
 const toast = useToast()
 const { addTransaction } = useTransactionStore()
 
-const { categories } = storeToRefs(useCategoryStore())
-const { types } = storeToRefs(useTypeStore())
+const categoryStore = useCategoryStore()
+const { categories } = storeToRefs(categoryStore)
+
+const typeStore = useTypeStore()
+const { types } = storeToRefs(typeStore)
 
 // types
 const transactionTypes = computed(() =>
@@ -84,6 +87,12 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
         loading.value = !loading.value
     }
 }
+
+onMounted(async () => {
+    // transaction categories and types
+    await categoryStore.getCategories()
+    await typeStore.getTypes()
+})
 </script>
 
 <template>

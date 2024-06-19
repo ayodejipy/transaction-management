@@ -64,8 +64,8 @@ export interface MonthlyTotalType {
 export type TransactionTypeSchemaType = z.output<typeof TransactionTypeSchema>
 export type AddTransactionSchemaType = z.output<typeof AddTransactionSchema>
 
-export interface ITransactionData
-    extends IDataResponse<ITransaction | ITransaction[]> {}
+export interface ITransactionData extends IDataResponse<ITransaction> {}
+export interface ITransactionsData extends IDataResponse<ITransaction[]> {}
 
 export interface TCategoryData extends IDataResponse<ICategory> {}
 export interface ICategoriesData extends IDataResponse<ICategory[]> {}
