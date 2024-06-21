@@ -9,32 +9,46 @@ import type {
 
 definePageMeta({
     title: 'Transactions',
-    middleware: ['auth'],
+    middleware: ['auth', 'admin'],
 })
 
 const { $dayjs } = useNuxtApp()
 
 const { isAdmin } = storeToRefs(useUserStore())
 
-const correctPageTitle = computed(() => isAdmin.value ? 'Transactions' : 'Dashboard')
+const correctPageTitle = computed(() =>
+    isAdmin.value ? 'Transactions' : 'Dashboard'
+)
 
 useHead({
     title: correctPageTitle,
 })
 
+const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
 
 const { transactions, transaction } = storeToRefs(useTransactionStore())
-
 const transactionsUrl = useEndpoints('transactionsUrl')
+
+const derivedURL = computed(() =>
+    selected.value
+        ? `${transactionsUrl}?FromDate="${selected.value.start}"&ToDate="${selected.value.end}"`
+        : transactionsUrl
+)
+
 const {
     pending: loading,
     data,
     refresh,
 } = await useAppFetch<ITransactionsData>(transactionsUrl, {
     pick: ['content', 'paging', 'status'],
+    query: {
+        FromDate: selected.value.start,
+        ToDate: selected.value.end
+    }
 })
 
-const dataForTable = computed(() => data.value?.content.map((transaction: ITransaction) => ({
+const dataForTable = computed(() =>
+    data.value?.content.map((transaction: ITransaction) => ({
         id: transaction.typeId,
         typeName: transaction.typeName,
         categoryName: transaction.categoryName,
@@ -43,7 +57,8 @@ const dataForTable = computed(() => data.value?.content.map((transaction: ITrans
         ),
         amount: formatCurrency(transaction.amount as number),
         description: transaction.description,
-    })))
+    }))
+)
 
 // const hasPagination = computed(() => !!data.value?.paging)
 const isOpenAddTransaction = ref<boolean>(false)
@@ -86,8 +101,6 @@ const actionsOption = (row: ITransaction) => [
         },
     ],
 ]
-
-const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
 
 const searchTerm = ref<string>('')
 
@@ -162,6 +175,10 @@ function onSelect(row: ITransaction) {
 //         description: transaction.description,
 //     }))
 // }
+
+watch(selected, (_newDate) => {
+    console.log({ _newDate })
+})
 
 watch(
     data,

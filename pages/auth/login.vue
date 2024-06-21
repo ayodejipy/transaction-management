@@ -10,6 +10,7 @@ definePageMeta({
 })
 
 const toast = useToast()
+const route = useRoute()
 const router = useRouter()
 
 const { $customFetch } = useNuxtApp()
@@ -23,6 +24,8 @@ const form = reactive({
     // stay_logged_in: false,
 })
 
+// console.log(route)
+
 async function handleLogin() {
     loading.value = true
     const loginUrl = useEndpoints('loginUrl')
@@ -32,8 +35,10 @@ async function handleLogin() {
             body: form,
         })
         authStore.setTokens(data.content.token, data.content.refreshToken)
-        
-        if (data.content.roles[0] == 'SuperAdmin') {
+
+        if (route.redirectedFrom) {
+            router.push(route.redirectedFrom.fullPath)
+        } else if (data.content.roles[0] == userTypes.admin) {
             router.push('/admin')
         } else {
             router.push('/')

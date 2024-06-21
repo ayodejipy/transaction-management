@@ -13,6 +13,20 @@ const { pending: loading, data, refresh } = await useAppFetch<IInvitedUsersData>
     pick: ['content', 'status'],
 })
 
+const searchTerm = ref<string>('')
+
+const searchedUsers = computed(() => {
+    if (!searchTerm.value) return invitedUsers.value
+
+    return invitedUsers.value.filter((user) => {
+        return Object.values(user).some((value) => {
+            return String(value)
+                .toLowerCase()
+                .includes(searchTerm.value.toLowerCase())
+        })
+    })
+})
+
 const uiConfig = computed(() => ({
     placeholder: 'text-icon-gray dark:text-gray-500',
     rounded: 'rounded-full',
@@ -170,7 +184,7 @@ watch(
                 </div>
             </div>
 
-            <AppTable :loading :columns :data="invitedUsers">
+            <AppTable :loading :columns :data="searchedUsers">
                 <template #actions="{ row }">
                     <UDropdown :items="actionsOption(row)">
                         <UButton

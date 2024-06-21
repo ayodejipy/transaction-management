@@ -34,7 +34,6 @@ export const useAuthStore = defineStore('auth', () => {
                 },
             })
 
-            console.log('...WRITING TO STORAGE...')
             setTokens(data.content.token, data.content.refreshToken)
 
             return data
@@ -68,13 +67,15 @@ export const useAuthStore = defineStore('auth', () => {
         const { $customFetch } = useNuxtApp()
         const authUrl = useEndpoints('authUrl')
 
-        await $customFetch<IAuthData>(`${authUrl}/${uid}/logout`)
+        const data = await $customFetch<IAuthData>(`${authUrl}/${uid}/logout`)
 
-        // if (data.success) {
-        // }
-        setTokens(null, null)
-        user.value = null
-        router.push(LOGIN_PATH)
+        if (data.success) {
+            setTokens(null, null)
+            user.value = null
+            router.push(LOGIN_PATH)
+        }
+
+        return data
     }
 
     return {

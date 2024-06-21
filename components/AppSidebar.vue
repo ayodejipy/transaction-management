@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // const route = useRoute()
 
-const { isAdmin } = storeToRefs(useUserStore())
+const { isAdmin, user } = storeToRefs(useUserStore())
+const { handleLogout } = useAuthStore()
 
 const ADMIN_PATH = '/admin'
 const appendedUrl = computed(() => (isAdmin.value ? ADMIN_PATH : ''))
@@ -39,12 +40,13 @@ const roleBasedLinks = computed(() => {
         // },
     ]
 })
-
 </script>
 
 <template>
     <!-- Static sidebar for desktop -->
-    <div class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+    <div
+        class="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col"
+    >
         <div
             class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 pb-4"
         >
@@ -54,7 +56,7 @@ const roleBasedLinks = computed(() => {
                         class="h-10 w-auto"
                         src="~/assets/logo.svg"
                         alt="Opabid transaction management"
-                    >
+                    />
                 </ULink>
                 <!-- <ClientOnly>
                     <Icon name="NuxtIcon" size="64" />
@@ -77,19 +79,15 @@ const roleBasedLinks = computed(() => {
                     <li
                         class="mt-auto before:w-full before:h-px before:bg-gray-300"
                     >
-                        <button
-                            type="button"
-                            class="group flex items-center gap-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-700 hover:bg-gray-50 hover:text-green-600"
+                        <UButton
+                            color="gray"
+                            variant="ghost"
+                            size="sm"
+                            icon="i-octicon-sign-out-16"
+                            @click="handleLogout(user?.uid as string)"
                         >
-                            <ClientOnly>
-                                <Icon
-                                    class="shrink-0 text-gray-400 group-hover:text-green-600"
-                                    aria-hidden="true"
-                                    name="i-octicon-sign-out-16"
-                                />
-                            </ClientOnly>
                             Logout
-                        </button>
+                        </UButton>
                     </li>
                 </ul>
             </div>

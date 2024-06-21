@@ -2,13 +2,10 @@
 definePageMeta({
     key: (route) => route.fullPath,
     title: 'Reports',
-    middleware: ['auth', 'admin']
+    middleware: ['auth', 'admin'],
 })
-
 </script>
 
 <template>
-    <section class="w-full">
-        <NuxtPage />
-    </section>
+    <NuxtPage />
 </template>

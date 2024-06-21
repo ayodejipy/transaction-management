@@ -14,6 +14,20 @@ const { data, pending, refresh } = await useAppFetch<ITypesData>(typesUrl, {
     pick: ['content', 'status'],
 })
 
+const searchTerm = ref<string>('')
+
+const searchedTypes = computed(() => {
+    if (!searchTerm.value) return types.value
+
+    return types.value.filter((type) => {
+        return Object.values(type).some((value) => {
+            return String(value)
+                .toLowerCase()
+                .includes(searchTerm.value.toLowerCase())
+        })
+    })
+})
+
 const columns: IColumn[] = [
     {
         key: 'id',
@@ -131,6 +145,7 @@ watch(
                 </div>
                 <div class="flex items-center gap-2.5">
                     <UInput
+                        v-model="searchTerm"
                         :ui="{
                             rounded: 'rounded-full',
                             icon: {
@@ -156,7 +171,7 @@ watch(
                 </div>
             </div>
 
-            <AppTable :loading="pending" :columns :data="types">
+            <AppTable :loading="pending" :columns :data="searchedTypes">
                 <template #actions="{ row }">
                     <div class="flex items-center gap-2">
                         <UButton

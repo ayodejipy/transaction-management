@@ -6,7 +6,8 @@ export const useUserStore = defineStore(
         const userProfileUrl = useEndpoints('userProfileUrl')
         const user = ref<IUser | null>(null)
 
-        const isAdmin = computed(() => user.value?.roles.includes('SuperAdmin'))
+        const isLoggedIn = computed(() => !!user.value)
+        const isAdmin = computed(() => user.value?.roles[0] === userRoles.SuperAdmin)
 
         async function getProfile(): Promise<IUserData> {
             const { $customFetch } = useNuxtApp()
@@ -14,13 +15,13 @@ export const useUserStore = defineStore(
             const data = await $customFetch<IUserData>(userProfileUrl)
 
             if (data.success) {
-                user.value = { ...data.content, roles: ['SuperAdmin'] }
+                user.value = data.content
             }
 
             return data
         }
 
-        return { user, isAdmin, getProfile }
+        return { user, isAdmin, isLoggedIn, getProfile }
     },
     {
         persist: {

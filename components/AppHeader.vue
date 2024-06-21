@@ -8,12 +8,17 @@ withDefaults(
     }
 )
 
-const userStore = useUserStore()
 const authStore = useAuthStore()
-const { user } = storeToRefs(userStore)
+
+const userStore = useUserStore()
+const { user, isAdmin } = storeToRefs(userStore)
 
 const fullname = computed<string>(
     () => user.value?.firstName + ' ' + user.value?.lastName
+)
+
+const userType = computed(() =>
+    isAdmin.value ? userTypes.admin : userTypes.user
 )
 
 const items = [
@@ -106,7 +111,7 @@ const items = [
                                             class="text-sm font-normal leading-6 text-gray-500"
                                             aria-hidden="true"
                                         >
-                                            Admin
+                                            {{ userType }}
                                         </span>
                                     </span>
                                 </button>

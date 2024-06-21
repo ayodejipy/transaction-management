@@ -5,7 +5,7 @@ type TTransaction = Omit<ITransaction, 'categoryId' | 'typeId' | 'createdAtUtc'>
 export const useTransactionStore = defineStore('transaction', () => {
     const transactionsUrl = useEndpoints('transactionsUrl')
 
-    const transactions = ref<TTransaction[]>([])
+    const transactions = ref<ITransaction[]>([])
     const transaction = ref<TTransaction | null>(null)
 
     async function getTransactions(): Promise<ITransactionData> {
@@ -14,7 +14,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         const data = await $customFetch<ITransactionData>(transactionsUrl)
 
         if (data.success) {
-            transactions.value = data.content as ITransaction[]
+            transactions.value = data.content
         }
 
         return data

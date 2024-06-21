@@ -26,3 +26,13 @@ export const columns: IColumn[] = [
         label: 'Description',
     },
 ]
+
+
+export const userRoles = {
+    SuperAdmin: 'SuperAdmin',
+    User: 'User'
+}
+export const userTypes = {
+    admin: 'admin',
+    user: 'user'
+}

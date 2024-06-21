@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     },
     runtimeConfig: {
         public: {
-            apiBaseURL: process.env.NUXT_PUBLIC_API_BASE, 
+            apiBaseURL: process.env.NUXT_PUBLIC_API_BASE,
         },
     },
     colorMode: {
@@ -41,12 +41,19 @@ export default defineNuxtConfig({
     },
     hooks: {
         'pages:extend'(pages) {
-            pages.push({
-                name: 'AdminTransactions',
-                path: '/admin/transactions',
-                file: '~/pages/index.vue'
-            })
-        }
+            pages.push(
+                {
+                    name: 'AdminTransactions',
+                    path: '/admin/transactions',
+                    file: '~/pages/index.vue',
+                },
+                {
+                    name: 'AdminSettings',
+                    path: '/admin/settings',
+                    file: '~/pages/admin/settings/categories.vue',
+                }
+            )
+        },
     },
     devtools: { enabled: true },
     modules: [
