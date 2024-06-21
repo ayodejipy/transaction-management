@@ -24,16 +24,25 @@ useHead({
     title: correctPageTitle,
 })
 
+const searchTerm = ref<string>('')
 const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
 
 const { transactions, transaction } = storeToRefs(useTransactionStore())
 const transactionsUrl = useEndpoints('transactionsUrl')
 
-const derivedURL = computed(() =>
-    selected.value
-        ? `${transactionsUrl}?FromDate="${selected.value.start}"&ToDate="${selected.value.end}"`
-        : transactionsUrl
-)
+const apiUrl = computed(() => {
+    const params = new URLSearchParams()
+
+    if (searchTerm.value) params.append('SearchQuery', searchTerm.value)
+    if (selected.value) {
+        params.append('FromDate', selected.value.start.toString())
+        params.append('ToDate', selected.value.end.toString())
+    }
+
+    return `${transactionsUrl}?${params.toString()}`
+})
+
+console.log('derived: ', apiUrl.value)
 
 const {
     pending: loading,
@@ -41,10 +50,6 @@ const {
     refresh,
 } = await useAppFetch<ITransactionsData>(transactionsUrl, {
     pick: ['content', 'paging', 'status'],
-    query: {
-        FromDate: selected.value.start,
-        ToDate: selected.value.end
-    }
 })
 
 const dataForTable = computed(() =>
@@ -92,6 +97,7 @@ const columns: IColumn[] = [
     { key: 'actions' },
 ]
 
+// actions
 const actionsOption = (row: ITransaction) => [
     [
         {
@@ -101,8 +107,6 @@ const actionsOption = (row: ITransaction) => [
         },
     ],
 ]
-
-const searchTerm = ref<string>('')
 
 const searchedTransactions = computed(() => {
     if (!searchTerm.value) return dataForTable.value
@@ -176,8 +180,11 @@ function onSelect(row: ITransaction) {
 //     }))
 // }
 
-watch(selected, (_newDate) => {
-    console.log({ _newDate })
+watch([selected, searchTerm], ([_newSelection, _newSearchTerm]) => {
+    if (_newSelection || _newSearchTerm) {
+        const query = `${transactionsUrl}?SearchQuery=${_newSearchTerm}&FromDate=${_newSelection.start}&ToDate=${_newSelection.end}`
+        console.log({ query })
+    }
 })
 
 watch(

@@ -6,24 +6,31 @@ import type {
 } from 'v-calendar/dist/types/src/use/datePicker.js'
 import 'v-calendar/dist/style.css'
 
-const props = defineProps({
-    modelValue: {
-        type: [Date, Object] as PropType<
-            DatePickerDate | DatePickerRangeObject | null
-        >,
-        default: null,
-    },
+const date = defineModel({
+    type: [Date, Object] as PropType<
+        DatePickerDate | DatePickerRangeObject | null
+    >,
+    default: null,
 })
 
-const emit = defineEmits(['update:model-value', 'close'])
+// const props = defineProps({
+//     modelValue: {
+//         type: [Date, Object] as PropType<
+//             DatePickerDate | DatePickerRangeObject | null
+//         >,
+//         default: null,
+//     },
+// })
 
-const date = computed({
-    get: () => props.modelValue,
-    set: (value) => {
-        emit('update:model-value', value)
-        emit('close')
-    },
-})
+const emit = defineEmits(['close'])
+
+// const date = computed({
+//     get: () => props.modelValue,
+//     set: (value) => {
+//         emit('update:model-value', value)
+//         emit('close')
+//     },
+// })
 
 const attrs = {
     transparent: true,
@@ -33,6 +40,9 @@ const attrs = {
     'first-day-of-week': 2,
 }
 
+watch(date, (_updated) => {
+    emit('close')
+})
 </script>
 
 <template>
