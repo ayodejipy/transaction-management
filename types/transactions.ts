@@ -15,7 +15,14 @@ export interface ITransactionForm {
     categoryId: number
     transactionDate: string
 }
+
+interface ICreatedby {
+    uid: string
+    firstName: string
+    lastName: string
+}
 export interface ITransaction {
+    id: number
     amount: number | string
     categoryId: number
     categoryName: string
@@ -24,6 +31,7 @@ export interface ITransaction {
     transactionDateUtc: string
     typeId: number
     typeName: string
+    createdBy: ICreatedby
 }
 
 export interface ITypes {

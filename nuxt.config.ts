@@ -45,12 +45,12 @@ export default defineNuxtConfig({
                 {
                     name: 'AdminTransactions',
                     path: '/admin/transactions',
-                    file: '~/pages/index.vue',
+                    file: '~/pages/transactions/index.vue',
                 },
                 {
                     name: 'AdminSettings',
                     path: '/admin/settings',
-                    file: '~/pages/admin/settings/categories.vue',
+                    file: '~/pages/admin/settings/users.vue',
                 }
             )
         },

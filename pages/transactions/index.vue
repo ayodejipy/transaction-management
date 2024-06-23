@@ -7,40 +7,56 @@ import type {
     ITransactionsData,
 } from '~/types'
 
-useHead({
-    title: 'Transactions',
-})
-
 definePageMeta({
     title: 'Transactions',
-    middleware: ['auth'],
+    middleware: ['auth', 'admin'],
 })
 
 const { $dayjs } = useNuxtApp()
+const router = useRouter()
 
-// const { isAdmin } = storeToRefs(useUserStore())
+const { isAdmin } = storeToRefs(useUserStore())
 
-const transactionsUrl = useEndpoints('transactionsUrl')
-const { transactions, transaction } = storeToRefs(useTransactionStore())
-
-const selected = ref({ start: sub(new Date(), { days: 14 }), end: new Date() })
-const derivedURL = computed(() =>
-    selected.value
-        ? `${transactionsUrl}?FromDate="${selected.value.start}"&ToDate="${selected.value.end}"`
-        : transactionsUrl
+const correctPageTitle = computed(() =>
+    isAdmin.value ? 'Transactions' : 'Dashboard'
 )
+
+useHead({
+    title: correctPageTitle,
+})
+
+const searchTerm = ref<string>('')
+const selected = ref({
+    start: '' as unknown as Date,
+    end: '' as unknown as Date,
+})
+
+const { transactions, transaction } = storeToRefs(useTransactionStore())
+const transactionsUrl = useEndpoints('transactionsUrl')
+
+const newTransactionUrl = computed(() => {
+    const params = new URLSearchParams()
+
+    if (searchTerm.value) params.append('SearchQuery', searchTerm.value)
+    if (selected.value.start && selected.value.end) {
+        params.append('FromDate', selected.value.start.toISOString())
+        params.append('ToDate', selected.value.end.toISOString())
+    }
+
+    return `${transactionsUrl}?${params.toString()}`
+})
+
 const {
     pending: loading,
     data,
     refresh,
-} = await useAppFetch<ITransactionsData>(transactionsUrl, {
+} = await useAppFetch<ITransactionsData>(() => newTransactionUrl.value, {
     pick: ['content', 'paging', 'status'],
-    watch: [selected],
 })
 
 const dataForTable = computed(() =>
-    data.value?.content.map((transaction: ITransaction) => ({
-        id: transaction.typeId,
+    data.value?.content?.map((transaction: ITransaction) => ({
+        id: transaction.id,
         typeName: transaction.typeName,
         categoryName: transaction.categoryName,
         transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
@@ -55,8 +71,35 @@ const dataForTable = computed(() =>
 const isOpenAddTransaction = ref<boolean>(false)
 const isViewTransaction = ref<boolean>(false)
 
-const tableColumns: IColumn[] = [...columns, { key: 'actions' }]
+const columns: IColumn[] = [
+    {
+        key: 'id',
+        label: 'Transaction ID',
+    },
+    {
+        key: 'typeName',
+        label: 'Transaction Type',
+    },
+    {
+        key: 'categoryName',
+        label: 'Transaction Category',
+    },
+    {
+        key: 'transactionDateUtc',
+        label: 'Transaction Date',
+    },
+    {
+        key: 'amount',
+        label: 'Amount',
+    },
+    {
+        key: 'description',
+        label: 'Description',
+    },
+    { key: 'actions' },
+]
 
+// actions
 const actionsOption = (row: ITransaction) => [
     [
         {
@@ -66,8 +109,6 @@ const actionsOption = (row: ITransaction) => [
         },
     ],
 ]
-
-const searchTerm = ref<string>('')
 
 const searchedTransactions = computed(() => {
     if (!searchTerm.value) return dataForTable.value
@@ -117,6 +158,11 @@ const handleExport = () => {
     console.log('click')
 }
 
+function $clearFilters() {
+    searchTerm.value = ''
+    selected.value.start = '' as unknown as Date
+    selected.value.end = '' as unknown as Date
+}
 function onUpdateTransaction(row: ITransaction) {
     console.log({ row })
     transaction.value = row
@@ -125,7 +171,8 @@ function onUpdateTransaction(row: ITransaction) {
 
 function onSelect(row: ITransaction) {
     transaction.value = row
-    isViewTransaction.value = true
+    router.push(`${isAdmin.value ? '/admin': ''}/transactions/${row.id}`)
+    // isViewTransaction.value = true
 }
 
 // function transformCategories(data: ITransaction[]) {
@@ -186,7 +233,7 @@ watch(
                 </div>
                 <div class="flex items-center gap-2.5">
                     <UInput
-                        v-model="searchTerm"
+                        v-model.lazy="searchTerm"
                         :ui="{
                             rounded: 'rounded-full',
                             icon: {
@@ -226,8 +273,11 @@ watch(
                             variant="outline"
                             :ui="{ rounded: 'rounded-full' }"
                         >
-                            {{ format(selected.start, 'd MMM, yyy') }} -
-                            {{ format(selected.end, 'd MMM, yyy') }}
+                            <span v-if="selected.start && selected.end">
+                                {{ format(selected.start, 'd MMM, yyy') }} -
+                                {{ format(selected.end, 'd MMM, yyy') }}
+                            </span>
+                            <span v-else>Date Range</span>
                         </UButton>
 
                         <template #panel="{ close }">
@@ -268,12 +318,23 @@ watch(
                     >
                         Export
                     </UButton>
+                    <UButton
+                        icon="i-ic-outline-clear"
+                        dynamic
+                        size="lg"
+                        color="white"
+                        variant="outline"
+                        :ui="{ rounded: 'rounded-full' }"
+                        @click="$clearFilters"
+                    >
+                        Clear
+                    </UButton>
                 </div>
             </div>
 
             <AppTable
                 :loading
-                :columns="tableColumns"
+                :columns
                 :data="searchedTransactions"
                 :selectable="true"
                 @select="onSelect"

@@ -9,7 +9,7 @@ import type {
 } from '~/types'
 
 const props = defineProps<{
-    refresh: () => Promise<void> | void
+    refresh?: () => Promise<void> | void
 }>()
 
 const isOpen = defineModel({ type: Boolean, default: false })
@@ -71,7 +71,11 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
                 description: "You've successfully uploaded a new transaction",
                 icon: 'i-heroicons-outline-check-badge',
             })
-            await props.refresh()
+
+            if (props.refresh) {
+                await props.refresh()
+            }
+            
             onCloseSlide()
         }
     } catch {
