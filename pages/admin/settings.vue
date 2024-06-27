@@ -13,27 +13,26 @@ definePageMeta({
 })
 
 const ADMIN_PATH = '/admin'
-const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PATH : '')
+// const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PATH : '')
 
 const links = [
     {
         label: 'Categories',
         icon: 'i-heroicons-chart-bar',
-        to: `${appendedUrl.value}/settings/categories`,
+        to: `${ADMIN_PATH}/settings/categories`,
     },
     {
         label: 'Types',
         icon: 'i-heroicons-chart-bar',
-        to: `${appendedUrl.value}/settings/types`,
+        to: `${ADMIN_PATH}/settings/types`,
     },
     {
         label: 'User Management',
         icon: 'i-heroicons-chart-bar',
-        to: `${appendedUrl.value}/settings/users`,
+        to: `${ADMIN_PATH}/settings/users`,
     }
 ]
 
-// onMounted(() => router.push(links[0].to))
 </script>
 
 <template>

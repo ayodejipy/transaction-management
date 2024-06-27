@@ -8,6 +8,7 @@ export default defineNuxtConfig({
             apiBaseURL: process.env.NUXT_PUBLIC_API_BASE,
         },
     },
+    ssr: false,
     colorMode: {
         preference: 'light',
     },
@@ -43,15 +44,15 @@ export default defineNuxtConfig({
         'pages:extend'(pages) {
             pages.push(
                 {
-                    name: 'AdminTransactions',
+                    name: 'Admin-transactions',
                     path: '/admin/transactions',
                     file: '~/pages/transactions/index.vue',
                 },
                 {
-                    name: 'AdminSettings',
-                    path: '/admin/settings',
-                    file: '~/pages/admin/settings/users.vue',
-                }
+                    name: 'Admin-transaction-view',
+                    path: '/admin/transactions/:id',
+                    file: '~/pages/transactions/[id].vue',
+                },
             )
         },
     },

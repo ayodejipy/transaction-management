@@ -13,17 +13,17 @@ const roleBasedLinks = computed(() => {
             {
                 label: 'Reports',
                 icon: 'ReportsIcon',
-                to: `${appendedUrl.value}`,
+                to: `${ADMIN_PATH}`,
             },
             {
                 label: 'Transactions',
                 icon: 'TransactionsIcon',
-                to: `${appendedUrl.value}/transactions`,
+                to: `${ADMIN_PATH}/transactions`,
             },
             {
                 label: 'Settings',
                 icon: 'SettingsIcon',
-                to: `${appendedUrl.value}/settings`,
+                to: `${ADMIN_PATH}/settings/categories`,
             },
         ]
     }
@@ -56,7 +56,7 @@ const roleBasedLinks = computed(() => {
                         class="h-10 w-auto"
                         src="~/assets/logo.svg"
                         alt="Opabid transaction management"
-                    />
+                    >
                 </ULink>
                 <!-- <ClientOnly>
                     <Icon name="NuxtIcon" size="64" />
@@ -65,6 +65,7 @@ const roleBasedLinks = computed(() => {
             <div class="flex flex-1 flex-col pt-6">
                 <ClientOnly fallback-tag="div">
                     <NavigationLinks :links="roleBasedLinks" />
+                    <!-- <UVerticalNavigation :links="roleBasedLinks" /> -->
 
                     <template #fallback>
                         <div class="space-y-6">

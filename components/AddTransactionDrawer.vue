@@ -15,7 +15,9 @@ const props = defineProps<{
 const isOpen = defineModel({ type: Boolean, default: false })
 
 const toast = useToast()
-const { addTransaction } = useTransactionStore()
+const transactionStore = useTransactionStore()
+const { addTransaction, updateTransaction } = transactionStore
+const { transaction } = storeToRefs(transactionStore)
 
 const categoryStore = useCategoryStore()
 const { categories } = storeToRefs(categoryStore)
@@ -60,9 +62,11 @@ const onCloseSlide = () => {
 
 async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
     loading.value = true
-
+    const transactionId = transaction.value?.id
     try {
-        const data = await addTransaction(event.data)
+        const data = transactionId
+            ? await updateTransaction(transactionId, event.data)
+            : await addTransaction(event.data)
 
         if (data.success) {
             toast.add({
@@ -75,7 +79,7 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
             if (props.refresh) {
                 await props.refresh()
             }
-            
+
             onCloseSlide()
         }
     } catch {
@@ -91,6 +95,20 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
         loading.value = !loading.value
     }
 }
+
+watch(transaction, (_updated) => {
+    if (_updated) {
+        const { amount, typeId, categoryId, transactionDateUtc, description } =
+            _updated
+        Object.assign(form, {
+            amount,
+            typeId,
+            categoryId,
+            description,
+            transactionDate: transactionDateUtc,
+        })
+    }
+})
 
 onMounted(async () => {
     // transaction categories and types

@@ -319,15 +319,15 @@ watch(
                         Export
                     </UButton>
                     <UButton
-                        icon="i-ic-outline-clear"
+                        icon="i-heroicons-x-mark"
                         dynamic
-                        size="lg"
-                        color="white"
-                        variant="outline"
+                        size="xs"
+                        color="gray"
+                        variant="ghost"
                         :ui="{ rounded: 'rounded-full' }"
                         @click="$clearFilters"
                     >
-                        Clear
+                        Clear filters
                     </UButton>
                 </div>
             </div>

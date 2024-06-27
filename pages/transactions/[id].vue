@@ -62,14 +62,16 @@ const fullname = computed(
                     class="relative overflow-hidden min-h-40 text-center bg-[url('https://preline.co/assets/svg/examples/abstract-bg-1.svg')] bg-no-repeat bg-center"
                 >
                     <!-- Close Button -->
-                    <div class="absolute top-2 end-2">
+                    <div class="absolute top-2 end-4">
+                        <ULink to="/admin/transactions"> Back </ULink>
                         <button
+                            v-if="transaction?.id"
                             type="button"
                             class="py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-xs dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:text-white dark:focus:ring-offset-gray-800"
                             data-hs-overlay="#hs-ai-offcanvas"
-                            @click=""
+                            @click="isOpenAddTransaction = true"
                         >
-                            Back
+                            Edit
                         </button>
                     </div>
                     <!-- End Close Button -->
@@ -154,6 +156,21 @@ const fullname = computed(
                     </div>
                 </div>
 
+                <div
+                    v-else-if="!loading && !transaction"
+                    class="flex flex-col gap-4 items-center justify-center py-20 sm:py-28"
+                >
+                    <UIcon
+                        name="i-fluent-cloud-error-28-regular"
+                        class="w-10 h-10"
+                        dynamic
+                    />
+
+                    <p class="text-sm text-gray-600 font-semibold">
+                        Unable to load data
+                    </p>
+                </div>
+
                 <div v-else class="p-4 sm:p-7 overflow-y-auto">
                     <div class="text-center">
                         <h3
@@ -179,7 +196,11 @@ const fullname = computed(
                             <span
                                 class="block text-sm font-medium text-gray-800 dark:text-neutral-200"
                             >
-                                {{ formatCurrency(transaction?.amount as number) }}
+                                {{
+                                    formatCurrency(
+                                        transaction?.amount as number
+                                    )
+                                }}
                             </span>
                         </div>
                         <!-- End Col -->
@@ -267,7 +288,9 @@ const fullname = computed(
                                     <span>Amount paid</span>
                                     <span>
                                         {{
-                                            formatCurrency(transaction?.amount as number)
+                                            formatCurrency(
+                                                transaction?.amount as number
+                                            )
                                         }}</span
                                     >
                                 </div>
