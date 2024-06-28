@@ -148,7 +148,7 @@ onMounted(async () => {
                 <template #header>
                     <div class="space-y-2">
                         <h3 class="text-brand-gray text-2xl font-semibold">
-                            {{ transaction ? ''  : 'New Transaction' }}
+                            {{ transaction ? 'Update Transaction'  : 'New Transaction' }}
                         </h3>
                         <p class="text-dark-gray font-light">
                             Upload new transactions by filling this form.
