@@ -32,7 +32,7 @@ const emit = defineEmits<{
 // Pagination
 const paging = computed(() => props.paging)
 
-const page = ref<number>(paging.value.pageIndex)
+// const page = ref<number>(paging.value.pageIndex)
 // const pageCount = ref<number>(paging.value.pageSize)
 
 // const rows = computed(() => {

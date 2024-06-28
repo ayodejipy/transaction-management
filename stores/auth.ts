@@ -6,9 +6,7 @@ export const useAuthStore = defineStore('auth', () => {
     const { user } = storeToRefs(useUserStore())
     const forgotPasswordUrl = useEndpoints('forgotPasswordUrl')
 
-    const accessToken = useCookie('opabid-access', {
-        maxAge: 60 * 60,
-    })
+    const accessToken = useCookie('opabid-access')
     const refreshToken = useCookie('opabid-refresh')
 
     const isAuthenticated = computed<boolean>(

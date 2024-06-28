@@ -100,7 +100,6 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
 }
 
 watch(transaction, (_updated) => {
-    console.log('watched-edit')
     if (_updated) {
         const { amount, typeId, categoryId, transactionDateUtc, description } =
             _updated
@@ -111,6 +110,14 @@ watch(transaction, (_updated) => {
             description,
             transactionDate: $dayjs(transactionDateUtc).format('YYYY-MM-DD'),
         })
+    }
+})
+
+watch(isOpen, (_isOpen) => {
+    if (!_isOpen) {
+        console.log('slide closed...')
+        $resetForm()
+        transaction.value = null
     }
 })
 
@@ -148,7 +155,11 @@ onMounted(async () => {
                 <template #header>
                     <div class="space-y-2">
                         <h3 class="text-brand-gray text-2xl font-semibold">
-                            {{ transaction ? 'Update Transaction'  : 'New Transaction' }}
+                            {{
+                                transaction
+                                    ? 'Update Transaction'
+                                    : 'New Transaction'
+                            }}
                         </h3>
                         <p class="text-dark-gray font-light">
                             Upload new transactions by filling this form.
