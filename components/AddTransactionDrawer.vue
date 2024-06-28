@@ -14,6 +14,8 @@ const props = defineProps<{
 
 const isOpen = defineModel({ type: Boolean, default: false })
 
+const { $dayjs } = useNuxtApp()
+
 const toast = useToast()
 const transactionStore = useTransactionStore()
 const { addTransaction, updateTransaction } = transactionStore
@@ -57,6 +59,7 @@ const $resetForm = () => {
 
 const onCloseSlide = () => {
     $resetForm()
+    transaction.value = null
     isOpen.value = !isOpen.value
 }
 
@@ -97,6 +100,7 @@ async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
 }
 
 watch(transaction, (_updated) => {
+    console.log('watched-edit')
     if (_updated) {
         const { amount, typeId, categoryId, transactionDateUtc, description } =
             _updated
@@ -105,7 +109,7 @@ watch(transaction, (_updated) => {
             typeId,
             categoryId,
             description,
-            transactionDate: transactionDateUtc,
+            transactionDate: $dayjs(transactionDateUtc).format('YYYY-MM-DD'),
         })
     }
 })
@@ -144,7 +148,7 @@ onMounted(async () => {
                 <template #header>
                     <div class="space-y-2">
                         <h3 class="text-brand-gray text-2xl font-semibold">
-                            New Transaction
+                            {{ transaction ? ''  : 'New Transaction' }}
                         </h3>
                         <p class="text-dark-gray font-light">
                             Upload new transactions by filling this form.

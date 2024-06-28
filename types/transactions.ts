@@ -28,7 +28,7 @@ export interface ITransaction {
     categoryName: string
     createdAtUtc: string
     description: string
-    transactionDateUtc: string
+    transactionDateUtc: Date
     typeId: number
     typeName: string
     createdBy: ICreatedby

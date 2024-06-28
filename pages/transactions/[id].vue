@@ -24,19 +24,26 @@ const isOpenAddTransaction = ref<boolean>(false)
 const { pending: loading, data } = await useAppFetch<ITransactionData>(
     () => `${transactionsUrl}/${id.value}`,
     {
-        pick: ['content', 'paging', 'status'],
+        pick: ['content', 'status'],
         watch: [id],
         lazy: true,
     }
 )
-transaction.value = data.value ? data.value.content : null
+
+const result = computed(() => data.value?.content ?? null)
 
 const fullname = computed(
     () =>
-        transaction.value?.createdBy.firstName +
+        result.value?.createdBy.firstName +
         ' ' +
-        transaction.value?.createdBy.lastName
+        result.value?.createdBy.lastName
 )
+
+function onToggleEdit() {
+    console.log('edit')
+    transaction.value = result.value
+    isOpenAddTransaction.value = true
+}
 </script>
 
 <template>
@@ -61,21 +68,6 @@ const fullname = computed(
                 <div
                     class="relative overflow-hidden min-h-40 text-center bg-[url('https://preline.co/assets/svg/examples/abstract-bg-1.svg')] bg-no-repeat bg-center"
                 >
-                    <!-- Close Button -->
-                    <div class="absolute top-2 end-4">
-                        <ULink to="/admin/transactions"> Back </ULink>
-                        <button
-                            v-if="transaction?.id"
-                            type="button"
-                            class="py-1.5 px-2 inline-flex justify-center items-center gap-2 rounded-lg border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-xs dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-400 dark:hover:text-white dark:focus:ring-offset-gray-800"
-                            data-hs-overlay="#hs-ai-offcanvas"
-                            @click="isOpenAddTransaction = true"
-                        >
-                            Edit
-                        </button>
-                    </div>
-                    <!-- End Close Button -->
-
                     <!-- SVG Background Element -->
                     <figure class="absolute inset-x-0 bottom-0 -mb-px">
                         <svg
@@ -157,7 +149,7 @@ const fullname = computed(
                 </div>
 
                 <div
-                    v-else-if="!loading && !transaction"
+                    v-else-if="!loading && !result"
                     class="flex flex-col gap-4 items-center justify-center py-20 sm:py-28"
                 >
                     <UIcon
@@ -176,10 +168,10 @@ const fullname = computed(
                         <h3
                             class="text-lg font-semibold text-gray-800 dark:text-neutral-200"
                         >
-                            Transaction for {{ transaction?.typeName }}
+                            Transaction for {{ result?.typeName }}
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-neutral-500">
-                            Transaction #{{ transaction?.id }}
+                            Transaction #{{ result?.id }}
                         </p>
                     </div>
 
@@ -196,11 +188,7 @@ const fullname = computed(
                             <span
                                 class="block text-sm font-medium text-gray-800 dark:text-neutral-200"
                             >
-                                {{
-                                    formatCurrency(
-                                        transaction?.amount as number
-                                    )
-                                }}
+                                {{ formatCurrency(result?.amount as number) }}
                             </span>
                         </div>
                         <!-- End Col -->
@@ -216,7 +204,7 @@ const fullname = computed(
                             >
                                 {{
                                     $dayjs(
-                                        transaction?.transactionDateUtc
+                                        result?.transactionDateUtc
                                     ).format('MMMM DD, YYYY')
                                 }}
                             </span>
@@ -226,14 +214,14 @@ const fullname = computed(
                     </div>
                     <!-- End Grid -->
 
-                    <div v-if="transaction?.description" class="mt-5 sm:mt-10">
+                    <div v-if="result?.description" class="mt-5 sm:mt-10">
                         <h4
                             class="text-xs font-semibold uppercase text-gray-800 dark:text-neutral-200"
                         >
                             Description
                         </h4>
                         <p class="text-sm text-gray-500 dark:text-neutral-500">
-                            {{ transaction?.description }}
+                            {{ result?.description }}
                         </p>
                     </div>
 
@@ -252,7 +240,7 @@ const fullname = computed(
                                     class="flex items-center justify-between w-full"
                                 >
                                     <span>Type</span>
-                                    <span>{{ transaction?.typeName }}</span>
+                                    <span>{{ result?.typeName }}</span>
                                 </div>
                             </li>
                             <li
@@ -263,7 +251,7 @@ const fullname = computed(
                                 >
                                     <span>Category</span>
                                     <span>
-                                        {{ transaction?.categoryName }}
+                                        {{ result?.categoryName }}
                                     </span>
                                 </div>
                             </li>
@@ -289,7 +277,7 @@ const fullname = computed(
                                     <span>
                                         {{
                                             formatCurrency(
-                                                transaction?.amount as number
+                                                result?.amount as number
                                             )
                                         }}</span
                                     >
@@ -301,21 +289,32 @@ const fullname = computed(
                 <!-- End Body -->
             </div>
 
-            <!-- <template #footer>
+            <template #footer>
+                <div class="flex justify-between gap-2 items-center">
+                    <ULink
+                        to="/admin/transactions"
+                        class="text-icon-gray flex items-center gap-2"
+                    >
+                        <UIcon name="i-heroicons-arrow-long-left" />
+                        back
+                    </ULink>
+
                     <UButton
-                        size="xl"
-                        color="gray"
-                        variant="outline"
-                        padding="md"
+                        icon="i-heroicons-pencil-square"
+                        size="sm"
+                        color="primary"
+                        variant="soft"
+                        padding="sm"
                         :ui="{
                             rounded: 'rounded-lg',
-                            font: 'font-semibold',
+                            font: 'font-medium',
                         }"
-                        @click="onCloseSlide"
+                        @click="onToggleEdit"
                     >
-                        Close
+                        Edit
                     </UButton>
-                </template> -->
+                </div>
+            </template>
         </UCard>
 
         <AddTransactionDrawer v-model="isOpenAddTransaction" />
