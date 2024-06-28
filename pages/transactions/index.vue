@@ -26,6 +26,7 @@ useHead({
 })
 
 const searchTerm = ref<string>('')
+const page = ref<number>(1)
 const selected = ref({
     start: '' as unknown as Date,
     end: '' as unknown as Date,
@@ -42,6 +43,7 @@ const newTransactionUrl = computed(() => {
         params.append('FromDate', selected.value.start.toISOString())
         params.append('ToDate', selected.value.end.toISOString())
     }
+    if (page.value) params.append('PageIndex', page.value.toString())
 
     return `${transactionsUrl}?${params.toString()}`
 })
@@ -99,29 +101,6 @@ const columns: IColumn[] = [
     { key: 'actions' },
 ]
 
-// actions
-const actionsOption = (row: ITransaction) => [
-    [
-        {
-            label: 'Update Transaction',
-            icon: 'i-heroicons-arrow-path',
-            click: () => onUpdateTransaction(row),
-        },
-    ],
-]
-
-const searchedTransactions = computed(() => {
-    if (!searchTerm.value) return dataForTable.value
-
-    return transactions.value.filter((transaction) => {
-        return Object.values(transaction).some((value) => {
-            return String(value)
-                .toLowerCase()
-                .includes(searchTerm.value.toLowerCase())
-        })
-    })
-})
-
 const uiConfig = computed(() => ({
     placeholder: 'text-icon-gray dark:text-gray-500',
     rounded: 'rounded-full',
@@ -163,30 +142,26 @@ function $clearFilters() {
     selected.value.start = '' as unknown as Date
     selected.value.end = '' as unknown as Date
 }
-function onUpdateTransaction(row: ITransaction) {
-    console.log({ row })
-    transaction.value = row
-    isOpenAddTransaction.value = true
-}
 
 function onSelect(row: ITransaction) {
     transaction.value = row
-    router.push(`${isAdmin.value ? '/admin': ''}/transactions/${row.id}`)
-    // isViewTransaction.value = true
+    router.push(`${isAdmin.value ? '/admin' : ''}/transactions/${row.id}`)
 }
 
-// function transformCategories(data: ITransaction[]) {
-//     transactions.value = data.map((transaction: ITransaction) => ({
-//         id: transaction.typeId,
-//         typeName: transaction.typeName,
-//         categoryName: transaction.categoryName,
-//         transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
-//             'DD/MM/YYYY'
-//         ),
-//         amount: formatCurrency(transaction.amount as number),
-//         description: transaction.description,
-//     }))
-// }
+function getNextList() {
+    if (data.value?.paging?.hasNextPage) {
+        page.value++
+    }
+}
+function getPrevList() {
+    if (data.value?.paging?.hasPreviousPage) {
+        page.value--
+    }
+}
+function getClickedPage(value: number) {
+    console.log('page: ', value)
+    page.value = toRef(value).value
+}
 
 watch(
     data,
@@ -300,7 +275,6 @@ watch(
                     />
 
                     <UButton
-                        icon="i-lets-icons-arhive-alt-export-light"
                         color="white"
                         variant="outline"
                         size="lg"
@@ -316,6 +290,12 @@ watch(
                         }"
                         @click="handleExport"
                     >
+                        <template #leading>
+                            <Icon
+                                name="i-line-md-downloading-loop"
+                                class="w-4 h-4"
+                            />
+                        </template>
                         Export
                     </UButton>
                     <UButton
@@ -335,11 +315,15 @@ watch(
             <AppTable
                 :loading
                 :columns
-                :data="searchedTransactions"
+                :data="dataForTable"
                 :selectable="true"
+                :paging="data?.paging"
                 @select="onSelect"
+                @on-click-next="getNextList"
+                @on-click-prev="getPrevList"
+                @on-page-click="getClickedPage"
             >
-                <template #actions="{ row }">
+                <!-- <template #actions="{ row }">
                     <UDropdown :items="actionsOption(row)">
                         <UButton
                             color="gray"
@@ -347,7 +331,7 @@ watch(
                             icon="i-heroicons-ellipsis-horizontal-20-solid"
                         />
                     </UDropdown>
-                </template>
+                </template> -->
             </AppTable>
         </section>
 

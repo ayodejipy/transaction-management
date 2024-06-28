@@ -3,7 +3,7 @@
     lang="ts"
     generic="T extends Record<string, string | number | boolean>"
 >
-import type { IColumn, ITransaction } from '~/types'
+import type { IColumn, ITransaction, IPaging } from '~/types'
 
 interface IProps {
     columns: IColumn[]
@@ -11,6 +11,7 @@ interface IProps {
     loading?: boolean
     paginate?: boolean
     selectable?: boolean
+    paging?: IPaging
 }
 
 const props = withDefaults(defineProps<IProps>(), {
@@ -19,27 +20,28 @@ const props = withDefaults(defineProps<IProps>(), {
     loading: false,
     paginate: true,
     selectable: false,
+    paging: () => defaultPaging,
 })
 
 const emit = defineEmits<{
     (e: 'select', value: ITransaction): void
+    (e: 'onClickNext' | 'onClickPrev'): void
+    (e: 'onPageClick', value: number): void
 }>()
 
 // Pagination
-const page = ref<number>(1)
-const pageCount = ref<number>(15)
-// const pageTotal = ref<number>(20) // This value should be dynamic coming from the API
-// const pageFrom = computed(() => (page.value - 1) * pageCount.value + 1)
-// const pageTo = computed(() =>
-//     Math.min(page.value * pageCount.value, pageTotal.value)
-// )
+const paging = computed(() => props.paging)
 
-const rows = computed(() => {
-    return props.data.slice(
-        (page.value - 1) * pageCount.value,
-        page.value * pageCount.value
-    )
-})
+const page = ref<number>(paging.value.pageIndex)
+// const pageCount = ref<number>(paging.value.pageSize)
+
+// const rows = computed(() => {
+//     return props.data.slice(
+//         (paging.value.pageIndex - 1) * pageCount.value,
+//         paging.value.pageIndex* paging.value.pageSize
+//     )
+// })
+const rows = computed(() => props.data)
 
 const tableUi = computed(() => ({
     th: {
@@ -57,11 +59,44 @@ const tableUi = computed(() => ({
     },
 }))
 
-function onSelect(row: ITransaction) {
+function onSelect(event: Event) {
+    const row = event as unknown as ITransaction
     emit('select', row)
 }
 
-// onUnmounted(() => window.removeEventListener('select', onSelect))
+function onClickNext() {
+    if (paging.value.hasNextPage) {
+        emit('onClickNext')
+    }
+}
+
+function onClickPrev() {
+    if (paging.value.hasPreviousPage) {
+        emit('onClickPrev')
+    }
+}
+
+watch(paging, (_updated) => {
+    emit('onPageClick', _updated.pageIndex)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('select', onSelect)
+    window.removeEventListener('onClickPrev', onClickPrev)
+    window.removeEventListener('onClickNext', onClickNext)
+    // window.removeEventListener('onPageClick')
+})
+</script>
+
+<script lang="ts">
+export const defaultPaging: IPaging = {
+    pageIndex: 1,
+    pageSize: 5,
+    totalPages: 2,
+    totalItems: 10,
+    hasPreviousPage: false,
+    hasNextPage: false,
+}
 </script>
 
 <template>
@@ -86,14 +121,7 @@ function onSelect(row: ITransaction) {
                 <slot name="actions" :row="row" />
             </template>
         </UTable>
-        <UTable
-            v-else
-            :columns
-            :rows
-            :loading
-            class="w-full"
-            :ui="tableUi"
-        >
+        <UTable v-else :columns :rows :loading class="w-full" :ui="tableUi">
             <template v-if="$slots.actions" #actions-data="{ row }">
                 <slot name="actions" :row="row" />
             </template>
@@ -104,40 +132,42 @@ function onSelect(row: ITransaction) {
             class="w-full flex px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
         >
             <UPagination
-                v-model="page"
+                v-model="paging.pageIndex"
                 :ui="{
                     wrapper: 'w-full flex items-center',
                 }"
-                :page-count="pageCount"
-                :total="data.length"
+                :page-count="paging.pageSize"
+                :total="paging.totalItems"
             >
-                <template #prev="{ onClick }">
+                <template #prev>
                     <UTooltip text="Previous page">
                         <UButton
                             icon="i-heroicons-arrow-small-left-20-solid"
                             color="primary"
-                            :ui="{ rounded: 'rounded-full' }"
+                            :ui="{ rounded: 'rounded-lg' }"
+                            :disabled="!paging.hasPreviousPage"
                             class="rtl:[&_span:first-child]:rotate-180 me-2"
-                            @click="onClick"
+                            @click="onClickPrev"
                         >
                             Previous
                         </UButton>
                     </UTooltip>
                 </template>
-                <template #next="{ onClick }">
+                <template #next>
                     <UTooltip text="Next page">
                         <UButton
                             icon="i-heroicons-arrow-small-right-20-solid"
+                            trailing
                             color="primary"
-                            :ui="{ rounded: 'rounded-full' }"
+                            :ui="{ rounded: 'rounded-lg' }"
+                            :disabled="!paging.hasNextPage"
                             class="rtl:[&_span:last-child]:rotate-180 ms-2"
-                            @click="onClick"
+                            @click="onClickNext"
                         >
                             Next
                         </UButton>
                     </UTooltip>
                 </template>
-                23456666
             </UPagination>
         </div>
     </UCard>

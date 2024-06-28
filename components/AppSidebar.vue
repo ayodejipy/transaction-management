@@ -78,15 +78,17 @@ const roleBasedLinks = computed(() => {
 
                 <ul role="list" class="flex flex-1 flex-col gap-y-7">
                     <li
-                        class="mt-auto before:w-full before:h-px before:bg-gray-300"
+                        class="mt-auto before:absolute before:left-0 before:bottom-16 before:w-full before:h-px before:bg-gray-200"
                     >
                         <UButton
                             color="gray"
                             variant="ghost"
                             size="sm"
-                            icon="i-octicon-sign-out-16"
                             @click="handleLogout(user?.uid as string)"
                         >
+                            <template #leading>
+                                <Icon class="relative w-4 h-4" name="LogoutIcon" />
+                            </template>
                             Logout
                         </UButton>
                     </li>
