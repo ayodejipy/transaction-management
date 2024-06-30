@@ -11,16 +11,16 @@ interface IProps {
     loading?: boolean
     paginate?: boolean
     selectable?: boolean
-    paging?: IPaging
+    paging?: IPaging | null
 }
 
 const props = withDefaults(defineProps<IProps>(), {
     columns: () => [],
     data: () => [],
     loading: false,
-    paginate: true,
+    paginate: false,
     selectable: false,
-    paging: () => defaultPaging,
+    paging: null,
 })
 
 const emit = defineEmits<{
@@ -31,8 +31,10 @@ const emit = defineEmits<{
 
 // Pagination
 const paging = computed(() => props.paging)
+const page = computed(() => props.paging?.pageIndex ?? 0)
+const pageCount = computed(() => props.paging?.pageSize ?? 0)
+const totalItems = computed(() => props.paging?.totalItems ?? 0)
 
-// const page = ref<number>(paging.value.pageIndex)
 // const pageCount = ref<number>(paging.value.pageSize)
 
 // const rows = computed(() => {
@@ -65,19 +67,21 @@ function onSelect(event: Event) {
 }
 
 function onClickNext() {
-    if (paging.value.hasNextPage) {
+    if (paging.value?.hasNextPage) {
         emit('onClickNext')
     }
 }
 
 function onClickPrev() {
-    if (paging.value.hasPreviousPage) {
+    if (paging.value?.hasPreviousPage) {
         emit('onClickPrev')
     }
 }
 
 watch(paging, (_updated) => {
-    emit('onPageClick', _updated.pageIndex)
+    if(_updated) {
+        emit('onPageClick', _updated.pageIndex)
+    }
 })
 
 onUnmounted(() => {
@@ -132,12 +136,12 @@ export const defaultPaging: IPaging = {
             class="w-full flex px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
         >
             <UPagination
-                v-model="paging.pageIndex"
+                v-model="page"
                 :ui="{
                     wrapper: 'w-full flex items-center',
                 }"
-                :page-count="paging.pageSize"
-                :total="paging.totalItems"
+                :page-count="pageCount"
+                :total="totalItems"
             >
                 <template #prev>
                     <UTooltip text="Previous page">
@@ -145,7 +149,7 @@ export const defaultPaging: IPaging = {
                             icon="i-heroicons-arrow-small-left-20-solid"
                             color="primary"
                             :ui="{ rounded: 'rounded-lg' }"
-                            :disabled="!paging.hasPreviousPage"
+                            :disabled="!paging?.hasPreviousPage"
                             class="rtl:[&_span:first-child]:rotate-180 me-2"
                             @click="onClickPrev"
                         >
@@ -160,7 +164,7 @@ export const defaultPaging: IPaging = {
                             trailing
                             color="primary"
                             :ui="{ rounded: 'rounded-lg' }"
-                            :disabled="!paging.hasNextPage"
+                            :disabled="!paging?.hasNextPage"
                             class="rtl:[&_span:last-child]:rotate-180 ms-2"
                             @click="onClickNext"
                         >

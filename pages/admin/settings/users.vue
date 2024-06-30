@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IColumn, IInvitedUsersData, InvitedUserInterface } from '~/types';
+import type { IColumn, IInvitedUsersData, InvitedUserInterface } from '~/types'
 
 const toast = useToast()
 const isOpen = ref<boolean>(false)
@@ -9,9 +9,15 @@ const { resendInvite } = inviteStore
 const { invitedUsers } = storeToRefs(inviteStore)
 
 const usersInvitedUrl = useEndpoints('userInviteUrl')
-const { pending: loading, data, refresh } = await useAppFetch<IInvitedUsersData>(usersInvitedUrl, {
+const {
+    pending: loading,
+    data,
+    refresh,
+} = await useAppFetch<IInvitedUsersData>(usersInvitedUrl, {
     pick: ['content', 'status'],
 })
+
+const shouldPaginate = computed(() => !!data.value?.paging)
 
 const searchTerm = ref<string>('')
 
@@ -89,12 +95,11 @@ const actionsOption = (row: InvitedUserInterface) => [
 ]
 
 async function onResendInvite({ id, email }: InvitedUserInterface) {
-    try{
+    try {
         const data = await resendInvite(id)
         if (data.success) {
-
             toast.add({
-                title: "Invite resent successful",
+                title: 'Invite resent successful',
                 color: 'green',
                 description: `Invite successfully sent to ${email}`,
                 icon: 'i-heroicons-outline-check-badge',
@@ -184,7 +189,13 @@ watch(
                 </div>
             </div>
 
-            <AppTable :loading :columns :data="searchedUsers">
+            <AppTable
+                :loading
+                :columns
+                :data="searchedUsers"
+                :paginate="shouldPaginate"
+                :paging="data?.paging"
+            >
                 <template #actions="{ row }">
                     <UDropdown :items="actionsOption(row)">
                         <UButton
@@ -194,7 +205,7 @@ watch(
                         />
                     </UDropdown>
                 </template>
-            </AppTable>    
+            </AppTable>
         </section>
 
         <ModalsAddUser v-model="isOpen" :refresh-data="refresh" />

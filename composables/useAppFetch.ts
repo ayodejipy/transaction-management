@@ -9,9 +9,6 @@ export default function useAppFetch<T>(
 
     const config = useRuntimeConfig()
 
-    const authStore = useAuthStore()
-    const { accessToken, refreshToken } = storeToRefs(authStore)
-
     const getKey = typeof url == 'function' ? url() : url
 
     const defaults: UseFetchOptions<T> = {
@@ -19,34 +16,7 @@ export default function useAppFetch<T>(
         key: getKey,
         headers: {
             Accept: 'application/json',
-        },
-        onRequest: async ({ options }) => {
-            if (accessToken.value) {
-                // Set the request headers
-                options.headers = {
-                    ...options.headers,
-                    Authorization: `Bearer ${accessToken.value}`,
-                }
-            }
-        },
-        onResponse: async ({ response, options }) => {
-            if (response.status === 401 && refreshToken.value) {
-                console.log('after failed condition')
-                const newAccessToken = await authStore.getRefreshedToken()
-
-                // save this new token to local storage
-                options.headers = {
-                    Authorization: `Bearer ${newAccessToken}`,
-                }
-
-                // retry request
-                // $customFetch(url)
-                // useFetch(url, {
-                //     ...(options as UseFetchOptions<T>),
-                //     $fetch: $customFetch,
-                // })
-            }
-        },
+        }
     }
 
     const params = defu(_options, defaults)

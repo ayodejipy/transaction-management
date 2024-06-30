@@ -56,6 +56,8 @@ const {
     pick: ['content', 'paging', 'status'],
 })
 
+const shouldPaginate = computed(() => !!data.value?.paging)
+
 const dataForTable = computed(() =>
     data.value?.content?.map((transaction: ITransaction) => ({
         id: transaction.id,
@@ -317,6 +319,7 @@ watch(
                 :columns
                 :data="dataForTable"
                 :selectable="true"
+                :paginate="shouldPaginate"
                 :paging="data?.paging"
                 @select="onSelect"
                 @on-click-next="getNextList"

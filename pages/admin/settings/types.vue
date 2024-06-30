@@ -14,6 +14,8 @@ const { data, pending, refresh } = await useAppFetch<ITypesData>(typesUrl, {
     pick: ['content', 'status'],
 })
 
+const shouldPaginate = computed(() => !!data.value?.paging)
+
 const searchTerm = ref<string>('')
 
 const searchedTypes = computed(() => {
@@ -171,7 +173,13 @@ watch(
                 </div>
             </div>
 
-            <AppTable :loading="pending" :columns :data="searchedTypes">
+            <AppTable
+                :loading="pending"
+                :columns
+                :data="searchedTypes"
+                :paginate="shouldPaginate"
+                :paging="data?.paging"
+            >
                 <template #actions="{ row }">
                     <div class="flex items-center gap-2">
                         <UButton

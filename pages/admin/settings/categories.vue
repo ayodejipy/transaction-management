@@ -15,9 +15,11 @@ const { category } = storeToRefs(categoryStore)
 const { data, pending, refresh } = await useAppFetch<ICategoriesData>(
     categoriesUrl,
     {
-        pick: ['content', 'status'],
+        pick: ['content', 'paging', 'status'],
     }
 )
+
+const shouldPaginate = computed(() => !!data.value?.paging)
 
 const columns: IColumn[] = [
     {
@@ -55,7 +57,7 @@ const actionOptions = (row: Omit<ICategory, 'isDeleted'>) => [
 ]
 
 async function onDeleteCategory(id: number) {
-    try{
+    try {
         const data = await deleteCategory(id)
         if (data.success) {
             toast.add({
@@ -166,7 +168,13 @@ watch(
                 </div>
             </div>
 
-            <AppTable :loading="pending" :columns :data="activeCategories">
+            <AppTable
+                :loading="pending"
+                :columns
+                :data="activeCategories"
+                :paginate="shouldPaginate"
+                :paging="data?.paging"
+            >
                 <template #actions="{ row }">
                     <UDropdown :items="actionOptions(row)">
                         <UButton
