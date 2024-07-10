@@ -24,7 +24,6 @@ const form = reactive({
     // stay_logged_in: false,
 })
 
-// console.log(route)
 
 async function handleLogin() {
     loading.value = true

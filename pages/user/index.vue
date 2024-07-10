@@ -163,7 +163,6 @@ function $clearFilters() {
     selected.value.end = '' as unknown as Date
 }
 function onUpdateTransaction(row: ITransaction) {
-    console.log({ row })
     transaction.value = row
     isOpenAddTransaction.value = true
 }

@@ -10,11 +10,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const { user } = storeToRefs(userStore)
 
     if (import.meta.client) {
-        if (!user.value) {
+        if (!user.value && isAuthenticated.value) {
             await userStore.getProfile()
         }
     }
-        
+
     if (to.path !== LOGIN_PATH && !isAuthenticated.value) {
         return navigateTo(LOGIN_PATH)
     }

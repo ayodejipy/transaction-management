@@ -196,6 +196,10 @@ watch(
                 :paginate="shouldPaginate"
                 :paging="data?.paging"
             >
+                <template #isAccepted-data="{ row }">
+                    {{ row }}
+                </template>
+                
                 <template #actions="{ row }">
                     <UDropdown :items="actionsOption(row)">
                         <UButton

@@ -161,7 +161,6 @@ function getPrevList() {
     }
 }
 function getClickedPage(value: number) {
-    console.log('page: ', value)
     page.value = toRef(value).value
 }
 

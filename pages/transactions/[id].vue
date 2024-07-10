@@ -40,7 +40,6 @@ const fullname = computed(
 )
 
 function onToggleEdit() {
-    console.log('edit')
     transaction.value = result.value
     isOpenAddTransaction.value = true
 }

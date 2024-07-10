@@ -115,7 +115,6 @@ watch(transaction, (_updated) => {
 
 watch(isOpen, (_isOpen) => {
     if (!_isOpen) {
-        console.log('slide closed...')
         $resetForm()
         transaction.value = null
     }

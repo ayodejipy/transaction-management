@@ -154,7 +154,7 @@ const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
 
 // Transactions filter i.e: Income, Expenditure
 const handleExport = () => {
-    console.log('click')
+    console.log('export')
 }
 
 function $clearFilters() {
@@ -163,7 +163,6 @@ function $clearFilters() {
     selected.value.end = '' as unknown as Date
 }
 function onUpdateTransaction(row: ITransaction) {
-    console.log({ row })
     transaction.value = row
     isOpenAddTransaction.value = true
 }
@@ -172,19 +171,6 @@ function onSelect(row: ITransaction) {
     transaction.value = row
     isViewTransaction.value = true
 }
-
-// function transformCategories(data: ITransaction[]) {
-//     transactions.value = data.map((transaction: ITransaction) => ({
-//         id: transaction.typeId,
-//         typeName: transaction.typeName,
-//         categoryName: transaction.categoryName,
-//         transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
-//             'DD/MM/YYYY'
-//         ),
-//         amount: formatCurrency(transaction.amount as number),
-//         description: transaction.description,
-//     }))
-// }
 
 watch(
     data,

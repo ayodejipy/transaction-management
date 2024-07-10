@@ -27,14 +27,13 @@ const monthlyStatsUrl = useEndpoints('monthlyStatsUrl')
 const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
 const transactionsUrl = useEndpoints('transactionsUrl')
 
-// const { data: employees } = await useAppFetch<{ data: [] }>(
-//     'https://dummy.restapiexample.com/api/v1/employees'
-// )
-// console.log('EM: ', employees.value)
+const { data: employees } = await useAppFetch<{ data: [] }>(
+    'https://dummy.restapiexample.com/api/v1/employees'
+)
+console.log('EM: ', employees.value)
 
 // Access to the cached value of useFetch
 const { data: cachedTransactions } = useNuxtData(transactionsUrl)
-console.log('cached - transact:', cachedTransactions.value?.content)
 
 const {
     pending: loadingTransactions,
@@ -63,7 +62,6 @@ const transactions = computed(() =>
 
 // Total revenue
 const { data: cachedRevenue } = useNuxtData(revenueUrl)
-console.log('cached - revenue:', cachedRevenue.value?.content)
 
 const { pending: loadingRevenue, data: revenue } = await useAppFetch<
     IDataResponse<number | undefined>
@@ -76,7 +74,6 @@ const totalRevenue = computed(() => formatCurrency(revenue.value?.content || 0))
 
 // Totals e.g; credit, debit
 const { data: cachedTotalStats } = useNuxtData(totalStatsUrl)
-console.log('cached - stats:', cachedTotalStats.value)
 
 const { pending: loadingStats, data: total } =
     await useAppFetch<ITotalTransaction>(totalStatsUrl, {
@@ -106,10 +103,6 @@ const statistics = computed(() => [
 
 // Credit OR Debit transactions percentage (20%, 80%)
 const { data: cachedTotalPercentage } = useNuxtData(creditDebitPercentageUrl)
-console.log(
-    'cached - creditDebitPercentageUrl:',
-    cachedTotalPercentage.value?.content
-)
 
 const { pending: loadingPercentage, data: totalPercentile } =
     await useAppFetch<ITransactionPercentage>(creditDebitPercentageUrl, {
@@ -125,7 +118,6 @@ const series = computed(() => [
 
 // Total transactions per month: Jan, Feb...
 const { data: cachedTotalPerMonth } = useNuxtData(monthlyStatsUrl)
-console.log('cached - totalPM:', cachedTotalPerMonth.value?.content)
 
 const { pending: loadingTotalPerMonth, data: totalPerMonth } =
     await useAppFetch<IMonthlyTotal>(monthlyStatsUrl, {
