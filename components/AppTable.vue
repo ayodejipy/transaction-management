@@ -61,6 +61,10 @@ const tableUi = computed(() => ({
     },
 }))
 
+function checkColKey(key: string) {
+    return props.columns.some((col) => col.key == key)
+}
+
 function onSelect(event: Event) {
     const row = event as unknown as ITransaction
     emit('select', row)
@@ -121,13 +125,14 @@ export const defaultPaging: IPaging = {
             :ui="tableUi"
             @select="onSelect"
         >
-            <template v-if="$slots.actions" #actions-data="{ row }">
-                <slot name="actions" :row="row" />
+            <template v-for="col in columns"  :key="col.key" #[`${col.key}-data`]="{ row }">
+                <slot :name="col.key" :row="row" />
             </template>
         </UTable>
+
         <UTable v-else :columns :rows :loading class="w-full" :ui="tableUi">
-            <template v-if="$slots.actions" #actions-data="{ row }">
-                <slot name="actions" :row="row" />
+            <template v-for="col in columns"  :key="col.key" #[`${col.key}-data`]="{ row }">
+                <slot :name="col.key" :row="row" />
             </template>
         </UTable>
 

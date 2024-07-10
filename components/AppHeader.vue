@@ -131,6 +131,11 @@ const items = [
                                     <UButton
                                         color="primary"
                                         variant="ghost"
+                                        size="sm"
+                                        block
+                                        :ui="{
+                                            block: 'w-full flex justify-between items-center',
+                                        }"
                                         @click="
                                             authStore.handleLogout(
                                                 user?.uid as string

@@ -70,7 +70,7 @@ const columns: IColumn[] = [
     },
     {
         key: 'isAccepted',
-        label: 'Registered',
+        label: 'Status',
     },
     {
         key: 'actions',
@@ -182,8 +182,8 @@ watch(
                         color="white"
                         size="lg"
                         padding="lg"
-                        :options="['Active', 'None Active']"
                         placeholder="Filter"
+                        :options="['Active', 'None Active']"
                         :ui="uiConfig"
                     />
                 </div>
@@ -196,10 +196,16 @@ watch(
                 :paginate="shouldPaginate"
                 :paging="data?.paging"
             >
-                <template #isAccepted-data="{ row }">
-                    {{ row }}
+                <template #isAccepted="{ row }">
+                    <UBadge v-if="row.isAccepted" color="primary" variant="soft">
+                        <Icon name="i-ic-round-circle" class="w-2 h-2 mr-2" />
+                        Active
+                    </UBadge>
+                    <UBadge v-else color="red" variant="soft">
+                        <Icon name="i-ic-round-circle" class="w-2 h-2 mr-2" />
+                        Inactive</UBadge>
                 </template>
-                
+
                 <template #actions="{ row }">
                     <UDropdown :items="actionsOption(row)">
                         <UButton
