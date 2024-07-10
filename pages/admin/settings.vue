@@ -28,7 +28,7 @@ const links = [
     },
     {
         label: 'User Management',
-        icon: 'i-heroicons-chart-bar',
+        icon: 'i-ci-users-group',
         to: `${ADMIN_PATH}/settings/users`,
     }
 ]

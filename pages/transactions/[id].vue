@@ -43,6 +43,8 @@ function onToggleEdit() {
     transaction.value = result.value
     isOpenAddTransaction.value = true
 }
+
+onBeforeUnmount(() => transaction.value = null)
 </script>
 
 <template>

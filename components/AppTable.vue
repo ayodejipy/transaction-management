@@ -125,7 +125,7 @@ export const defaultPaging: IPaging = {
             :ui="tableUi"
             @select="onSelect"
         >
-            <template v-for="col in columns"  :key="col.key" #[`${col.key}-data`]="{ row }">
+            <template v-for="col in columns" :key="col.key" #[`${col.key}-data`]="{ row }">
                 <slot :name="col.key" :row="row" />
             </template>
         </UTable>
