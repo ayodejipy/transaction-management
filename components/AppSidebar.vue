@@ -28,16 +28,16 @@ const roleBasedLinks = computed(() => {
         ]
     }
     return [
-        {
-            label: 'Dashboard',
-            icon: 'DashboardIcon',
-            to: '/',
-        },
         // {
-        //     label: 'Transactions',
-        //     icon: 'TransactionsIcon',
-        //     to: '/transactions',
+        //     label: 'Dashboard',
+        //     icon: 'DashboardIcon',
+        //     to: '/',
         // },
+        {
+            label: 'Transactions',
+            icon: 'TransactionsIcon',
+            to: '/transactions',
+        },
     ]
 })
 </script>

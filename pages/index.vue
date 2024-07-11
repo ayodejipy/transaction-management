@@ -1,341 +1,291 @@
 <script setup lang="ts">
-import { format } from 'date-fns'
 import type {
-    IColumn,
-    IDaysOptionFilter,
+    IDataResponse,
+    IMonthlyTotal,
+    ITotalTransaction,
+    ITransactionPercentage,
     ITransaction,
     ITransactionsData,
 } from '~/types'
 
+useHead({
+    title: 'Admin Reports',
+})
+
 definePageMeta({
-    title: 'Transactions',
+    title: 'Reports',
     middleware: ['auth', 'admin'],
 })
 
 const { $dayjs } = useNuxtApp()
 
-const { isAdmin } = storeToRefs(useUserStore())
+const isOpenAddTransaction = ref<boolean>(false)
 
-const correctPageTitle = computed(() =>
-    isAdmin.value ? 'Transactions' : 'Dashboard'
-)
-
-useHead({
-    title: correctPageTitle,
-})
-
-const searchTerm = ref<string>('')
-const selected = ref({
-    start: '' as unknown as Date,
-    end: '' as unknown as Date,
-})
-
-const { transactions, transaction } = storeToRefs(useTransactionStore())
+const revenueUrl = useEndpoints('totalRevenueUrl')
+const totalStatsUrl = useEndpoints('totalStatsUrl')
+const monthlyStatsUrl = useEndpoints('monthlyStatsUrl')
+const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
 const transactionsUrl = useEndpoints('transactionsUrl')
 
-const newTransactionUrl = computed(() => {
-    const params = new URLSearchParams()
-
-    if (searchTerm.value) params.append('SearchQuery', searchTerm.value)
-    if (selected.value.start && selected.value.end) {
-        params.append('FromDate', selected.value.start.toISOString())
-        params.append('ToDate', selected.value.end.toISOString())
-    }
-
-    return `${transactionsUrl}?${params.toString()}`
-})
+// Access to the cached value of useFetch
+const { data: cachedTransactions } = useNuxtData(transactionsUrl)
 
 const {
-    pending: loading,
+    pending: loadingTransactions,
     data,
     refresh,
-} = await useAppFetch<ITransactionsData>(() => newTransactionUrl.value, {
-    pick: ['content', 'paging', 'status'],
+} = await useAppFetch<ITransactionsData>(transactionsUrl, {
+    pick: ['content'],
+    key: transactionsUrl,
+    default: () => cachedTransactions.value,
 })
 
-const dataForTable = computed(() =>
-    data.value?.content?.map((transaction: ITransaction) => ({
-        id: transaction.id,
-        typeName: transaction.typeName,
-        categoryName: transaction.categoryName,
-        transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
-            'DD/MM/YYYY'
-        ),
-        amount: formatCurrency(transaction.amount as number),
-        description: transaction.description,
-    }))
+const transactions = computed(() =>
+    data.value?.content
+        .map((transaction: ITransaction) => ({
+            id: transaction.typeId,
+            typeName: transaction.typeName,
+            categoryName: transaction.categoryName,
+            transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
+                'DD/MM/YYYY'
+            ),
+            amount: formatCurrency(transaction.amount as number),
+            description: transaction.description,
+        }))
+        .slice(0, 10)
 )
 
-// const hasPagination = computed(() => !!data.value?.paging)
-const isOpenAddTransaction = ref<boolean>(false)
-const isViewTransaction = ref<boolean>(false)
+// Total revenue
+const { data: cachedRevenue } = useNuxtData(revenueUrl)
 
-const columns: IColumn[] = [
-    {
-        key: 'id',
-        label: 'Transaction ID',
-    },
-    {
-        key: 'typeName',
-        label: 'Transaction Type',
-    },
-    {
-        key: 'categoryName',
-        label: 'Transaction Category',
-    },
-    {
-        key: 'transactionDateUtc',
-        label: 'Transaction Date',
-    },
-    {
-        key: 'amount',
-        label: 'Amount',
-    },
-    {
-        key: 'description',
-        label: 'Description',
-    },
-    { key: 'actions' },
-]
-
-// actions
-const actionsOption = (row: ITransaction) => [
-    [
-        {
-            label: 'Update Transaction',
-            icon: 'i-heroicons-arrow-path',
-            click: () => onUpdateTransaction(row),
-        },
-    ],
-]
-
-const searchedTransactions = computed(() => {
-    if (!searchTerm.value) return dataForTable.value
-
-    return transactions.value.filter((transaction) => {
-        return Object.values(transaction).some((value) => {
-            return String(value)
-                .toLowerCase()
-                .includes(searchTerm.value.toLowerCase())
-        })
-    })
+const { pending: loadingRevenue, data: revenue } = await useAppFetch<
+    IDataResponse<number | undefined>
+>(revenueUrl, {
+    pick: ['content'],
+    key: revenueUrl,
+    default: () => cachedRevenue.value,
 })
+const totalRevenue = computed(() => formatCurrency(revenue.value?.content || 0))
 
-const uiConfig = computed(() => ({
-    placeholder: 'text-icon-gray dark:text-gray-500',
-    rounded: 'rounded-full',
-    color: {
-        white: {
-            outline:
-                'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
-        },
-    },
-    icon: {
-        base: 'text-icon-gray dark:text-gray-500',
-    },
-}))
+// Totals e.g; credit, debit
+const { data: cachedTotalStats } = useNuxtData(totalStatsUrl)
 
-// days filters i.e 'Past 30days'
-const daysOption = ref<string>('')
-const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
+const { pending: loadingStats, data: total } =
+    await useAppFetch<ITotalTransaction>(totalStatsUrl, {
+        pick: ['content'],
+        key: totalStatsUrl,
+        default: () => cachedTotalStats.value,
+    })
+
+const statistics = computed(() => [
     {
-        label: 'Past 30 days',
-        value: $dayjs().subtract(30, 'days'),
+        title: 'All Transactions',
+        figure: total.value?.content?.totalTransactions || 0,
     },
     {
-        label: 'Past week',
-        value: $dayjs().subtract(7, 'days'),
+        title: 'Credit Transactions',
+        figure: formatCurrency(total.value?.content?.totalCredits || 0),
     },
     {
-        label: 'Past 6 months',
-        value: $dayjs().subtract(6, 'months'),
+        title: 'Debit Transactions',
+        figure: formatCurrency(total.value?.content?.totalDebits || 0),
+    },
+    {
+        title: 'Net Amount',
+        figure: formatCurrency(total.value?.content?.netTotal || 0),
     },
 ])
 
-// Transactions filter i.e: Income, Expenditure
-const handleExport = () => {
-    console.log('export')
-}
+// Credit OR Debit transactions percentage (20%, 80%)
+const { data: cachedTotalPercentage } = useNuxtData(creditDebitPercentageUrl)
 
-function $clearFilters() {
-    searchTerm.value = ''
-    selected.value.start = '' as unknown as Date
-    selected.value.end = '' as unknown as Date
-}
-function onUpdateTransaction(row: ITransaction) {
-    transaction.value = row
-    isOpenAddTransaction.value = true
-}
+const { pending: loadingPercentage, data: totalPercentile } =
+    await useAppFetch<ITransactionPercentage>(creditDebitPercentageUrl, {
+        pick: ['content'],
+        key: creditDebitPercentageUrl,
+        default: () => cachedTotalPercentage.value,
+    })
 
-function onSelect(row: ITransaction) {
-    transaction.value = row
-    isViewTransaction.value = true
-}
+const series = computed(() => [
+    totalPercentile.value?.content.totalCreditsPercentage || 0,
+    totalPercentile.value?.content.totalDebitsPercentage || 0,
+])
 
-watch(
-    data,
-    async (newData) => {
-        if (newData && newData.content) {
-            transactions.value = newData.content as ITransaction[]
-        } else {
-            await refresh()
-        }
-    },
-    { immediate: true }
+// Total transactions per month: Jan, Feb...
+const { data: cachedTotalPerMonth } = useNuxtData(monthlyStatsUrl)
+
+const { pending: loadingTotalPerMonth, data: totalPerMonth } =
+    await useAppFetch<IMonthlyTotal>(monthlyStatsUrl, {
+        pick: ['content'],
+        key: monthlyStatsUrl,
+        default: () => cachedTotalPerMonth.value,
+    })
+
+const monthsSeries = computed(() =>
+    totalPerMonth.value?.content.map((month) => month.monthName)
 )
+const amountsSeries = computed(() =>
+    totalPerMonth.value?.content.map((month) => month.netTotal.toString())
+)
+
+const isLoading = computed(
+    () =>
+        loadingTransactions.value ||
+        loadingRevenue.value ||
+        loadingStats.value ||
+        loadingPercentage.value ||
+        loadingTotalPerMonth.value
+)
+
+const uiConfig = computed(() => ({
+    divide: '',
+    ring: 'ring-1 ring-gray-100 dark:ring-gray-800',
+    header: {
+        padding: 'px-0 sm:p-6',
+    },
+    body: {
+        padding: 'px-0 sm:px-6',
+    },
+}))
 </script>
 
 <template>
     <section class="w-full">
-        <section class="flex justify-end items-center">
-            <button
-                type="button"
-                class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
-                @click="isOpenAddTransaction = true"
-            >
-                <Icon name="i-mage-file-upload" />
-                Upload new transaction
-            </button>
-        </section>
-
-        <!-- transactions table -->
-        <section
-            class="bg-white rounded-lg border border-gray-100 mt-6 space-y-3"
-        >
-            <div class="flex justify-between items-center py-8 px-6">
-                <div class="flex items-center gap-2">
-                    <h3 class="font-semibold text-xl">All Transactions</h3>
-                    <UBadge
-                        color="green"
-                        variant="subtle"
-                        :ui="{
-                            rounded: 'rounded-full',
-                        }"
+        <template v-if="!isLoading">
+            <section class="flex justify-between items-center">
+                <div class="">
+                    <span class="text-gray-500 font-medium"
+                        >Your total revenue</span
                     >
-                        {{ transactions.length }}
-                    </UBadge>
+                    <p
+                        class="text-4xl font-inter font-semibold text-brand-green"
+                    >
+                        {{ totalRevenue }}
+                    </p>
                 </div>
-                <div class="flex items-center gap-2.5">
-                    <UInput
-                        v-model.lazy="searchTerm"
-                        :ui="{
-                            rounded: 'rounded-full',
-                            icon: {
-                                base: 'text-icon-gray dark:text-gray-500',
-                            },
-                        }"
-                        icon="i-ri-search-2-line"
-                        size="lg"
-                        color="white"
-                        trailing
-                        placeholder="Search..."
-                    />
-                    <USelect
-                        v-model="daysOption"
-                        icon="i-heroicons-calendar"
-                        color="white"
-                        size="lg"
-                        padding="lg"
-                        :options="daysOptionFilter"
-                        placeholder="Past 30 days"
-                        :ui="uiConfig"
-                    />
-                    <!-- <USelect
-                        color="white"
-                        size="lg"
-                        padding="lg"
-                        :options="['United States', 'Canada', 'Mexico']"
-                        placeholder="Date Range"
-                        :ui="uiConfig"
-                    /> -->
+                <button
+                    type="button"
+                    class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
+                    @click="isOpenAddTransaction = true"
+                >
+                    <Icon name="i-mage-file-upload" />
+                    Add new transaction
+                </button>
+            </section>
 
-                    <UPopover>
-                        <UButton
-                            icon="i-heroicons-calendar-days-20-solid"
-                            size="lg"
-                            color="white"
-                            variant="outline"
-                            :ui="{ rounded: 'rounded-full' }"
+            <section class="grid grid-cols-4 gap-3 mt-6">
+                <StatsCard
+                    v-for="stats in statistics"
+                    :key="stats.title"
+                    :stats
+                />
+            </section>
+
+            <!-- recent transaction table -->
+            <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
+                <div class="flex justify-between items-center py-8 px-6">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-semibold text-xl">
+                            Recent Transactions
+                        </h3>
+                        <UBadge
+                            color="green"
+                            variant="subtle"
+                            :ui="{
+                                rounded: 'rounded-full',
+                            }"
                         >
-                            <span v-if="selected.start && selected.end">
-                                {{ format(selected.start, 'd MMM, yyy') }} -
-                                {{ format(selected.end, 'd MMM, yyy') }}
-                            </span>
-                            <span v-else>Date Range</span>
-                        </UButton>
+                            10
+                        </UBadge>
+                    </div>
+                    <ULink
+                        to="/admin/transactions"
+                        active-class="text-primary"
+                        inactive-class="text-sm text-green-500 font-semibold dark:text-gray-400 hover:text-green-600 dark:hover:text-gray-200"
+                    >
+                        View all
+                    </ULink>
+                </div>
 
-                        <template #panel="{ close }">
-                            <DatePicker
-                                v-model="selected"
-                                is-required
-                                @close="close"
-                            />
-                        </template>
-                    </UPopover>
+                <AppTable :columns :data="transactions" :paginate="false" />
+            </section>
 
-                    <USelect
-                        trailing-icon="i-ci-filter-off-outline"
-                        color="white"
-                        size="lg"
-                        padding="lg"
-                        :options="['Charity', 'Expenditure', 'Income']"
-                        placeholder="All Transactions"
-                        :ui="uiConfig"
+            <!-- analysis section -->
+            <section class="flex gap-4 mt-6">
+                <UCard :ui="{ ...uiConfig, base: 'flex-1 space-y-3' }">
+                    <template #header>
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="font-semibold text-xl">
+                                Transaction Analytics
+                            </h3>
+                        </div>
+                    </template>
+
+                    <ChartsTransactionAnalytics
+                        :categories="monthsSeries"
+                        :series="amountsSeries"
                     />
+                </UCard>
 
-                    <UButton
-                        icon="i-lets-icons-arhive-alt-export-light"
-                        color="white"
-                        variant="outline"
-                        size="lg"
-                        :ui="{
-                            font: 'font-normal',
-                            rounded: 'rounded-full',
-                            color: {
-                                white: {
-                                    outline:
-                                        'shadow-sm bg-white dark:bg-gray-900 text-icon-gray dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
-                                },
-                            },
-                        }"
-                        @click="handleExport"
-                    >
-                        Export
-                    </UButton>
-                    <UButton
-                        icon="i-ic-outline-clear"
-                        dynamic
-                        size="lg"
-                        color="white"
-                        variant="outline"
-                        :ui="{ rounded: 'rounded-full' }"
-                        @click="$clearFilters"
-                    >
-                        Clear
-                    </UButton>
+                <UCard
+                    :ui="{
+                        ...uiConfig,
+                        base: 'w-full sm:w-1/4',
+                    }"
+                >
+                    <template #header>
+                        <div class="flex items-center">
+                            <h3 class="font-semibold text-xl">
+                                Transaction Summary
+                            </h3>
+                        </div>
+                    </template>
+
+                    <div class="mb-4">
+                        <ChartsTransactionSummary :series />
+                    </div>
+
+                    <template #footer>
+                        <div class="flex flex-col gap-4">
+                            <UMeter color="black" :value="series[0]" :max="100">
+                                <template #indicator="{ percent }">
+                                    <div
+                                        class="flex items-center justify-between text-sm text-right"
+                                    >
+                                        <span>Credit Transactions</span>
+                                        <span>{{ Math.round(percent) }}%</span>
+                                    </div>
+                                </template>
+                            </UMeter>
+                            <UMeter :value="series[1]" :max="100">
+                                <template #indicator="{ percent }">
+                                    <div
+                                        class="flex items-center justify-between text-sm text-right"
+                                    >
+                                        <span>Debit Transactions</span>
+                                        <span>{{ Math.round(percent) }}%</span>
+                                    </div>
+                                </template>
+                            </UMeter>
+                        </div>
+                    </template>
+                </UCard>
+            </section>
+        </template>
+
+        <template v-else>
+            <div class="w-full flex flex-col gap-6">
+                <div class="flex items-center justify-between gap-4">
+                    <USkeleton v-for="c in 4" :key="c" class="h-20 w-full" />
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                    <USkeleton class="h-60 flex-1" />
+                    <USkeleton class="h-60 w-1/4" />
                 </div>
             </div>
-
-            <AppTable
-                :loading
-                :columns
-                :data="searchedTransactions"
-                :selectable="true"
-                @select="onSelect"
-            >
-                <template #actions="{ row }">
-                    <UDropdown :items="actionsOption(row)">
-                        <UButton
-                            color="gray"
-                            variant="ghost"
-                            icon="i-heroicons-ellipsis-horizontal-20-solid"
-                        />
-                    </UDropdown>
-                </template>
-            </AppTable>
-        </section>
+        </template>
 
         <AddTransactionDrawer v-model="isOpenAddTransaction" :refresh />
-        <TransactionDetailDrawer v-model="isViewTransaction" />
     </section>
 </template>

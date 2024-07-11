@@ -161,7 +161,7 @@ onMounted(async () => {
                             }}
                         </h3>
                         <p class="text-dark-gray font-light">
-                            Upload new transactions by filling this form.
+                            Add new transactions by filling this form.
                         </p>
                     </div>
                 </template>

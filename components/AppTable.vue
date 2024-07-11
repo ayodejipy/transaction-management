@@ -61,10 +61,6 @@ const tableUi = computed(() => ({
     },
 }))
 
-function checkColKey(key: string) {
-    return props.columns.some((col) => col.key == key)
-}
-
 function onSelect(event: Event) {
     const row = event as unknown as ITransaction
     emit('select', row)

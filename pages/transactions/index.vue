@@ -186,7 +186,7 @@ watch(
                 @click="isOpenAddTransaction = true"
             >
                 <Icon name="i-mage-file-upload" />
-                Upload new transaction
+                Add new transaction
             </button>
         </section>
 
