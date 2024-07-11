@@ -3,7 +3,11 @@ import type { IAuthData, IDataResponse } from '~/types'
 export const useAuthStore = defineStore('auth', () => {
     // const TOKEN_KEY: string = 'opabid-accessToken'
     const LOGIN_PATH: string = '/auth/login'
+    const ADMIN_PATH: string = '/admin'
+    const USER_PATH: string = '/transactions'
+
     const { user } = storeToRefs(useUserStore())
+
     const forgotPasswordUrl = useEndpoints('forgotPasswordUrl')
 
     const accessToken = useCookie('opabid-access')
@@ -77,6 +81,8 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     return {
+        adminPath: unref(ADMIN_PATH),
+        userPath: unref(USER_PATH),
         accessToken,
         refreshToken,
         isAuthenticated,

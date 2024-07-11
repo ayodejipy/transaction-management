@@ -16,6 +16,7 @@ const router = useRouter()
 const { $customFetch } = useNuxtApp()
 
 const authStore = useAuthStore()
+const { userPath, adminPath } = authStore
 
 const loading = ref<boolean>(false)
 const form = reactive({
@@ -38,9 +39,9 @@ async function handleLogin() {
         if (route.redirectedFrom) {
             router.push(route.redirectedFrom.fullPath)
         } else if (data.content.roles[0] == userTypes.admin) {
-            router.push('/admin')
+            router.push(adminPath)
         } else {
-            router.push('/')
+            router.push(userPath)
         }
 
         toast.add({

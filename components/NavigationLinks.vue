@@ -38,6 +38,8 @@ const isExactLink = (to: string) => {
         return true
     } else {
         if (currentPath === to && to === ADMIN_PATH) return true
+        if (currentPath === to) return true
+
     }
 
     return false

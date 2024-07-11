@@ -44,11 +44,6 @@ export default defineNuxtConfig({
         'pages:extend'(pages) {
             pages.push(
                 {
-                    name: 'admin',
-                    path: '/admin',
-                    file: '~/pages/index.vue',
-                },
-                {
                     name: 'admin-transactions',
                     path: '/admin/transactions',
                     file: '~/pages/transactions/index.vue',

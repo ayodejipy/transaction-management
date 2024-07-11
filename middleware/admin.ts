@@ -1,12 +1,12 @@
 export default defineNuxtRouteMiddleware((to) => {
-    // const LOGIN_PATH = '/auth/login'
-    const ADMIN_PATH = '/admin'
-    const USER_PATH = '/'
+    // const USER_PATH = '/transactions'
 
     // const { isAuthenticated } = storeToRefs(useAuthStore())
+    const { adminPath, userPath } = useAuthStore()
+
     const { isAdmin } = storeToRefs(useUserStore())
 
-    if (to.path === USER_PATH && isAdmin.value) {
-        return navigateTo(ADMIN_PATH)
+    if (to.path === userPath && isAdmin.value) {
+        return navigateTo(adminPath)
     }
 })

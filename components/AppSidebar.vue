@@ -2,10 +2,9 @@
 // const route = useRoute()
 
 const { isAdmin, user } = storeToRefs(useUserStore())
-const { handleLogout } = useAuthStore()
+const { adminPath, handleLogout } = useAuthStore()
 
-const ADMIN_PATH = '/admin'
-const appendedUrl = computed(() => (isAdmin.value ? ADMIN_PATH : ''))
+const appendedUrl = computed(() => (isAdmin.value ? adminPath : ''))
 
 const roleBasedLinks = computed(() => {
     if (isAdmin.value) {
@@ -13,17 +12,17 @@ const roleBasedLinks = computed(() => {
             {
                 label: 'Reports',
                 icon: 'ReportsIcon',
-                to: `${ADMIN_PATH}`,
+                to: `${adminPath}`,
             },
             {
                 label: 'Transactions',
                 icon: 'TransactionsIcon',
-                to: `${ADMIN_PATH}/transactions`,
+                to: `${adminPath}/transactions`,
             },
             {
                 label: 'Settings',
                 icon: 'SettingsIcon',
-                to: `${ADMIN_PATH}/settings/categories`,
+                to: `${adminPath}/settings/categories`,
             },
         ]
     }
