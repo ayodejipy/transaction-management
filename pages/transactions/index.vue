@@ -194,7 +194,9 @@ watch(
         <section
             class="bg-white rounded-lg border border-gray-100 mt-6 space-y-3"
         >
-            <div class="flex justify-between items-center py-8 px-6">
+            <div
+                class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-8 px-3 sm:px-6"
+            >
                 <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-xl">All Transactions</h3>
                     <UBadge
@@ -207,10 +209,11 @@ watch(
                         {{ transactions.length }}
                     </UBadge>
                 </div>
-                <div class="flex items-center gap-2.5">
+                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
                     <UInput
                         v-model.lazy="searchTerm"
                         :ui="{
+                            base: 'flex-1',
                             rounded: 'rounded-full',
                             icon: {
                                 base: 'text-icon-gray dark:text-gray-500',

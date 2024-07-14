@@ -128,7 +128,7 @@ watch(
         </div>
 
         <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
-            <div class="flex justify-between items-center py-6 px-6">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-6 px-4 sm:px-6">
                 <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-xl">Categories</h3>
                     <UBadge
@@ -144,6 +144,7 @@ watch(
                 <div class="flex items-center gap-2.5">
                     <UInput
                         :ui="{
+                            base: 'w-full',
                             rounded: 'rounded-full',
                             icon: {
                                 base: 'text-icon-gray dark:text-gray-500',

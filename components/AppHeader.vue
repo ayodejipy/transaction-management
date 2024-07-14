@@ -13,6 +13,12 @@ const authStore = useAuthStore()
 const userStore = useUserStore()
 const { user, isAdmin } = storeToRefs(userStore)
 
+const { isOpen, toggle, appendedUrl } = useSidebar()
+
+const menuIcon = computed(() =>
+    isOpen.value ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'
+)
+
 const fullname = computed<string>(
     () => user.value?.firstName + ' ' + user.value?.lastName
 )
@@ -41,22 +47,27 @@ const items = [
 <template>
     <div class="sticky top-0 z-40 lg:mx-auto">
         <div
-            class="flex h-16 items-center gap-x-4 border-b border-gray-200 bg-white px-2 shadow-sm sm:gap-x-6 sm:px-6 lg:px-0 lg:shadow-none"
+            class="flex h-16 items-center gap-x-2.5 border-b border-gray-200 bg-white px-2 shadow-sm sm:gap-x-6 sm:px-6 lg:px-0 lg:shadow-none"
         >
-            <!-- <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
-            <span class="sr-only">Open sidebar</span>
-            <Bars3Icon class="h-6 w-6" aria-hidden="true" />
-          </button> -->
+            <div class="flex sm:hidden h-16 shrink-0 items-center">
+                <ULink :to="appendedUrl">
+                    <img
+                        class="h-11 w-auto"
+                        src="~/assets/logo.svg"
+                        alt="Opabid transaction management"
+                    >
+                </ULink>
+            </div>
 
             <!-- Separator -->
             <div class="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
 
-            <div class="flex items-center justify-between px-4 flex-1">
-                <h1 class="text-2xl font-semibold text-brand-gray">
+            <div class="flex items-center justify-between sm:px-4 flex-1">
+                <h1 class="text-xl sm:text-2xl font-semibold text-brand-gray">
                     {{ pageTitle }}
                 </h1>
 
-                <div class="flex items-center gap-x-4 lg:gap-x-4">
+                <div class="flex items-center lg:gap-x-4">
                     <!-- <button
                         type="button"
                         class="relative w-10 h-10 flex items-center justify-center flex-shrink-0 p-2.5 text-[#667085] font-medium hover:text-gray-500 rounded-full ring-1 ring-gray-300"
@@ -165,6 +176,18 @@ const items = [
                             </template>
                         </ClientOnly>
                     </div>
+                    <UButton
+                        size="sm"
+                        color="gray"
+                        variant="ghost"
+                        :ui="{
+                            base: 'text-gray-700 lg:hidden',
+                            rounded: 'rounded-full',
+                        }"
+                        @click="toggle"
+                    >
+                        <Icon :name="menuIcon" size="1.75em" />
+                    </UButton>
                 </div>
             </div>
         </div>

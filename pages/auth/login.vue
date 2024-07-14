@@ -68,7 +68,7 @@ async function handleLogin() {
     <section
         class="w-full min-h-screen bg-gray-900 flex justify-center items-center"
     >
-        <section class="w-2/6 bg-white flex flex-col px-10 py-12 rounded-3xl">
+        <section class="w-full mx-6 md:mx-0 md:w-2/6 bg-white flex flex-col px-6 sm:px-10 py-12 rounded-3xl">
             <div class="mx-auto mb-6">
                 <img
                     class="w-16 h-16"
@@ -77,10 +77,10 @@ async function handleLogin() {
                 >
             </div>
             <div class="text-center space-y-3">
-                <h3 class="text-brand-gray text-3xl font-semibold">
+                <h3 class="text-brand-gray text-xl md:text-3xl font-semibold">
                     Log in to your account
                 </h3>
-                <p class="text-dark-gray font-light">
+                <p class="text-dark-gray font-light text-sm sm:text-base">
                     Welcome back! Please enter your details.
                 </p>
             </div>
@@ -101,12 +101,12 @@ async function handleLogin() {
                     />
                 </UFormGroup>
 
-                <div class="flex items-center justify-between my-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-0 my-6">
                     <UCheckbox
                         name="stayLogged"
                         label="Remember for 30 days"
                         :ui="{
-                            label: 'text-gray-500',
+                            label: 'text-gray-500 text-sm sm:text-base',
                         }"
                     />
                     <ULink

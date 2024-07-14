@@ -152,11 +152,13 @@ const uiConfig = computed(() => ({
 <template>
     <section class="w-full">
         <template v-if="!isLoading">
-            <section class="flex justify-between items-center">
+            <section
+                class="flex flex-col sm:flex-row justify-between sm:items-center"
+            >
                 <div class="">
-                    <span class="text-gray-500 font-medium"
-                        >Your total revenue</span
-                    >
+                    <span class="text-gray-500 font-medium">
+                        Your total revenue
+                    </span>
                     <p
                         class="text-4xl font-inter font-semibold text-brand-green"
                     >
@@ -165,7 +167,7 @@ const uiConfig = computed(() => ({
                 </div>
                 <button
                     type="button"
-                    class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
+                    class="hidden sm:flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
                     @click="isOpenAddTransaction = true"
                 >
                     <Icon name="i-mage-file-upload" />
@@ -173,7 +175,7 @@ const uiConfig = computed(() => ({
                 </button>
             </section>
 
-            <section class="grid grid-cols-4 gap-3 mt-6">
+            <section class="grid sm:grid-cols-4 gap-3 mt-6">
                 <StatsCard
                     v-for="stats in statistics"
                     :key="stats.title"
@@ -185,7 +187,7 @@ const uiConfig = computed(() => ({
             <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
                 <div class="flex justify-between items-center py-8 px-6">
                     <div class="flex items-center gap-2">
-                        <h3 class="font-semibold text-xl">
+                        <h3 class="font-semibold sm:text-xl">
                             Recent Transactions
                         </h3>
                         <UBadge
@@ -211,8 +213,16 @@ const uiConfig = computed(() => ({
             </section>
 
             <!-- analysis section -->
-            <section class="flex gap-4 mt-6">
-                <UCard :ui="{ ...uiConfig, base: 'flex-1 space-y-3' }">
+            <section class="flex flex-col sm:flex-row gap-4 mt-6">
+                <UCard
+                    :ui="{
+                        ...uiConfig,
+                        base: 'flex-1 space-y-3',
+                        header: {
+                            padding: 'p-3 sm:p-6',
+                        },
+                    }"
+                >
                     <template #header>
                         <div class="flex items-center justify-between gap-2">
                             <h3 class="font-semibold text-xl">
@@ -231,6 +241,9 @@ const uiConfig = computed(() => ({
                     :ui="{
                         ...uiConfig,
                         base: 'w-full sm:w-1/4',
+                        header: {
+                            padding: 'p-3 sm:p-6',
+                        },
                     }"
                 >
                     <template #header>

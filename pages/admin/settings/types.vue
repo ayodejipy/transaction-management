@@ -132,7 +132,7 @@ watch(
         </div>
 
         <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
-            <div class="flex justify-between items-center py-6 px-6">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-6 px-4 sm:px-6">
                 <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-xl">Types</h3>
                     <UBadge
