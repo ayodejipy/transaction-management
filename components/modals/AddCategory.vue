@@ -1,12 +1,8 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from '#ui/types'
-import type {
-    ICategory,
-    TSubCategory,
-    TransactionTypeSchemaType,
-} from '~/types'
+import type { ICategory, TransactionTypeSchemaType } from '~/types'
 
-type NewCategoryT = Omit<ICategory, 'id' | 'isDeleted' | 'toSubtract'>
+type TNewCategory = Omit<ICategory, 'id' | 'isDeleted' | 'toSubtract'>
 
 const props = defineProps<{
     refresh: () => Promise<void> | void
@@ -23,12 +19,12 @@ const { category } = storeToRefs(categoryStore)
 const loading = ref<boolean>(false)
 
 const formElement = ref<HTMLFormElement | null>(null)
-const defaultFormState: NewCategoryT = {
+const defaultFormState: TNewCategory = {
     name: '',
     description: '',
     subCategories: [],
 }
-const form: NewCategoryT = reactive({ ...defaultFormState })
+const form: TNewCategory = reactive({ ...defaultFormState })
 
 const isEnabled = computed<boolean>(() => !!form.name)
 const buttonText = computed(() =>
@@ -51,15 +47,11 @@ function addSub() {
 }
 
 function onRemoveInput(value: number) {
-    // subs.value.splice(value, 1)
     form.subCategories.splice(value, 1)
-    console.log('onRemoveInput: ', value)
 }
 
 async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
     loading.value = true
-
-    console.log({ event })
 
     const categoryId = category.value?.id
     try {

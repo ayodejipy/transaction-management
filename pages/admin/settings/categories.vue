@@ -91,6 +91,7 @@ function getActiveCategories(categories: ICategory[]) {
             id: category.id,
             name: category.name,
             description: category.description,
+            subCategories: category.subCategories
         }))
 }
 
