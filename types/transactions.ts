@@ -13,8 +13,9 @@ export interface IDaysOptionFilter {
 export interface ITransactionForm {
     description: string
     amount: number
-    typeId: number
+    type: string
     categoryId: number
+    subCategoryId: number
     transactionDate: string
 }
 
@@ -31,8 +32,9 @@ export interface ITransaction {
     createdAtUtc: string
     description: string
     transactionDateUtc: Date
-    typeId: number
-    typeName: string
+    type: string
+    subCategoryId: number
+    subCategoryName: string
     createdBy: ICreatedby
 }
 

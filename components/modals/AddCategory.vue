@@ -75,7 +75,7 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
                 icon: 'i-heroicons-outline-check-badge',
             })
             await props.refresh()
-            
+
             // close and reset
             onCloseModal()
         }
@@ -159,7 +159,6 @@ onMounted(() => {
                         name="sub-category"
                         hint="Optional"
                     >
-                        <!-- <RemoveableInput :is-removable="false" :index="-1" /> -->
                         <RemoveableInput
                             v-for="(sub, idx) in form.subCategories"
                             :key="`${idx}-subinput`"

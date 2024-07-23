@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from '#ui/types'
+import type { FormSubmitEvent, FormError, FormErrorEvent } from '#ui/types'
 
 import type {
     AddTransactionSchemaType,
     ICategory,
     ITransactionForm,
-    TActiveType,
+    TSubCategory,
 } from '~/types'
 
 const props = defineProps<{
@@ -24,16 +24,17 @@ const { transaction } = storeToRefs(transactionStore)
 const categoryStore = useCategoryStore()
 const { categories } = storeToRefs(categoryStore)
 
-const typeStore = useTypeStore()
-const { types } = storeToRefs(typeStore)
+// const typeStore = useTypeStore()
+// const { types } = storeToRefs(typeStore)
 
 // types
-const transactionTypes = computed(() =>
-    types.value.map((type: TActiveType) => ({
-        label: type.name,
-        value: type.id,
-    }))
-)
+// const transactionTypes = computed(() =>
+//     types.value.map((type: TActiveType) => ({
+//         label: type.name,
+//         value: type.id,
+//     }))
+// )
+const transactionTypes = ref(['Credit', 'Debit'])
 
 // categories
 const transactionCategories = computed(() =>
@@ -43,36 +44,71 @@ const transactionCategories = computed(() =>
     }))
 )
 
-const fileRef = ref<HTMLInputElement>()
+const subCategories = ref<{ label: string; value: number }[]>([])
 
-function onFileChange(e: Event) {
-    const input = e.target as HTMLInputElement
+// const fileRef = ref<HTMLInputElement>()
 
-    if (!input.files?.length) {
-        return
-    }
+// function onFileChange(e: Event) {
+//     const input = e.target as HTMLInputElement
 
-    //   form.attachment = URL.createObjectURL(input.files[0])
-}
+//     if (!input.files?.length) {
+//         return
+//     }
+
+//     //   form.attachment = URL.createObjectURL(input.files[0])
+// }
 
 const loading = ref<boolean>(false)
 const defaultFormState: ITransactionForm = {
     amount: 0,
-    typeId: 0,
+    type: '',
     categoryId: 0,
+    subCategoryId: 0,
     transactionDate: '',
     description: '',
 }
-const form: ITransactionForm = reactive({ ...defaultFormState })
+const form = ref<ITransactionForm>({ ...toRef(defaultFormState).value })
+
+const validate = (state: ITransactionForm): FormError[] => {
+    const errors = []
+    if (!state.amount)
+        errors.push({ path: 'amount', message: 'Please input an amount' })
+    if (!state.type)
+        errors.push({ path: 'type', message: 'Please select a type' })
+    if (!state.categoryId)
+        errors.push({ path: 'categoryId', message: 'Please add a category' })
+    //   if (!state.subCategoryId) errors.push({ path: 'subCategoryId', message: 'Required' })
+    if (!state.transactionDate)
+        errors.push({
+            path: 'transactionDate',
+            message: 'Please select a date for the transaction',
+        })
+    if (!state.description)
+        errors.push({ path: 'description', message: 'Description is required' })
+    return errors
+}
+
+async function onError(event: FormErrorEvent) {
+    const element = document.getElementById(event.errors[0].id)
+    element?.focus()
+    element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
 
 const $resetForm = () => {
-    Object.assign(form, defaultFormState)
+    Object.assign(form.value, defaultFormState)
 }
 
 const onCloseSlide = () => {
     $resetForm()
     transaction.value = null
     isOpen.value = !isOpen.value
+}
+
+const getSubCatogories = (categoryId: number): TSubCategory[] | [] => {
+    return (
+        categories.value.find((category) => category.id == categoryId)
+            ?.subCategories ?? []
+    )
 }
 
 async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
@@ -115,7 +151,7 @@ watch(transaction, (_updated) => {
     if (_updated) {
         const { amount, typeId, categoryId, transactionDateUtc, description } =
             _updated
-        Object.assign(form, {
+        Object.assign(form.value, {
             amount,
             typeId,
             categoryId,
@@ -132,10 +168,20 @@ watch(isOpen, (_isOpen) => {
     }
 })
 
+watch(
+    () => form.value.categoryId,
+    (updated) => {
+        const categories = getSubCatogories(updated)
+        subCategories.value = categories.map((sub) => ({
+            value: sub.id as number,
+            label: sub.name,
+        }))
+    }
+)
+
 onMounted(async () => {
     // transaction categories and types
     await categoryStore.getCategories()
-    await typeStore.getTypes()
 })
 </script>
 
@@ -153,7 +199,7 @@ onMounted(async () => {
                     shadow: '',
                     divide: 'divide-y divide-gray-100 dark:divide-gray-800',
                     body: {
-                        base: 'overflow-hidden',
+                        base: 'overflow-hidden sm:h-[44.063]',
                         padding: 'sm:p-8',
                     },
                     header: {
@@ -179,12 +225,14 @@ onMounted(async () => {
                     </div>
                 </template>
 
-                <div class="space-y-4 h-full overflow-y-auto">
+                <div class="space-y-4 h-[44rem]">
                     <UForm
+                        :validate
                         :schema="AddTransactionSchema"
                         :state="form"
                         class="space-y-6"
                         @submit="onSubmit"
+                        @error="onError"
                     >
                         <UFormGroup size="xl" label="Amount" name="amount">
                             <UInput
@@ -196,7 +244,8 @@ onMounted(async () => {
 
                         <UFormGroup size="xl" label="Type" name="type">
                             <USelect
-                                v-model.number="form.typeId"
+                                id="typeId"
+                                v-model.number="form.type"
                                 :options="transactionTypes"
                                 placeholder="Select transaction type"
                             />
@@ -210,6 +259,19 @@ onMounted(async () => {
                             />
                         </UFormGroup>
 
+                        <UFormGroup
+                            v-if="subCategories.length > 0"
+                            size="xl"
+                            label="Sub Category"
+                            name="subCategory"
+                        >
+                            <USelect
+                                v-model.number="form.subCategoryId"
+                                :options="subCategories"
+                                placeholder="Select sub category"
+                            />
+                        </UFormGroup>
+
                         <UFormGroup size="xl" label="Date" name="date">
                             <UInput
                                 v-model="form.transactionDate"
@@ -219,7 +281,7 @@ onMounted(async () => {
                             />
                         </UFormGroup>
 
-                        <UFormGroup
+                        <!-- <UFormGroup
                             size="xl"
                             label="Attachments"
                             name="attachments"
@@ -227,7 +289,7 @@ onMounted(async () => {
                             :ui="{ help: 'mt-1 text-sm' }"
                         >
                             <UInput type="file" icon="i-heroicons-folder" />
-                        </UFormGroup>
+                        </UFormGroup> -->
 
                         <UFormGroup
                             size="xl"

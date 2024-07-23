@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns'
 import type {
+    ICategory,
     IColumn,
     IDaysOptionFilter,
     ITransaction,
@@ -27,10 +28,14 @@ useHead({
 
 const searchTerm = ref<string>('')
 const page = ref<number>(1)
+const categoryId = ref<string>('')
 const selected = ref({
     start: '' as unknown as Date,
     end: '' as unknown as Date,
 })
+
+const categoryStore = useCategoryStore()
+const { categories } = storeToRefs(categoryStore)
 
 const { transactions, transaction } = storeToRefs(useTransactionStore())
 const transactionsUrl = useEndpoints('transactionsUrl')
@@ -44,6 +49,9 @@ const newTransactionUrl = computed(() => {
         params.append('ToDate', selected.value.end.toISOString())
     }
     if (page.value) params.append('PageIndex', page.value.toString())
+
+    if (categoryId.value)
+        params.append('CategoryId', categoryId.value.toString())
 
     return `${transactionsUrl}?${params.toString()}`
 })
@@ -61,13 +69,20 @@ const shouldPaginate = computed(() => !!data.value?.paging)
 const dataForTable = computed(() =>
     data.value?.content?.map((transaction: ITransaction) => ({
         id: transaction.id,
-        typeName: transaction.typeName,
+        type: transaction.type,
         categoryName: transaction.categoryName,
         transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
             'DD/MM/YYYY'
         ),
         amount: formatCurrency(transaction.amount as number),
         description: transaction.description,
+    }))
+)
+
+const transactionCategories = computed(() =>
+    categories.value.map((category: Omit<ICategory, 'isDeleted'>) => ({
+        label: category.name,
+        value: category.id,
     }))
 )
 
@@ -81,8 +96,9 @@ const columns: IColumn[] = [
         label: 'Transaction ID',
     },
     {
-        key: 'typeName',
+        key: 'type',
         label: 'Transaction Type',
+        sortable: true
     },
     {
         key: 'categoryName',
@@ -163,6 +179,7 @@ const handleExport = () => {
 }
 
 function $clearFilters() {
+    categoryId.value = ''
     searchTerm.value = ''
     selected.value.start = '' as unknown as Date
     selected.value.end = '' as unknown as Date
@@ -200,6 +217,10 @@ watch(
     },
     { immediate: true }
 )
+
+onMounted(async () => {
+    await categoryStore.getCategories()
+})
 </script>
 
 <template>
@@ -304,11 +325,12 @@ watch(
                     </UPopover>
 
                     <USelect
+                        v-model="categoryId"
                         trailing-icon="i-ci-filter-off-outline"
                         color="white"
                         size="lg"
                         padding="lg"
-                        :options="['Charity', 'Expenditure', 'Income']"
+                        :options="transactionCategories"
                         placeholder="All Transactions"
                         :ui="uiConfig"
                     />

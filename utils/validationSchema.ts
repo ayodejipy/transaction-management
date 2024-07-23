@@ -38,8 +38,9 @@ export const TransactionCategorySchema = z
 
 export const AddTransactionSchema = z.object({
     amount: z.number(),
-    typeId: z.number(),
+    type: z.string(),
     categoryId: z.number(),
+    subCategoryId: z.number(),
     transactionDate: z.string(),
     description: z.string(),
 })
