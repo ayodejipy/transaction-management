@@ -5,7 +5,9 @@ import type { IDataResponse } from './api'
 
 export interface IDaysOptionFilter {
     label: string
-    value: string | Date | Dayjs
+    value: string | Date | Dayjs | object
+    start: string | Date | Dayjs 
+    end: string | Date | Dayjs 
 }
 
 export interface ITransactionForm {
@@ -40,6 +42,14 @@ export interface ITypes {
     description: string
     toSubtract: boolean
     isDeleted: boolean
+}
+
+export type TSubCategory = {
+    id?: number;
+    name: string;
+}
+export interface ICategory extends ITypes {
+    subCategories: TSubCategory[]
 }
 
 export type TActiveType = Omit<ITypes, 'isDeleted' | 'toSubtract'>

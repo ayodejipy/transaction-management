@@ -1,6 +1,12 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from '#ui/types'
-import type { ITypes, TransactionTypeSchemaType } from '~/types'
+import type {
+    ICategory,
+    TSubCategory,
+    TransactionTypeSchemaType,
+} from '~/types'
+
+type NewCategoryT = Omit<ICategory, 'id' | 'isDeleted' | 'toSubtract'>
 
 const props = defineProps<{
     refresh: () => Promise<void> | void
@@ -17,14 +23,17 @@ const { category } = storeToRefs(categoryStore)
 const loading = ref<boolean>(false)
 
 const formElement = ref<HTMLFormElement | null>(null)
-const defaultFormState: Partial<ITypes> = {
+const defaultFormState: NewCategoryT = {
     name: '',
     description: '',
+    subCategories: [],
 }
-const form: Partial<ITypes> = reactive({ ...defaultFormState })
+const form: NewCategoryT = reactive({ ...defaultFormState })
 
 const isEnabled = computed<boolean>(() => !!form.name)
-const buttonText = computed(() => category.value?.id ? 'Edit category' : 'Create category')
+const buttonText = computed(() =>
+    category.value?.id ? 'Edit category' : 'Create category'
+)
 
 const $resetForm = () => {
     Object.assign(form, defaultFormState)
@@ -35,12 +44,28 @@ const onCloseModal = () => {
     isOpen.value = !isOpen.value
 }
 
+function addSub() {
+    form.subCategories.push({
+        name: '',
+    })
+}
+
+function onRemoveInput(value: number) {
+    // subs.value.splice(value, 1)
+    form.subCategories.splice(value, 1)
+    console.log('onRemoveInput: ', value)
+}
+
 async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
     loading.value = true
+
+    console.log({ event })
+
     const categoryId = category.value?.id
     try {
-        const data = categoryId ? await updateCategory(categoryId, event.data) : await addCategory(event.data)
-
+        const data = categoryId
+            ? await updateCategory(categoryId, event.data)
+            : await addCategory(event.data)
         if (data.success) {
             toast.add({
                 title: 'Category created Successfully',
@@ -49,8 +74,8 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
                     "You've successfully added a new transaction category",
                 icon: 'i-heroicons-outline-check-badge',
             })
-
             await props.refresh()
+            
             // close and reset
             onCloseModal()
         }
@@ -70,6 +95,12 @@ async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
 watch(category, (data) => {
     if (data) {
         Object.assign(form, data)
+    }
+})
+
+onMounted(() => {
+    if (!category.value) {
+        addSub()
     }
 })
 </script>
@@ -119,6 +150,32 @@ watch(category, (data) => {
                         <UInput
                             v-model="form.name"
                             placeholder="Category name"
+                        />
+                    </UFormGroup>
+
+                    <UFormGroup
+                        size="xl"
+                        label="Sub category"
+                        name="sub-category"
+                        hint="Optional"
+                    >
+                        <!-- <RemoveableInput :is-removable="false" :index="-1" /> -->
+                        <RemoveableInput
+                            v-for="(sub, idx) in form.subCategories"
+                            :key="`${idx}-subinput`"
+                            v-model="form.subCategories[idx].name"
+                            :index="idx"
+                            @remove="onRemoveInput"
+                        />
+                        <UButton
+                            icon="i-heroicons-plus-small"
+                            dynamic
+                            size="xs"
+                            color="primary"
+                            variant="soft"
+                            :ui="{ rounded: 'rounded-full' }"
+                            label="Add Sub"
+                            @click="addSub"
                         />
                     </UFormGroup>
 

@@ -118,19 +118,42 @@ const uiConfig = computed(() => ({
 }))
 
 // days filters i.e 'Past 30days'
-const daysOption = ref<string>('')
 const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
     {
-        label: 'Past 30 days',
-        value: $dayjs().subtract(30, 'days'),
-    },
-    {
-        label: 'Past week',
-        value: $dayjs().subtract(7, 'days'),
+        label: 'Last 7 days',
+        start: $dayjs().toDate(),
+        end: $dayjs().subtract(7, 'days').toDate(),
+        value: {},
     },
     {
         label: 'Past 6 months',
-        value: $dayjs().subtract(6, 'months'),
+        start: $dayjs().toDate(),
+        end: $dayjs().subtract(6, 'months').toDate(),
+        value: {},
+    },
+    {
+        label: 'First quarter (Q1)',
+        start: $dayjs().quarter(1).startOf('quarter').toDate(),
+        end: $dayjs().quarter(1).endOf('quarter').toDate(),
+        value: {},
+    },
+    {
+        label: 'Second quarter (Q2)',
+        start: $dayjs().quarter(2).startOf('quarter').toDate(),
+        end: $dayjs().quarter(2).endOf('quarter').toDate(),
+        value: {},
+    },
+    {
+        label: 'Third quarter (Q3)',
+        start: $dayjs().quarter(3).startOf('quarter').toDate(),
+        end: $dayjs().quarter(3).endOf('quarter').toDate(),
+        value: {},
+    },
+    {
+        label: 'Fourth quarter (Q4)',
+        start: $dayjs().quarter(4).startOf('quarter').toDate(),
+        end: $dayjs().quarter(4).endOf('quarter').toDate(),
+        value: {},
     },
 ])
 
@@ -155,11 +178,13 @@ function getNextList() {
         page.value++
     }
 }
+
 function getPrevList() {
     if (data.value?.paging?.hasPreviousPage) {
         page.value--
     }
 }
+
 function getClickedPage(value: number) {
     page.value = toRef(value).value
 }
@@ -225,7 +250,7 @@ watch(
                         trailing
                         placeholder="Search..."
                     />
-                    <USelect
+                    <!-- <USelect
                         v-model="daysOption"
                         icon="i-heroicons-calendar"
                         color="white"
@@ -233,6 +258,16 @@ watch(
                         padding="lg"
                         :options="daysOptionFilter"
                         placeholder="Past 30 days"
+                        :ui="uiConfig"
+                    /> -->
+                    <USelectMenu
+                        v-model="selected"
+                        icon="i-heroicons-calendar"
+                        color="white"
+                        size="lg"
+                        padding="lg"
+                        :options="daysOptionFilter"
+                        placeholder="Select range option"
                         :ui="uiConfig"
                     />
                     <!-- <USelect

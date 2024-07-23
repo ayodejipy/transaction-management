@@ -43,6 +43,18 @@ const transactionCategories = computed(() =>
     }))
 )
 
+const fileRef = ref<HTMLInputElement>()
+
+function onFileChange(e: Event) {
+    const input = e.target as HTMLInputElement
+
+    if (!input.files?.length) {
+        return
+    }
+
+    //   form.attachment = URL.createObjectURL(input.files[0])
+}
+
 const loading = ref<boolean>(false)
 const defaultFormState: ITransactionForm = {
     amount: 0,
@@ -141,6 +153,7 @@ onMounted(async () => {
                     shadow: '',
                     divide: 'divide-y divide-gray-100 dark:divide-gray-800',
                     body: {
+                        base: 'overflow-hidden',
                         padding: 'sm:p-8',
                     },
                     header: {
@@ -166,7 +179,7 @@ onMounted(async () => {
                     </div>
                 </template>
 
-                <div class="space-y-4">
+                <div class="space-y-4 h-full overflow-y-auto">
                     <UForm
                         :schema="AddTransactionSchema"
                         :state="form"
@@ -202,7 +215,18 @@ onMounted(async () => {
                                 v-model="form.transactionDate"
                                 type="date"
                                 placeholder=""
+                                :max="$dayjs().format('YYYY-MM-DD')"
                             />
+                        </UFormGroup>
+
+                        <UFormGroup
+                            size="xl"
+                            label="Attachments"
+                            name="attachments"
+                            help="JPG, PNG or PDF. 1MB Max."
+                            :ui="{ help: 'mt-1 text-sm' }"
+                        >
+                            <UInput type="file" icon="i-heroicons-folder" />
                         </UFormGroup>
 
                         <UFormGroup

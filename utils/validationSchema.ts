@@ -25,6 +25,16 @@ export const TransactionTypeSchema = z
             .string().optional(),
     })
 
+export const TransactionCategorySchema = z
+    .object({
+        name: z.string(),
+        description: z.string().optional(),
+        subCategories: z.object({
+            id: z.number().optional(),
+            name: z.string(),
+        }).array().optional(),
+    })
+
 
 export const AddTransactionSchema = z.object({
     amount: z.number(),
