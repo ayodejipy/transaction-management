@@ -2,7 +2,6 @@ import type { IAuthData, IDataResponse } from '~/types'
 import getEndpoints from '~/utils/endpoints'
 
 export const useAuthStore = defineStore('auth', () => {
-    // const TOKEN_KEY: string = 'opabid-accessToken'
     const LOGIN_PATH: string = '/auth/login'
     const ADMIN_PATH: string = '/admin'
     const USER_PATH: string = '/transactions'

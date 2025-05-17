@@ -121,7 +121,7 @@ onMounted(() => {
         >
             <template #header>
                 <div class="space-y-2">
-                    <h3 class="text-brand-gray text-2xl font-semibold">
+                    <h3 class="text-brand-gray dark:text-gray-200 text-2xl font-semibold">
                         Add New Category
                     </h3>
                     <p class="text-dark-gray font-light">

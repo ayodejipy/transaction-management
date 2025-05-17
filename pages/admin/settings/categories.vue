@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import getEndpoints from '~/utils/endpoints'
+
 import type { ICategoriesData, ICategory, IColumn } from '~/types'
 
 const toast = useToast()
@@ -95,7 +97,8 @@ function getActiveCategories(categories: ICategory[]) {
             id: category.id,
             name: category.name,
             description: category.description,
-            subCategories: category.subCategories,
+            subCategories: [...category.subCategories],
+            toSubtract: category.toSubtract
         }))
 }
 
@@ -132,7 +135,7 @@ watch(
             />
         </div>
 
-        <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
+        <section class="rounded-lg border border-gray-100 dark:border-gray-700 mt-6 space-y-3">
             <div
                 class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-6 px-4 sm:px-6"
             >
@@ -183,12 +186,12 @@ watch(
                 :paginate="shouldPaginate"
                 :paging="data?.paging"
             >
-                <template #subCategories="{ row: category }">
+                <template #subCategories="{ row }">
                     <p
                         class="text-ellipsis overflow-hidden inline-flex gap-1.5"
                     >
                         <span
-                            v-for="{ id, name } in category.subCategories"
+                            v-for="{ id, name } in row.subCategories"
                             :key="id"
                             class="rounded-full border border-gray-500 px-2 text-xs font-medium"
                         >

@@ -8,6 +8,7 @@ useHead({
 
 definePageMeta({
     layout: false,
+    middleware: ['auth']
 })
 
 const toast = useToast()
