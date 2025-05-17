@@ -2,7 +2,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const LOGIN_PATH = '/auth/login'
     // const ADMIN_PATH = '/admin'
     // const USER_PATH = '/'
-
+    const publicPaths = ['/', '/auth/login', '/auth/accept-invite', '/auth/forgot-password']
     const authStore = useAuthStore()
     const { isAuthenticated } = storeToRefs(authStore)
 
@@ -15,7 +15,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
         }
     }
 
-    if (to.path !== LOGIN_PATH && !isAuthenticated.value) {
+
+    if (!publicPaths.includes(to.path) && !isAuthenticated.value) {
         return navigateTo(LOGIN_PATH)
     }
 })

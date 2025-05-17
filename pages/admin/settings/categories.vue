@@ -6,7 +6,7 @@ const toast = useToast()
 const isOpen = ref<boolean>(false)
 const activeCategories = ref<Omit<ICategory, 'isDeleted'>[]>([])
 
-const categoriesUrl = useEndpoints('categoriesUrl')
+const categoriesUrl = getEndpoints('categoriesUrl')
 
 const categoryStore = useCategoryStore()
 const { deleteCategory } = categoryStore
@@ -184,11 +184,13 @@ watch(
                 :paging="data?.paging"
             >
                 <template #subCategories="{ row: category }">
-                    <p class="text-ellipsis overflow-hidden inline-flex gap-2">
+                    <p
+                        class="text-ellipsis overflow-hidden inline-flex gap-1.5"
+                    >
                         <span
                             v-for="{ id, name } in category.subCategories"
                             :key="id"
-                            class="rounded-lg border border-gray-500 px-1.5 text-sm font-medium"
+                            class="rounded-full border border-gray-500 px-2 text-xs font-medium"
                         >
                             {{ name }}
                         </span>

@@ -1,4 +1,5 @@
 import type { IAuthData, IDataResponse } from '~/types'
+import getEndpoints from '~/utils/endpoints'
 
 export const useAuthStore = defineStore('auth', () => {
     // const TOKEN_KEY: string = 'opabid-accessToken'
@@ -8,7 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     const { user } = storeToRefs(useUserStore())
 
-    const forgotPasswordUrl = useEndpoints('forgotPasswordUrl')
+    const forgotPasswordUrl = getEndpoints('forgotPasswordUrl')
 
     const accessToken = useCookie('opabid-access')
     const refreshToken = useCookie('opabid-refresh')
@@ -26,7 +27,7 @@ export const useAuthStore = defineStore('auth', () => {
     async function getRefreshedToken(): Promise<IAuthData> {
         const router = useRouter()
         const { $customFetch } = useNuxtApp()
-        const tokensRefreshUrl = useEndpoints('refreshTokenUrl')
+        const tokensRefreshUrl = getEndpoints('refreshTokenUrl')
 
         try {
             const data = await $customFetch<IAuthData>(tokensRefreshUrl, {
@@ -67,7 +68,7 @@ export const useAuthStore = defineStore('auth', () => {
     async function handleLogout(uid: string) {
         const router = useRouter()
         const { $customFetch } = useNuxtApp()
-        const authUrl = useEndpoints('authUrl')
+        const authUrl = getEndpoints('authUrl')
 
         const data = await $customFetch<IAuthData>(`${authUrl}/${uid}/logout`)
 
@@ -92,3 +93,6 @@ export const useAuthStore = defineStore('auth', () => {
         handleLogout,
     }
 })
+
+
+// "postinstall": "nuxt prepare",

@@ -1,9 +1,10 @@
 import type { IUser, IUserData } from '~/types'
+import getEndpoints from '~/utils/endpoints'
 
 export const useUserStore = defineStore(
     'users',
     () => {
-        const userProfileUrl = useEndpoints('userProfileUrl')
+        const userProfileUrl = getEndpoints('userProfileUrl')
         const user = ref<IUser | null>(null)
 
         const isLoggedIn = computed(() => !!user.value)

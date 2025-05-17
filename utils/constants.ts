@@ -1,4 +1,4 @@
-import type { IColumn } from "~/types";
+import type { IColumn } from '~/types'
 
 export const columns: IColumn[] = [
     {
@@ -27,12 +27,12 @@ export const columns: IColumn[] = [
     },
 ]
 
-
 export const userRoles = {
     SuperAdmin: 'SuperAdmin',
-    User: 'User'
+    User: 'User',
 }
 export const userTypes = {
     admin: 'admin',
-    user: 'user'
+    user: 'user',
 }
+

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import getEndpoints from '~/utils/endpoints'
 import type { IAuthData } from '~/types'
 
 useHead({
@@ -28,7 +29,7 @@ const form = reactive({
 
 async function handleLogin() {
     loading.value = true
-    const loginUrl = useEndpoints('loginUrl')
+    const loginUrl = getEndpoints('loginUrl')
     try {
         const data = await $customFetch<IAuthData>(loginUrl, {
             method: 'POST',

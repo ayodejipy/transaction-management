@@ -15,6 +15,11 @@ export default defineNuxtConfig({
     ui: {
         icons: ['ri', 'ci'],
     },
+    imports: {
+        dirs: [
+            'utils/**',
+        ],
+    },
     app: {
         head: {
             htmlAttrs: {

@@ -7,6 +7,7 @@ import type {
     ITransaction,
     ITransactionsData,
 } from '~/types'
+import getEndpoints from '~/utils/endpoints'
 
 useHead({
     title: 'Admin Reports',
@@ -21,11 +22,11 @@ const { $dayjs } = useNuxtApp()
 
 const isOpenAddTransaction = ref<boolean>(false)
 
-const revenueUrl = useEndpoints('totalRevenueUrl')
-const totalStatsUrl = useEndpoints('totalStatsUrl')
-const monthlyStatsUrl = useEndpoints('monthlyStatsUrl')
-const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
-const transactionsUrl = useEndpoints('transactionsUrl')
+const revenueUrl = getEndpoints('totalRevenueUrl')
+const totalStatsUrl = getEndpoints('totalStatsUrl')
+const monthlyStatsUrl = getEndpoints('monthlyStatsUrl')
+const creditDebitPercentageUrl = getEndpoints('percentageStatsUrl')
+const transactionsUrl = getEndpoints('transactionsUrl')
 
 // Access to the cached value of useFetch
 const { data: cachedTransactions } = useNuxtData(transactionsUrl)
@@ -43,8 +44,8 @@ const {
 const transactions = computed(() =>
     data.value?.content
         .map((transaction: ITransaction) => ({
-            id: transaction.typeId,
-            typeName: transaction.typeName,
+            id: transaction.id,
+            typeName: transaction.type,
             categoryName: transaction.categoryName,
             transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
                 'DD/MM/YYYY'
@@ -184,7 +185,7 @@ const uiConfig = computed(() => ({
             </section>
 
             <!-- recent transaction table -->
-            <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
+            <section class="rounded-lg border border-gray-100 dark:border-gray-700 mt-6 space-y-3">
                 <div class="flex justify-between items-center py-8 px-6">
                     <div class="flex items-center gap-2">
                         <h3 class="font-semibold sm:text-xl">
@@ -209,7 +210,7 @@ const uiConfig = computed(() => ({
                     </ULink>
                 </div>
 
-                <AppTable :columns :data="transactions" :paginate="false" />
+                <AppTable :columns :data="transactions ?? []" :paginate="false" />
             </section>
 
             <!-- analysis section -->

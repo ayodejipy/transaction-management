@@ -1,6 +1,8 @@
+import getEndpoints from "~/utils/endpoints"
+
 export default defineNuxtPlugin(() => {
 	const config = useRuntimeConfig()
-    const tokensRefreshUrl = useEndpoints('refreshTokenUrl')
+    const tokensRefreshUrl = getEndpoints('refreshTokenUrl')
 
     const authStore = useAuthStore()
 	const { accessToken, refreshToken } = storeToRefs(authStore)

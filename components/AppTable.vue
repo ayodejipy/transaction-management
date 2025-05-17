@@ -47,7 +47,7 @@ const rows = computed(() => props.data)
 
 const tableUi = computed(() => ({
     th: {
-        base: 'bg-[#F9FAFB]',
+        base: 'bg-[#F9FAFB] dark:bg-gray-900',
         padding: 'px-8 py-3.5',
         color: 'text-brand-gray dark:text-white',
         font: 'font-medium',

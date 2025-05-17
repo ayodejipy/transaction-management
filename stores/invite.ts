@@ -3,9 +3,10 @@ import type {
     IDataResponse,
     InviteUserForm,
 } from '~/types'
+import getEndpoints from '~/utils/endpoints'
 
 export const useInviteStore = defineStore('invite', () => {
-    const userInviteUrl = useEndpoints('userInviteUrl')
+    const userInviteUrl = getEndpoints('userInviteUrl')
     const invitedUsers = ref<InvitedUserInterface[]>([])
 
     async function invite(

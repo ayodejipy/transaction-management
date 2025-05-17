@@ -1,7 +1,7 @@
 import type { ITypes, TActiveType, TTypeData } from '~/types'
 
 export const useTypeStore = defineStore('type', () => {
-    const typesUrl = useEndpoints('typesUrl')
+    const typesUrl = getEndpoints('typesUrl')
     const type = ref<TActiveType | null>(null)
     const types = ref<TActiveType[]>([])
 

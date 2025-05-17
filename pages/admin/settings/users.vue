@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import getEndpoints from '~/utils/endpoints'
 import type { IColumn, IInvitedUsersData, InvitedUserInterface } from '~/types'
 
 const toast = useToast()
@@ -8,7 +9,7 @@ const inviteStore = useInviteStore()
 const { resendInvite } = inviteStore
 const { invitedUsers } = storeToRefs(inviteStore)
 
-const usersInvitedUrl = useEndpoints('userInviteUrl')
+const usersInvitedUrl = getEndpoints('userInviteUrl')
 const {
     pending: loading,
     data,
@@ -149,7 +150,9 @@ watch(
         </div>
 
         <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-6 px-4 sm:px-6">
+            <div
+                class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-6 px-4 sm:px-6"
+            >
                 <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-xl">Users</h3>
                     <UBadge
@@ -197,13 +200,18 @@ watch(
                 :paging="data?.paging"
             >
                 <template #isAccepted="{ row }">
-                    <UBadge v-if="row.isAccepted" color="primary" variant="soft">
+                    <UBadge
+                        v-if="row.isAccepted"
+                        color="primary"
+                        variant="soft"
+                    >
                         <Icon name="i-ic-round-circle" class="w-2 h-2 mr-2" />
                         Active
                     </UBadge>
                     <UBadge v-else color="red" variant="soft">
                         <Icon name="i-ic-round-circle" class="w-2 h-2 mr-2" />
-                        Inactive</UBadge>
+                        Inactive
+                    </UBadge>
                 </template>
 
                 <template #actions="{ row }">

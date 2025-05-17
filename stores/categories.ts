@@ -1,7 +1,8 @@
 import type { ICategory, TCategoryData } from '~/types'
+import getEndpoints from '~/utils/endpoints'
 
 export const useCategoryStore = defineStore('category', () => {
-	const categoriesUrl = useEndpoints('categoriesUrl')
+	const categoriesUrl = getEndpoints('categoriesUrl')
     const categories = ref<Omit<ICategory, 'isDeleted'>[]>([])
 
     const category = ref<Omit<ICategory, 'isDeleted'> | null>(null)

@@ -8,6 +8,8 @@ import type {
     ITransactionsData,
 } from '~/types'
 
+import getEndpoints from '~/utils/endpoints'
+
 useHead({
     title: 'Admin Reports',
 })
@@ -21,11 +23,11 @@ const { $dayjs } = useNuxtApp()
 
 const isOpenAddTransaction = ref<boolean>(false)
 
-const revenueUrl = useEndpoints('totalRevenueUrl')
-const totalStatsUrl = useEndpoints('totalStatsUrl')
-const monthlyStatsUrl = useEndpoints('monthlyStatsUrl')
-const creditDebitPercentageUrl = useEndpoints('percentageStatsUrl')
-const transactionsUrl = useEndpoints('transactionsUrl')
+const revenueUrl = getEndpoints('totalRevenueUrl')
+const totalStatsUrl = getEndpoints('totalStatsUrl')
+const monthlyStatsUrl = getEndpoints('monthlyStatsUrl')
+const creditDebitPercentageUrl = getEndpoints('percentageStatsUrl')
+const transactionsUrl = getEndpoints('transactionsUrl')
 
 // Access to the cached value of useFetch
 const { data: cachedTransactions } = useNuxtData(transactionsUrl)

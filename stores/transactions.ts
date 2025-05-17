@@ -4,11 +4,12 @@ import type {
     ITransactionForm,
     ITransactionsData,
 } from '~/types'
+import getEndpoints from '~/utils/endpoints'
 
 // type TTransaction = Omit<ITransaction, 'categoryId' | 'typeId' | 'createdAtUtc'>
 
 export const useTransactionStore = defineStore('transaction', () => {
-    const transactionsUrl = useEndpoints('transactionsUrl')
+    const transactionsUrl = getEndpoints('transactionsUrl')
 
     const transactions = ref<ITransaction[]>([])
     const transaction = ref<ITransaction | null>(null)

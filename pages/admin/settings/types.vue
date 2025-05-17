@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { IColumn, ITypes, TActiveType, ITypesData } from '~/types'
+import getEndpoints from '~/utils/endpoints'
 
 const isOpen = ref<boolean>(false)
 
 const toast = useToast()
-const typesUrl = useEndpoints('typesUrl')
+const typesUrl = getEndpoints('typesUrl')
 
 const typeStore = useTypeStore()
 const { deleteType } = typeStore

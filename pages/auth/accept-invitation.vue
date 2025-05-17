@@ -2,6 +2,7 @@
 import type { FormSubmitEvent } from '#ui/types'
 import type { IAuthData, TSchema } from '~/types';
 import { acceptInviteSchema } from '~/utils'
+import getEndpoints from '~/utils/endpoints';
 
 useHead({
     title: 'Accept Invite'
@@ -35,7 +36,7 @@ const isButtonEnabled = computed<boolean>(() => !!token.value)
 
 async function handleAcceptInvite(event: FormSubmitEvent<TSchema>) {
     loading.value = true
-    const acceptInviteUrl = useEndpoints('userInviteAcceptUrl')
+    const acceptInviteUrl = getEndpoints('userInviteAcceptUrl')
     const body = {
         ...event.data,
         token: token.value,
@@ -51,7 +52,7 @@ async function handleAcceptInvite(event: FormSubmitEvent<TSchema>) {
 
         toast.add({
             title: 'Account created Successfully',
-            color: 'green',
+            color: 'success',
             description: 'Welcome onboard! Your account is ready',
             icon: 'i-heroicons-outline-check-badge',
 		})
@@ -60,7 +61,7 @@ async function handleAcceptInvite(event: FormSubmitEvent<TSchema>) {
     } catch {
         toast.add({
             title: 'Account Setup Failed',
-            color: 'red',
+            color: 'error',
             description: 'Email or password incorrect.',
             icon: 'i-heroicons-outline-exclaimation-circle',
         })

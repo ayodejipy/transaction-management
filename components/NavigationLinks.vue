@@ -25,7 +25,7 @@ const ui = {
     font: 'font-medium',
     size: 'text-sm',
     label: 'truncate relative',
-    active: 'text-white/80 dark:text-white before:bg-brand-green dark:before:bg-gray-800',
+    active: 'text-white/80 dark:text-white before:bg-brand-green dark:before:bg-brand-green',
 }
 
 const isExactLink = (to: string) => {

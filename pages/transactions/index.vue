@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import getEndpoints from '~/utils/endpoints'
 import { format } from 'date-fns'
 import type {
     ICategory,
@@ -33,12 +34,27 @@ const selected = ref({
     start: '' as unknown as Date,
     end: '' as unknown as Date,
 })
+const dateRange = ref({
+    start: '' as unknown as Date,
+    end: '' as unknown as Date,
+})
 
 const categoryStore = useCategoryStore()
 const { categories } = storeToRefs(categoryStore)
 
 const { transactions, transaction } = storeToRefs(useTransactionStore())
-const transactionsUrl = useEndpoints('transactionsUrl')
+const transactionsUrl = getEndpoints('transactionsUrl')
+
+const computedDateRange = computed({
+    get: () => dateRange.value || selected.value,
+    set: (value: object) => {
+        if (value.label) {
+            dateRange.value = value
+        }
+        selected.value = value
+    },
+})
+console.log(computedDateRange)
 
 const newTransactionUrl = computed(() => {
     const params = new URLSearchParams()
@@ -98,7 +114,7 @@ const columns: IColumn[] = [
     {
         key: 'type',
         label: 'Transaction Type',
-        sortable: true
+        sortable: true,
     },
     {
         key: 'categoryName',
@@ -139,37 +155,31 @@ const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
         label: 'Last 7 days',
         start: $dayjs().toDate(),
         end: $dayjs().subtract(7, 'days').toDate(),
-        value: {},
     },
     {
         label: 'Past 6 months',
         start: $dayjs().toDate(),
         end: $dayjs().subtract(6, 'months').toDate(),
-        value: {},
     },
     {
         label: 'First quarter (Q1)',
         start: $dayjs().quarter(1).startOf('quarter').toDate(),
         end: $dayjs().quarter(1).endOf('quarter').toDate(),
-        value: {},
     },
     {
         label: 'Second quarter (Q2)',
         start: $dayjs().quarter(2).startOf('quarter').toDate(),
         end: $dayjs().quarter(2).endOf('quarter').toDate(),
-        value: {},
     },
     {
         label: 'Third quarter (Q3)',
         start: $dayjs().quarter(3).startOf('quarter').toDate(),
         end: $dayjs().quarter(3).endOf('quarter').toDate(),
-        value: {},
     },
     {
         label: 'Fourth quarter (Q4)',
         start: $dayjs().quarter(4).startOf('quarter').toDate(),
         end: $dayjs().quarter(4).endOf('quarter').toDate(),
-        value: {},
     },
 ])
 
@@ -238,7 +248,7 @@ onMounted(async () => {
 
         <!-- transactions table -->
         <section
-            class="bg-white rounded-lg border border-gray-100 mt-6 space-y-3"
+            class="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-700 mt-6 space-y-3"
         >
             <div
                 class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-8 px-3 sm:px-6"
@@ -282,7 +292,7 @@ onMounted(async () => {
                         :ui="uiConfig"
                     /> -->
                     <USelectMenu
-                        v-model="selected"
+                        v-model="computedDateRange"
                         icon="i-heroicons-calendar"
                         color="white"
                         size="lg"

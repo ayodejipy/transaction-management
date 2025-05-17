@@ -47,7 +47,7 @@ const items = [
 <template>
     <div class="sticky top-0 z-40 lg:mx-auto">
         <div
-            class="flex h-16 items-center gap-x-2.5 border-b border-gray-200 bg-white px-2 shadow-sm sm:gap-x-6 sm:px-6 lg:px-0 lg:shadow-none"
+            class="flex h-16 items-center gap-x-2.5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-2 shadow-sm sm:gap-x-6 sm:px-6 lg:px-0 lg:shadow-none"
         >
             <div class="flex sm:hidden h-16 shrink-0 items-center">
                 <ULink :to="appendedUrl">
@@ -63,7 +63,7 @@ const items = [
             <div class="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
 
             <div class="flex items-center justify-between sm:px-4 flex-1">
-                <h1 class="text-xl sm:text-2xl font-semibold text-brand-gray">
+                <h1 class="text-xl sm:text-2xl font-semibold text-brand-gray dark:text-gray-200">
                     {{ pageTitle }}
                 </h1>
 
@@ -114,7 +114,7 @@ const items = [
                                         class="hidden lg:flex lg:flex-col lg:items-start"
                                     >
                                         <p
-                                            class="font-medium leading-6 text-brand-gray"
+                                            class="font-medium leading-6 text-brand-gray dark:text-gray-200"
                                         >
                                             {{ fullname }}
                                         </p>

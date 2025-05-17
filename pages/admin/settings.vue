@@ -21,11 +21,11 @@ const links = [
         icon: 'i-heroicons-chart-bar',
         to: `${ADMIN_PATH}/settings/categories`,
     },
-    {
-        label: 'Types',
-        icon: 'i-heroicons-chart-bar',
-        to: `${ADMIN_PATH}/settings/types`,
-    },
+    // {
+    //     label: 'Types',
+    //     icon: 'i-heroicons-chart-bar',
+    //     to: `${ADMIN_PATH}/settings/types`,
+    // },
     {
         label: 'User Management',
         icon: 'i-ci-users-group',

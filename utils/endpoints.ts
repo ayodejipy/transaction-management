@@ -1,4 +1,4 @@
-export default function getEndpointsUtils(key: string) {
+export default function getEndpoints(key: string) {
 	const apiUrls: Record<string, string> = {
 		'authUrl': '/auth',
 		'loginUrl': '/auth/token',
@@ -17,7 +17,7 @@ export default function getEndpointsUtils(key: string) {
 		'transactionsUrl': '/transactions'
 	}
 
-	if(!apiUrls[key]) {
+	if (!apiUrls[key]) {
 		throw new Error(`No API URL found for key: ${key}`)
 	}
 

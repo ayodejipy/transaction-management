@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import getEndpoints from '~/utils/endpoints'
 import type { ITransactionData } from '~/types'
 
 const route = useRoute()
@@ -17,7 +18,7 @@ definePageMeta({
 })
 
 const { transaction } = storeToRefs(useTransactionStore())
-const transactionsUrl = useEndpoints('transactionsUrl')
+const transactionsUrl = getEndpoints('transactionsUrl')
 
 const isOpenAddTransaction = ref<boolean>(false)
 

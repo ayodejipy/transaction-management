@@ -5,7 +5,7 @@ import type { IDataResponse } from './api'
 
 export interface IDaysOptionFilter {
     label: string
-    value: string | Date | Dayjs | object
+    value?: string | Date | Dayjs | object
     start: string | Date | Dayjs 
     end: string | Date | Dayjs 
 }
