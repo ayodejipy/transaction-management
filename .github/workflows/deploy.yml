@@ -21,6 +21,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+      - name: Clear npm cache
+        run: npm cache clean --force
+      - name: Configure npm registry
+        run: echo "registry=https://registry.npmjs.org/" > .npmrc
       - run: npm ci --legacy-peer-deps
       - run: echo "💡 Installing dependencies in ${{ github.ref }}"
 
