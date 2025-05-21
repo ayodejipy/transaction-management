@@ -19,10 +19,9 @@ jobs:
       - name: Installing Dependencies
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
           cache: 'npm'
-          cache-dependency-path: subdir/package-lock.json
-      - run: npm install
+      - run: npm ci --legacy-peer-deps
       - run: echo "💡 Installing dependencies in ${{ github.ref }}"
 
       - name: Lint
