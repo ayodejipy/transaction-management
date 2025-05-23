@@ -25,4 +25,5 @@ export type InviteUserSchemaType = z.output<typeof InviteUserSchema>
 
 export interface IUserData extends IDataResponse<IUser> {}
 
-export interface IInvitedUsersData extends IDataResponse<InvitedUserInterface[]> {}
+export interface IInvitedUsersData
+    extends IDataResponse<InvitedUserInterface[]> {}

@@ -1,132 +1,136 @@
 <script setup lang="ts">
-import getEndpoints from '~/utils/endpoints'
-import type { IColumn, IInvitedUsersData, InvitedUserInterface } from '~/types'
+    import getEndpoints from '~/utils/endpoints'
+    import type {
+        IColumn,
+        IInvitedUsersData,
+        InvitedUserInterface,
+    } from '~/types'
 
-const toast = useToast()
-const isOpen = ref<boolean>(false)
+    const toast = useToast()
+    const isOpen = ref<boolean>(false)
 
-const inviteStore = useInviteStore()
-const { resendInvite } = inviteStore
-const { invitedUsers } = storeToRefs(inviteStore)
+    const inviteStore = useInviteStore()
+    const { resendInvite } = inviteStore
+    const { invitedUsers } = storeToRefs(inviteStore)
 
-const usersInvitedUrl = getEndpoints('userInviteUrl')
-const {
-    pending: loading,
-    data,
-    refresh,
-} = await useAppFetch<IInvitedUsersData>(usersInvitedUrl, {
-    pick: ['content', 'status'],
-})
+    const usersInvitedUrl = getEndpoints('userInviteUrl')
+    const {
+        pending: loading,
+        data,
+        refresh,
+    } = await useAppFetch<IInvitedUsersData>(usersInvitedUrl, {
+        pick: ['content', 'status'],
+    })
 
-const shouldPaginate = computed(() => !!data.value?.paging)
+    const shouldPaginate = computed(() => !!data.value?.paging)
 
-const searchTerm = ref<string>('')
+    const searchTerm = ref<string>('')
 
-const searchedUsers = computed(() => {
-    if (!searchTerm.value) return invitedUsers.value
+    const searchedUsers = computed(() => {
+        if (!searchTerm.value) return invitedUsers.value
 
-    return invitedUsers.value.filter((user) => {
-        return Object.values(user).some((value) => {
-            return String(value)
-                .toLowerCase()
-                .includes(searchTerm.value.toLowerCase())
+        return invitedUsers.value.filter((user) => {
+            return Object.values(user).some((value) => {
+                return String(value)
+                    .toLowerCase()
+                    .includes(searchTerm.value.toLowerCase())
+            })
         })
     })
-})
 
-const uiConfig = computed(() => ({
-    placeholder: 'text-icon-gray dark:text-gray-500',
-    rounded: 'rounded-full',
-    color: {
-        white: {
-            outline:
-                'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
+    const uiConfig = computed(() => ({
+        placeholder: 'text-icon-gray dark:text-gray-500',
+        rounded: 'rounded-full',
+        color: {
+            white: {
+                outline:
+                    'shadow-sm bg-white dark:bg-gray-900 text-black dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
+            },
         },
-    },
-    icon: {
-        base: 'text-icon-gray dark:text-gray-500',
-    },
-}))
+        icon: {
+            base: 'text-icon-gray dark:text-gray-500',
+        },
+    }))
 
-const columns: IColumn[] = [
-    {
-        key: 'id',
-        label: 'ID',
-    },
-    {
-        key: 'email',
-        label: 'Email',
-    },
-    {
-        key: 'firstName',
-        label: 'First Name',
-    },
-    {
-        key: 'lastName',
-        label: 'Last Name',
-    },
-    {
-        key: 'phone',
-        label: 'Phone',
-    },
-    {
-        key: 'isAccepted',
-        label: 'Status',
-    },
-    {
-        key: 'actions',
-    },
-]
-
-const actionsOption = (row: InvitedUserInterface) => [
-    [
+    const columns: IColumn[] = [
         {
-            label: 'Resend invite',
-            icon: 'i-heroicons-arrow-path',
-            click: () => onResendInvite(row),
+            key: 'id',
+            label: 'ID',
         },
-    ],
-    // [
-    //     {
-    //         label: 'Delete',
-    //         icon: 'i-heroicons-trash-20-solid',
-    //         click: () => onDeleteCategory(row.id),
-    //     },
-    // ],
-]
+        {
+            key: 'email',
+            label: 'Email',
+        },
+        {
+            key: 'firstName',
+            label: 'First Name',
+        },
+        {
+            key: 'lastName',
+            label: 'Last Name',
+        },
+        {
+            key: 'phone',
+            label: 'Phone',
+        },
+        {
+            key: 'isAccepted',
+            label: 'Status',
+        },
+        {
+            key: 'actions',
+        },
+    ]
 
-async function onResendInvite({ id, email }: InvitedUserInterface) {
-    try {
-        const data = await resendInvite(id)
-        if (data.success) {
+    const actionsOption = (row: InvitedUserInterface) => [
+        [
+            {
+                label: 'Resend invite',
+                icon: 'i-heroicons-arrow-path',
+                click: () => onResendInvite(row),
+            },
+        ],
+        // [
+        //     {
+        //         label: 'Delete',
+        //         icon: 'i-heroicons-trash-20-solid',
+        //         click: () => onDeleteCategory(row.id),
+        //     },
+        // ],
+    ]
+
+    async function onResendInvite({ id, email }: InvitedUserInterface) {
+        try {
+            const data = await resendInvite(id)
+            if (data.success) {
+                toast.add({
+                    title: 'Invite resent successful',
+                    color: 'green',
+                    description: `Invite successfully sent to ${email}`,
+                    icon: 'i-heroicons-outline-check-badge',
+                })
+                await refresh()
+            }
+        } catch {
             toast.add({
-                title: 'Invite resent successful',
-                color: 'green',
-                description: `Invite successfully sent to ${email}`,
-                icon: 'i-heroicons-outline-check-badge',
+                title: `Failed to send invite to ${email}`,
+                color: 'red',
+                icon: 'i-heroicons-outline-exclaimation-circle',
             })
-            await refresh()
         }
-    } catch {
-        toast.add({
-            title: `Failed to send invite to ${email}`,
-            color: 'red',
-            icon: 'i-heroicons-outline-exclaimation-circle',
-        })
     }
-}
 
-watch(
-    data,
-    async (newData) => {
-        if (newData && newData.content) {
-            invitedUsers.value = newData.content
-        } else {
-            await refresh()
-        }
-    },
-    { immediate: true }
-)
+    watch(
+        data,
+        async (newData) => {
+            if (newData && newData.content) {
+                invitedUsers.value = newData.content
+            } else {
+                await refresh()
+            }
+        },
+        { immediate: true }
+    )
 </script>
 
 <template>

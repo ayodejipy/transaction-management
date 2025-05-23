@@ -1,51 +1,51 @@
 <script setup lang="ts">
-import getEndpoints from '~/utils/endpoints'
-import type { ITransactionData } from '~/types'
+    import getEndpoints from '~/utils/endpoints'
+    import type { ITransactionData } from '~/types'
 
-const route = useRoute()
+    const route = useRoute()
 
-const id = ref<string>(route.params.id as string)
+    const id = ref<string>(route.params.id as string)
 
-const pageTitle = computed(() => `Transaction ${id.value}`)
+    const pageTitle = computed(() => `Transaction ${id.value}`)
 
-useHead({
-    title: pageTitle,
-})
+    useHead({
+        title: pageTitle,
+    })
 
-definePageMeta({
-    title: 'Transaction',
-    middleware: ['auth', 'admin'],
-})
+    definePageMeta({
+        title: 'Transaction',
+        middleware: ['auth', 'admin'],
+    })
 
-const { transaction } = storeToRefs(useTransactionStore())
-const transactionsUrl = getEndpoints('transactionsUrl')
+    const { transaction } = storeToRefs(useTransactionStore())
+    const transactionsUrl = getEndpoints('transactionsUrl')
 
-const isOpenAddTransaction = ref<boolean>(false)
+    const isOpenAddTransaction = ref<boolean>(false)
 
-const { pending: loading, data } = await useAppFetch<ITransactionData>(
-    () => `${transactionsUrl}/${id.value}`,
-    {
-        pick: ['content', 'status'],
-        watch: [id],
-        lazy: true,
+    const { pending: loading, data } = await useAppFetch<ITransactionData>(
+        () => `${transactionsUrl}/${id.value}`,
+        {
+            pick: ['content', 'status'],
+            watch: [id],
+            lazy: true,
+        }
+    )
+
+    const result = computed(() => data.value?.content ?? null)
+
+    const fullname = computed(
+        () =>
+            result.value?.createdBy.firstName +
+            ' ' +
+            result.value?.createdBy.lastName
+    )
+
+    function onToggleEdit() {
+        transaction.value = result.value
+        isOpenAddTransaction.value = true
     }
-)
 
-const result = computed(() => data.value?.content ?? null)
-
-const fullname = computed(
-    () =>
-        result.value?.createdBy.firstName +
-        ' ' +
-        result.value?.createdBy.lastName
-)
-
-function onToggleEdit() {
-    transaction.value = result.value
-    isOpenAddTransaction.value = true
-}
-
-onBeforeUnmount(() => transaction.value = null)
+    onBeforeUnmount(() => (transaction.value = null))
 </script>
 
 <template>
@@ -170,7 +170,7 @@ onBeforeUnmount(() => transaction.value = null)
                         <h3
                             class="text-lg font-semibold text-gray-800 dark:text-neutral-200"
                         >
-                            Transaction for {{ result?.typeName }}
+                            Transaction for {{ result?.categoryName }}
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-neutral-500">
                             Transaction #{{ result?.id }}
@@ -205,9 +205,9 @@ onBeforeUnmount(() => transaction.value = null)
                                 class="block text-sm font-medium text-gray-800 dark:text-neutral-200"
                             >
                                 {{
-                                    $dayjs(
-                                        result?.transactionDateUtc
-                                    ).format('MMMM DD, YYYY')
+                                    $dayjs(result?.transactionDateUtc).format(
+                                        'MMMM DD, YYYY'
+                                    )
                                 }}
                             </span>
                         </div>
@@ -242,7 +242,7 @@ onBeforeUnmount(() => transaction.value = null)
                                     class="flex items-center justify-between w-full"
                                 >
                                     <span>Type</span>
-                                    <span>{{ result?.typeName }}</span>
+                                    <span>{{ result?.type }}</span>
                                 </div>
                             </li>
                             <li
@@ -295,7 +295,7 @@ onBeforeUnmount(() => transaction.value = null)
                 <div class="flex justify-between gap-2 items-center">
                     <ULink
                         to="/admin/transactions"
-                        class="text-icon-gray flex items-center gap-2"
+                        class="text-icon-gray dark:text-gray-200 flex items-center gap-2"
                     >
                         <UIcon name="i-heroicons-arrow-long-left" />
                         back

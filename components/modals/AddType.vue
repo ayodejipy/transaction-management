@@ -1,69 +1,73 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent } from '#ui/types'
-import type { ITypes, TransactionTypeSchemaType } from '~/types'
+    import type { FormSubmitEvent } from '#ui/types'
+    import type { ITypes, TransactionTypeSchemaType } from '~/types'
 
-const props = defineProps<{
-    refreshTypes: () => Promise<void> | void
-}>()
+    const props = defineProps<{
+        refreshTypes: () => Promise<void> | void
+    }>()
 
-const isOpen = defineModel({ type: Boolean, default: false })
+    const isOpen = defineModel({ type: Boolean, default: false })
 
-const toast = useToast()
-const typeStore = useTypeStore()
-const { addType, updateType } = typeStore
-const { type } = storeToRefs(typeStore)
+    const toast = useToast()
+    const typeStore = useTypeStore()
+    const { addType, updateType } = typeStore
+    const { type } = storeToRefs(typeStore)
 
-// const isError = ref<boolean>(false)
-const loading = ref<boolean>(false)
+    // const isError = ref<boolean>(false)
+    const loading = ref<boolean>(false)
 
-const formElement = ref<HTMLFormElement | null>(null)
-const form: Partial<ITypes> = reactive({
-    name: '',
-    description: '',
-})
+    const formElement = ref<HTMLFormElement | null>(null)
+    const form: Partial<ITypes> = reactive({
+        name: '',
+        description: '',
+    })
 
-const isEnabled = computed<boolean>(() => !!form.name)
-const buttonText = computed(() => type.value?.id ? 'Edit type' : 'Create type')
+    const isEnabled = computed<boolean>(() => !!form.name)
+    const buttonText = computed(() =>
+        type.value?.id ? 'Edit type' : 'Create type'
+    )
 
-const onCloseModal = () => {
-    formElement.value?.clear()
-    Object.assign(form, {name: '', description: ''})
-    isOpen.value = !isOpen.value
-}
+    const onCloseModal = () => {
+        formElement.value?.clear()
+        Object.assign(form, { name: '', description: '' })
+        isOpen.value = !isOpen.value
+    }
 
-async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
-	loading.value = true
-    const typeId = type.value?.id
-	try {
-		const data = typeId ? await updateType(typeId, event.data) : await addType(event.data)
+    async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
+        loading.value = true
+        const typeId = type.value?.id
+        try {
+            const data = typeId
+                ? await updateType(typeId, event.data)
+                : await addType(event.data)
 
-		if (data.success) {
-			toast.add({
-				title: `Type ${typeId ? 'updated': 'created'} Successfully`,
-				color: 'green',
-				icon: 'i-heroicons-outline-check-badge',
+            if (data.success) {
+                toast.add({
+                    title: `Type ${typeId ? 'updated' : 'created'} Successfully`,
+                    color: 'green',
+                    icon: 'i-heroicons-outline-check-badge',
+                })
+
+                await props.refreshTypes()
+                onCloseModal()
+            }
+        } catch {
+            toast.add({
+                title: 'Failed',
+                color: 'red',
+                icon: 'i-heroicons-outline-exclaimation-circle',
             })
-
-            await props.refreshTypes();
-            onCloseModal()
-		}
-    } catch {
-        toast.add({
-            title: 'Failed',
-            color: 'red',
-            icon: 'i-heroicons-outline-exclaimation-circle',
-        })
-        // throw new Error('Failed authenticate user. Please try again.')
-    } finally {
-        loading.value = !loading.value
+            // throw new Error('Failed authenticate user. Please try again.')
+        } finally {
+            loading.value = !loading.value
+        }
     }
-}
 
-watch(type, (data) => {
-    if (data) {
-        Object.assign(form, data)
-    }
-})
+    watch(type, (data) => {
+        if (data) {
+            Object.assign(form, data)
+        }
+    })
 </script>
 
 <template>
@@ -100,18 +104,15 @@ watch(type, (data) => {
             </template>
 
             <div class="w-full">
-				<UForm
-					ref="formElement"
-					:schema="TransactionTypeSchema"
-					:state="form"
-					class="space-y-6"
-					@submit="onSubmit"
-				>
+                <UForm
+                    ref="formElement"
+                    :schema="TransactionTypeSchema"
+                    :state="form"
+                    class="space-y-6"
+                    @submit="onSubmit"
+                >
                     <UFormGroup size="xl" label="Name" name="name">
-                        <UInput
-                            v-model="form.name"
-                            placeholder="Type name"
-                        />
+                        <UInput v-model="form.name" placeholder="Type name" />
                     </UFormGroup>
 
                     <UFormGroup
@@ -127,35 +128,37 @@ watch(type, (data) => {
                         />
                     </UFormGroup>
 
-					 <div class="sm:mt-8 sm:pt-4 border-t border-gray-200 flex justify-between items-center">
-						<UButton
-							size="xl"
-							color="gray"
-							variant="outline"
-							padding="md"
-							:ui="{
-								rounded: 'rounded-lg',
-								font: 'font-semibold',
-							}"
-							@click="onCloseModal"
-						>
-							Cancel
-						</UButton>
+                    <div
+                        class="sm:mt-8 sm:pt-4 border-t border-gray-200 flex justify-between items-center"
+                    >
+                        <UButton
+                            size="xl"
+                            color="gray"
+                            variant="outline"
+                            padding="md"
+                            :ui="{
+                                rounded: 'rounded-lg',
+                                font: 'font-semibold',
+                            }"
+                            @click="onCloseModal"
+                        >
+                            Cancel
+                        </UButton>
 
-						<UButton
-							type="submit"
-							:loading
-							size="xl"
-							padding="md"
-							:disabled="!isEnabled"
-							:ui="{
-								rounded: 'rounded-lg',
-								font: 'font-semibold',
-							}"
-						>
-							{{ buttonText }}
-						</UButton>
-					</div>
+                        <UButton
+                            type="submit"
+                            :loading
+                            size="xl"
+                            padding="md"
+                            :disabled="!isEnabled"
+                            :ui="{
+                                rounded: 'rounded-lg',
+                                font: 'font-semibold',
+                            }"
+                        >
+                            {{ buttonText }}
+                        </UButton>
+                    </div>
                 </UForm>
             </div>
 

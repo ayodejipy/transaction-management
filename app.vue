@@ -1,9 +1,11 @@
 <script setup lang="ts">
-useHead({
-  titleTemplate: (titleChunk) => {
-    return titleChunk ? `${titleChunk} - Transaction Management` : 'Transaction Management';
-  }
-})
+    useHead({
+        titleTemplate: (titleChunk) => {
+            return titleChunk
+                ? `${titleChunk} - Transaction Management`
+                : 'Transaction Management'
+        },
+    })
 </script>
 
 <template>

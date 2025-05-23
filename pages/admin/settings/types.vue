@@ -1,115 +1,115 @@
 <script setup lang="ts">
-import type { IColumn, ITypes, TActiveType, ITypesData } from '~/types'
-import getEndpoints from '~/utils/endpoints'
+    import type { IColumn, ITypes, TActiveType, ITypesData } from '~/types'
+    import getEndpoints from '~/utils/endpoints'
 
-const isOpen = ref<boolean>(false)
+    const isOpen = ref<boolean>(false)
 
-const toast = useToast()
-const typesUrl = getEndpoints('typesUrl')
+    const toast = useToast()
+    const typesUrl = getEndpoints('typesUrl')
 
-const typeStore = useTypeStore()
-const { deleteType } = typeStore
-const { types, type } = storeToRefs(typeStore)
+    const typeStore = useTypeStore()
+    const { deleteType } = typeStore
+    const { types, type } = storeToRefs(typeStore)
 
-const { data, pending, refresh } = await useAppFetch<ITypesData>(typesUrl, {
-    pick: ['content', 'status'],
-})
+    const { data, pending, refresh } = await useAppFetch<ITypesData>(typesUrl, {
+        pick: ['content', 'status'],
+    })
 
-const shouldPaginate = computed(() => !!data.value?.paging)
+    const shouldPaginate = computed(() => !!data.value?.paging)
 
-const searchTerm = ref<string>('')
+    const searchTerm = ref<string>('')
 
-const searchedTypes = computed(() => {
-    if (!searchTerm.value) return types.value
+    const searchedTypes = computed(() => {
+        if (!searchTerm.value) return types.value
 
-    return types.value.filter((type) => {
-        return Object.values(type).some((value) => {
-            return String(value)
-                .toLowerCase()
-                .includes(searchTerm.value.toLowerCase())
+        return types.value.filter((type) => {
+            return Object.values(type).some((value) => {
+                return String(value)
+                    .toLowerCase()
+                    .includes(searchTerm.value.toLowerCase())
+            })
         })
     })
-})
 
-const columns: IColumn[] = [
-    {
-        key: 'id',
-        label: 'ID',
-    },
-    {
-        key: 'name',
-        label: 'Type',
-    },
-    {
-        key: 'description',
-        label: 'Description',
-    },
-    {
-        key: 'actions',
-    },
-]
+    const columns: IColumn[] = [
+        {
+            key: 'id',
+            label: 'ID',
+        },
+        {
+            key: 'name',
+            label: 'Type',
+        },
+        {
+            key: 'description',
+            label: 'Description',
+        },
+        {
+            key: 'actions',
+        },
+    ]
 
-const actionOptions = (row: TActiveType) => [
-    {
-        label: 'Edit',
-        icon: 'i-heroicons-pencil-square-20-solid',
-        color: 'gray',
-        click: () => toggleEdit(row),
-    },
-    {
-        label: 'Delete',
-        color: 'red',
-        icon: 'i-heroicons-trash-20-solid',
-        click: () => onDelete(row.id),
-    },
-]
-
-function toggleEdit(item: TActiveType) {
-    isOpen.value = !isOpen.value
-    type.value = item
-}
-
-async function onDelete(id: number) {
-    try {
-        const data = await deleteType(id)
-        if (data.success) {
-            toast.add({
-                title: 'Type deleted Successfully',
-                color: 'green',
-                icon: 'i-heroicons-outline-check-badge',
-            })
-            await refresh()
-        }
-    } catch {
-        toast.add({
-            title: 'Deletion Failed.',
+    const actionOptions = (row: TActiveType) => [
+        {
+            label: 'Edit',
+            icon: 'i-heroicons-pencil-square-20-solid',
+            color: 'gray',
+            click: () => toggleEdit(row),
+        },
+        {
+            label: 'Delete',
             color: 'red',
-            icon: 'i-heroicons-outline-exclaimation-circle',
-        })
+            icon: 'i-heroicons-trash-20-solid',
+            click: () => onDelete(row.id),
+        },
+    ]
+
+    function toggleEdit(item: TActiveType) {
+        isOpen.value = !isOpen.value
+        type.value = item
     }
-}
 
-function getActiveTypes(toFilterTypes: ITypes[]) {
-    types.value = toFilterTypes
-        .filter((type: ITypes) => !type.isDeleted)
-        .map((type: ITypes) => ({
-            id: type.id,
-            name: type.name,
-            description: type.description,
-        }))
-}
-
-watch(
-    data,
-    async (newData) => {
-        if (newData && newData.content) {
-            getActiveTypes(newData.content)
-        } else {
-            await refresh()
+    async function onDelete(id: number) {
+        try {
+            const data = await deleteType(id)
+            if (data.success) {
+                toast.add({
+                    title: 'Type deleted Successfully',
+                    color: 'green',
+                    icon: 'i-heroicons-outline-check-badge',
+                })
+                await refresh()
+            }
+        } catch {
+            toast.add({
+                title: 'Deletion Failed.',
+                color: 'red',
+                icon: 'i-heroicons-outline-exclaimation-circle',
+            })
         }
-    },
-    { immediate: true }
-)
+    }
+
+    function getActiveTypes(toFilterTypes: ITypes[]) {
+        types.value = toFilterTypes
+            .filter((type: ITypes) => !type.isDeleted)
+            .map((type: ITypes) => ({
+                id: type.id,
+                name: type.name,
+                description: type.description,
+            }))
+    }
+
+    watch(
+        data,
+        async (newData) => {
+            if (newData && newData.content) {
+                getActiveTypes(newData.content)
+            } else {
+                await refresh()
+            }
+        },
+        { immediate: true }
+    )
 </script>
 
 <template>
@@ -133,7 +133,9 @@ watch(
         </div>
 
         <section class="rounded-lg border border-gray-100 mt-6 space-y-3">
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-6 px-4 sm:px-6">
+            <div
+                class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-6 px-4 sm:px-6"
+            >
                 <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-xl">Types</h3>
                     <UBadge

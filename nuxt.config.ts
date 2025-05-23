@@ -16,9 +16,7 @@ export default defineNuxtConfig({
         icons: ['ri', 'ci'],
     },
     imports: {
-        dirs: [
-            'utils/**',
-        ],
+        dirs: ['utils/**'],
     },
     app: {
         head: {

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-const isOpen = defineModel({ type: Boolean, default: false })
+    const isOpen = defineModel({ type: Boolean, default: false })
 
-const { $dayjs } = useNuxtApp()
+    const { $dayjs } = useNuxtApp()
 
-const { transaction } = storeToRefs(useTransactionStore())
+    const { transaction } = storeToRefs(useTransactionStore())
 
-const onCloseSlide = () => {
-    transaction.value = null
-    isOpen.value = !isOpen.value
-}
+    const onCloseSlide = () => {
+        transaction.value = null
+        isOpen.value = !isOpen.value
+    }
 </script>
 
 <template>

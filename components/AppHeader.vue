@@ -1,47 +1,47 @@
 <script setup lang="ts">
-withDefaults(
-    defineProps<{
-        pageTitle: string
-    }>(),
-    {
-        pageTitle: 'Default Page Title',
-    }
-)
-
-const authStore = useAuthStore()
-
-const userStore = useUserStore()
-const { user, isAdmin } = storeToRefs(userStore)
-
-const { isOpen, toggle, appendedUrl } = useSidebar()
-
-const menuIcon = computed(() =>
-    isOpen.value ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'
-)
-
-const fullname = computed<string>(
-    () => user.value?.firstName + ' ' + user.value?.lastName
-)
-
-const userType = computed(() =>
-    isAdmin.value ? userTypes.admin : userTypes.user
-)
-
-const items = [
-    [
+    withDefaults(
+        defineProps<{
+            pageTitle: string
+        }>(),
         {
-            label: `${user.value?.email}`,
-            slot: 'account',
-            disabled: true,
-        },
-    ],
-    [
-        {
-            label: 'Sign out',
-            icon: 'i-heroicons-arrow-left-on-rectangle',
-        },
-    ],
-]
+            pageTitle: 'Default Page Title',
+        }
+    )
+
+    const authStore = useAuthStore()
+
+    const userStore = useUserStore()
+    const { user, isAdmin } = storeToRefs(userStore)
+
+    const { isOpen, toggle, appendedUrl } = useSidebar()
+
+    const menuIcon = computed(() =>
+        isOpen.value ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'
+    )
+
+    const fullname = computed<string>(
+        () => user.value?.firstName + ' ' + user.value?.lastName
+    )
+
+    const userType = computed(() =>
+        isAdmin.value ? userTypes.admin : userTypes.user
+    )
+
+    const items = [
+        [
+            {
+                label: `${user.value?.email}`,
+                slot: 'account',
+                disabled: true,
+            },
+        ],
+        [
+            {
+                label: 'Sign out',
+                icon: 'i-heroicons-arrow-left-on-rectangle',
+            },
+        ],
+    ]
 </script>
 
 <template>
@@ -55,7 +55,7 @@ const items = [
                         class="h-11 w-auto"
                         src="~/assets/logo.svg"
                         alt="Opabid transaction management"
-                    >
+                    />
                 </ULink>
             </div>
 
@@ -63,7 +63,9 @@ const items = [
             <div class="h-6 w-px bg-gray-200 lg:hidden" aria-hidden="true" />
 
             <div class="flex items-center justify-between sm:px-4 flex-1">
-                <h1 class="text-xl sm:text-2xl font-semibold text-brand-gray dark:text-gray-200">
+                <h1
+                    class="text-xl sm:text-2xl font-semibold text-brand-gray dark:text-gray-200"
+                >
                     {{ pageTitle }}
                 </h1>
 

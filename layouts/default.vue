@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const route = useRoute()
+    const route = useRoute()
 
-const pageTitle = computed<string>(() => route.meta.title as string)
+    const pageTitle = computed<string>(() => route.meta.title as string)
 </script>
 
 <template>

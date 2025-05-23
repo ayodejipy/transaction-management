@@ -1,55 +1,56 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from '#ui/types'
-import type { TForgotPasswordSchema } from '~/types';
+    import type { FormSubmitEvent } from '#ui/types'
+    import type { TForgotPasswordSchema } from '~/types'
 
-useHead({
-    title: 'Forgot Password'
-})
+    useHead({
+        title: 'Forgot Password',
+    })
 
-definePageMeta({
-    layout: false,
-})
+    definePageMeta({
+        layout: false,
+    })
 
-const { forgotPassword } = useAuthStore()
+    const { forgotPassword } = useAuthStore()
 
-const toast = useToast()
+    const toast = useToast()
 
-const loading = ref<boolean>(false)
-const form = reactive({
-    email: '',
-})
+    const loading = ref<boolean>(false)
+    const form = reactive({
+        email: '',
+    })
 
-const isButtonEnabled = computed<boolean>(() => !!form.email)
+    const isButtonEnabled = computed<boolean>(() => !!form.email)
 
-async function onSubmit(event: FormSubmitEvent<TForgotPasswordSchema>) {
-    loading.value = true
-	
-    try {
-        const data = await forgotPassword(event.data)
+    async function onSubmit(event: FormSubmitEvent<TForgotPasswordSchema>) {
+        loading.value = true
 
-		if(data.success) {
-			toast.add({
-				title: 'Recovery email sent Successfully',
-				color: 'green',
-				description: 'You will receive a password recovery/reset email soon',
-				icon: 'i-heroicons-outline-check-badge',
-			})
-		}
+        try {
+            const data = await forgotPassword(event.data)
 
-    } catch(error) {
-		const errorLog = getErrorObject(error as Error)
-        toast.add({
-            title: 'Account Recovery Failed',
-            color: 'red',
-            description: errorLog?.message ?? 'Cannot send recovery email at this time.',
-            icon: 'i-heroicons-outline-exclaimation-circle',
-        })
-        // throw new Error('Failed authenticate user. Please try again.')
-    } finally {
-        loading.value = !loading.value
+            if (data.success) {
+                toast.add({
+                    title: 'Recovery email sent Successfully',
+                    color: 'green',
+                    description:
+                        'You will receive a password recovery/reset email soon',
+                    icon: 'i-heroicons-outline-check-badge',
+                })
+            }
+        } catch (error) {
+            const errorLog = getErrorObject(error as Error)
+            toast.add({
+                title: 'Account Recovery Failed',
+                color: 'red',
+                description:
+                    errorLog?.message ??
+                    'Cannot send recovery email at this time.',
+                icon: 'i-heroicons-outline-exclaimation-circle',
+            })
+            // throw new Error('Failed authenticate user. Please try again.')
+        } finally {
+            loading.value = !loading.value
+        }
     }
-}
-
 </script>
 
 <template>
@@ -62,7 +63,7 @@ async function onSubmit(event: FormSubmitEvent<TForgotPasswordSchema>) {
                     class="w-16 h-16"
                     src="~/assets/logo.svg"
                     alt="application logo"
-                >
+                />
             </div>
             <div class="text-center space-y-3">
                 <h3 class="text-brand-gray text-3xl font-semibold">
@@ -104,12 +105,15 @@ async function onSubmit(event: FormSubmitEvent<TForgotPasswordSchema>) {
                 </UForm>
             </div>
 
-			<div class="mx-auto mt-4">
-				<ULink to="/auth/login" class="text-gray-600 font-normal transition hover:underline">
-					<Icon name="i-solar-login-line-duotone" />
-					Back to login
-				</ULink>
-			</div>
+            <div class="mx-auto mt-4">
+                <ULink
+                    to="/auth/login"
+                    class="text-gray-600 font-normal transition hover:underline"
+                >
+                    <Icon name="i-solar-login-line-duotone" />
+                    Back to login
+                </ULink>
+            </div>
         </section>
     </section>
 </template>

@@ -16,7 +16,7 @@ export default function useAppFetch<T>(
         key: getKey,
         headers: {
             Accept: 'application/json',
-        }
+        },
     }
 
     const params = defu(_options, defaults)

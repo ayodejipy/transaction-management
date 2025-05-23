@@ -2,12 +2,12 @@ import type { ICategory, TCategoryData } from '~/types'
 import getEndpoints from '~/utils/endpoints'
 
 export const useCategoryStore = defineStore('category', () => {
-	const categoriesUrl = getEndpoints('categoriesUrl')
+    const categoriesUrl = getEndpoints('categoriesUrl')
     const categories = ref<Omit<ICategory, 'isDeleted'>[]>([])
 
     const category = ref<Omit<ICategory, 'isDeleted'> | null>(null)
 
-	async function getCategories(): Promise<TCategoryData> {
+    async function getCategories(): Promise<TCategoryData> {
         const { $customFetch } = useNuxtApp()
 
         const data = await $customFetch<TCategoryData>(categoriesUrl)
@@ -18,19 +18,21 @@ export const useCategoryStore = defineStore('category', () => {
 
         return data
     }
-	
-	async function addCategory(body: Partial<ICategory>): Promise<TCategoryData> {
+
+    async function addCategory(
+        body: Partial<ICategory>
+    ): Promise<TCategoryData> {
         const { $customFetch } = useNuxtApp()
 
-		const data = await $customFetch<TCategoryData>(categoriesUrl, {
+        const data = await $customFetch<TCategoryData>(categoriesUrl, {
             method: 'POST',
             body,
         })
 
-       return data
+        return data
     }
 
-	async function updateCategory(
+    async function updateCategory(
         id: number,
         body: Partial<ICategory>
     ): Promise<TCategoryData> {
@@ -47,15 +49,17 @@ export const useCategoryStore = defineStore('category', () => {
         return data
     }
 
-	async function deleteCategory(id: number): Promise<TCategoryData> {
+    async function deleteCategory(id: number): Promise<TCategoryData> {
         const { $customFetch } = useNuxtApp()
 
-		const data = await $customFetch<TCategoryData>(`${categoriesUrl}/${id}/remove`)
+        const data = await $customFetch<TCategoryData>(
+            `${categoriesUrl}/${id}/remove`
+        )
 
-       return data
+        return data
     }
 
-	return {
+    return {
         category,
         categories,
         getCategories,

@@ -93,5 +93,4 @@ export const useAuthStore = defineStore('auth', () => {
     }
 })
 
-
 // "postinstall": "nuxt prepare",

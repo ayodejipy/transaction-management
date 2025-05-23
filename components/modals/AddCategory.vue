@@ -1,100 +1,100 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent } from '#ui/types'
-import type { ICategory, TransactionTypeSchemaType } from '~/types'
+    import type { FormSubmitEvent } from '#ui/types'
+    import type { ICategory, TransactionTypeSchemaType } from '~/types'
 
-type TNewCategory = Omit<ICategory, 'id' | 'isDeleted' | 'toSubtract'>
+    type TNewCategory = Omit<ICategory, 'id' | 'isDeleted' | 'toSubtract'>
 
-const props = defineProps<{
-    refresh: () => Promise<void> | void
-}>()
+    const props = defineProps<{
+        refresh: () => Promise<void> | void
+    }>()
 
-const isOpen = defineModel({ type: Boolean, default: false })
+    const isOpen = defineModel({ type: Boolean, default: false })
 
-const toast = useToast()
-const categoryStore = useCategoryStore()
-const { addCategory, updateCategory } = categoryStore
-const { category } = storeToRefs(categoryStore)
+    const toast = useToast()
+    const categoryStore = useCategoryStore()
+    const { addCategory, updateCategory } = categoryStore
+    const { category } = storeToRefs(categoryStore)
 
-// const isError = ref<boolean>(false)
-const loading = ref<boolean>(false)
+    // const isError = ref<boolean>(false)
+    const loading = ref<boolean>(false)
 
-const formElement = ref<HTMLFormElement | null>(null)
-const defaultFormState: TNewCategory = {
-    name: '',
-    description: '',
-    subCategories: [],
-}
-const form: TNewCategory = reactive({ ...defaultFormState })
-
-const isEnabled = computed<boolean>(() => !!form.name)
-const buttonText = computed(() =>
-    category.value?.id ? 'Edit category' : 'Create category'
-)
-
-const $resetForm = () => {
-    Object.assign(form, defaultFormState)
-}
-
-const onCloseModal = () => {
-    $resetForm()
-    isOpen.value = !isOpen.value
-}
-
-function addSub() {
-    form.subCategories.push({
+    const formElement = ref<HTMLFormElement | null>(null)
+    const defaultFormState: TNewCategory = {
         name: '',
-    })
-}
+        description: '',
+        subCategories: [],
+    }
+    const form: TNewCategory = reactive({ ...defaultFormState })
 
-function onRemoveInput(value: number) {
-    form.subCategories.splice(value, 1)
-}
+    const isEnabled = computed<boolean>(() => !!form.name)
+    const buttonText = computed(() =>
+        category.value?.id ? 'Edit category' : 'Create category'
+    )
 
-async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
-    loading.value = true
+    const $resetForm = () => {
+        Object.assign(form, defaultFormState)
+    }
 
-    const categoryId = category.value?.id
-    try {
-        const data = categoryId
-            ? await updateCategory(categoryId, event.data)
-            : await addCategory(event.data)
-        if (data.success) {
-            toast.add({
-                title: 'Category created Successfully',
-                color: 'green',
-                description:
-                    "You've successfully added a new transaction category",
-                icon: 'i-heroicons-outline-check-badge',
-            })
-            await props.refresh()
+    const onCloseModal = () => {
+        $resetForm()
+        isOpen.value = !isOpen.value
+    }
 
-            // close and reset
-            onCloseModal()
-        }
-    } catch {
-        toast.add({
-            title: 'Category Creation Failed',
-            color: 'red',
-            description: 'Unable to create your category at this moment.',
-            icon: 'i-heroicons-outline-exclaimation-circle',
+    function addSub() {
+        form.subCategories.push({
+            name: '',
         })
-        // throw new Error('Failed authenticate user. Please try again.')
-    } finally {
-        loading.value = !loading.value
     }
-}
 
-watch(category, (data) => {
-    if (data) {
-        Object.assign(form, data)
+    function onRemoveInput(value: number) {
+        form.subCategories.splice(value, 1)
     }
-})
 
-onMounted(() => {
-    if (!category.value) {
-        addSub()
+    async function onSubmit(event: FormSubmitEvent<TransactionTypeSchemaType>) {
+        loading.value = true
+
+        const categoryId = category.value?.id
+        try {
+            const data = categoryId
+                ? await updateCategory(categoryId, event.data)
+                : await addCategory(event.data)
+            if (data.success) {
+                toast.add({
+                    title: 'Category created Successfully',
+                    color: 'green',
+                    description:
+                        "You've successfully added a new transaction category",
+                    icon: 'i-heroicons-outline-check-badge',
+                })
+                await props.refresh()
+
+                // close and reset
+                onCloseModal()
+            }
+        } catch {
+            toast.add({
+                title: 'Category Creation Failed',
+                color: 'red',
+                description: 'Unable to create your category at this moment.',
+                icon: 'i-heroicons-outline-exclaimation-circle',
+            })
+            // throw new Error('Failed authenticate user. Please try again.')
+        } finally {
+            loading.value = !loading.value
+        }
     }
-})
+
+    watch(category, (data) => {
+        if (data) {
+            Object.assign(form, data)
+        }
+    })
+
+    onMounted(() => {
+        if (!category.value) {
+            addSub()
+        }
+    })
 </script>
 
 <template>
@@ -121,7 +121,9 @@ onMounted(() => {
         >
             <template #header>
                 <div class="space-y-2">
-                    <h3 class="text-brand-gray dark:text-gray-200 text-2xl font-semibold">
+                    <h3
+                        class="text-brand-gray dark:text-gray-200 text-2xl font-semibold"
+                    >
                         Add New Category
                     </h3>
                     <p class="text-dark-gray font-light">

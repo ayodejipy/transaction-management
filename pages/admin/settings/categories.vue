@@ -1,118 +1,118 @@
 <script setup lang="ts">
-import getEndpoints from '~/utils/endpoints'
+    import getEndpoints from '~/utils/endpoints'
 
-import type { ICategoriesData, ICategory, IColumn } from '~/types'
+    import type { ICategoriesData, ICategory, IColumn } from '~/types'
 
-const toast = useToast()
+    const toast = useToast()
 
-const isOpen = ref<boolean>(false)
-const activeCategories = ref<Omit<ICategory, 'isDeleted'>[]>([])
+    const isOpen = ref<boolean>(false)
+    const activeCategories = ref<Omit<ICategory, 'isDeleted'>[]>([])
 
-const categoriesUrl = getEndpoints('categoriesUrl')
+    const categoriesUrl = getEndpoints('categoriesUrl')
 
-const categoryStore = useCategoryStore()
-const { deleteCategory } = categoryStore
-const { category } = storeToRefs(categoryStore)
+    const categoryStore = useCategoryStore()
+    const { deleteCategory } = categoryStore
+    const { category } = storeToRefs(categoryStore)
 
-const { data, pending, refresh } = await useAppFetch<ICategoriesData>(
-    categoriesUrl,
-    {
-        pick: ['content', 'paging', 'status'],
-    }
-)
-
-const shouldPaginate = computed(() => !!data.value?.paging)
-
-const columns: IColumn[] = [
-    {
-        key: 'id',
-        label: 'ID',
-    },
-    {
-        key: 'name',
-        label: 'Name',
-    },
-    {
-        key: 'description',
-        label: 'Description',
-    },
-    {
-        key: 'subCategories',
-        label: 'Sub Categories',
-    },
-    {
-        key: 'actions',
-    },
-]
-
-const actionOptions = (row: Omit<ICategory, 'isDeleted'>) => [
-    [
+    const { data, pending, refresh } = await useAppFetch<ICategoriesData>(
+        categoriesUrl,
         {
-            label: 'Edit',
-            icon: 'i-heroicons-pencil-square-20-solid',
-            click: () => toggleEdit(row),
-        },
-    ],
-    [
-        {
-            label: 'Delete',
-            icon: 'i-heroicons-trash-20-solid',
-            click: () => onDeleteCategory(row.id),
-        },
-    ],
-]
+            pick: ['content', 'paging', 'status'],
+        }
+    )
 
-async function onDeleteCategory(id: number) {
-    try {
-        const data = await deleteCategory(id)
-        if (data.success) {
+    const shouldPaginate = computed(() => !!data.value?.paging)
+
+    const columns: IColumn[] = [
+        {
+            key: 'id',
+            label: 'ID',
+        },
+        {
+            key: 'name',
+            label: 'Name',
+        },
+        {
+            key: 'description',
+            label: 'Description',
+        },
+        {
+            key: 'subCategories',
+            label: 'Sub Categories',
+        },
+        {
+            key: 'actions',
+        },
+    ]
+
+    const actionOptions = (row: Omit<ICategory, 'isDeleted'>) => [
+        [
+            {
+                label: 'Edit',
+                icon: 'i-heroicons-pencil-square-20-solid',
+                click: () => toggleEdit(row),
+            },
+        ],
+        [
+            {
+                label: 'Delete',
+                icon: 'i-heroicons-trash-20-solid',
+                click: () => onDeleteCategory(row.id),
+            },
+        ],
+    ]
+
+    async function onDeleteCategory(id: number) {
+        try {
+            const data = await deleteCategory(id)
+            if (data.success) {
+                toast.add({
+                    title: 'Category deleted Successfully',
+                    color: 'green',
+                    description:
+                        "You've successfully removed a transaction category",
+                    icon: 'i-heroicons-outline-check-badge',
+                })
+                await refresh()
+            }
+        } catch {
             toast.add({
-                title: 'Category deleted Successfully',
-                color: 'green',
-                description:
-                    "You've successfully removed a transaction category",
-                icon: 'i-heroicons-outline-check-badge',
+                title: 'Deletion Failed.',
+                color: 'red',
+                description: 'Unable to delete your category at this moment.',
+                icon: 'i-heroicons-outline-exclaimation-circle',
             })
-            await refresh()
         }
-    } catch {
-        toast.add({
-            title: 'Deletion Failed.',
-            color: 'red',
-            description: 'Unable to delete your category at this moment.',
-            icon: 'i-heroicons-outline-exclaimation-circle',
-        })
     }
-}
 
-function toggleEdit(item: Omit<ICategory, 'isDeleted'>) {
-    isOpen.value = !isOpen.value
-    category.value = item
-}
+    function toggleEdit(item: Omit<ICategory, 'isDeleted'>) {
+        isOpen.value = !isOpen.value
+        category.value = item
+    }
 
-function getActiveCategories(categories: ICategory[]) {
-    activeCategories.value = categories
-        .filter((category: ICategory) => !category.isDeleted)
-        .map((category: ICategory) => ({
-            id: category.id,
-            name: category.name,
-            description: category.description,
-            subCategories: [...category.subCategories],
-            toSubtract: category.toSubtract
-        }))
-}
+    function getActiveCategories(categories: ICategory[]) {
+        activeCategories.value = categories
+            .filter((category: ICategory) => !category.isDeleted)
+            .map((category: ICategory) => ({
+                id: category.id,
+                name: category.name,
+                description: category.description,
+                subCategories: [...category.subCategories],
+                toSubtract: category.toSubtract,
+            }))
+    }
 
-watch(
-    data,
-    async (newData) => {
-        if (newData && newData.content) {
-            getActiveCategories(newData.content)
-        } else {
-            await refresh()
-        }
-    },
-    { immediate: true }
-)
+    watch(
+        data,
+        async (newData) => {
+            if (newData && newData.content) {
+                getActiveCategories(newData.content)
+            } else {
+                await refresh()
+            }
+        },
+        { immediate: true }
+    )
 </script>
 
 <template>
@@ -135,7 +135,9 @@ watch(
             />
         </div>
 
-        <section class="rounded-lg border border-gray-100 dark:border-gray-700 mt-6 space-y-3">
+        <section
+            class="rounded-lg border border-gray-100 dark:border-gray-700 mt-6 space-y-3"
+        >
             <div
                 class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-6 px-4 sm:px-6"
             >

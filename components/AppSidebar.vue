@@ -1,43 +1,43 @@
 <script setup lang="ts">
-const { isAdmin, user } = storeToRefs(useUserStore())
-const { adminPath, handleLogout } = useAuthStore()
+    const { isAdmin, user } = storeToRefs(useUserStore())
+    const { adminPath, handleLogout } = useAuthStore()
 
-// const isOpen = ref<boolean>(false)
-const { isOpen, toggle, appendedUrl } = useSidebar()
+    // const isOpen = ref<boolean>(false)
+    const { isOpen, toggle, appendedUrl } = useSidebar()
 
-const roleBasedLinks = computed(() => {
-    if (isAdmin.value) {
+    const roleBasedLinks = computed(() => {
+        if (isAdmin.value) {
+            return [
+                {
+                    label: 'Reports',
+                    icon: 'ReportsIcon',
+                    to: `${adminPath}`,
+                },
+                {
+                    label: 'Transactions',
+                    icon: 'TransactionsIcon',
+                    to: `${adminPath}/transactions`,
+                },
+                {
+                    label: 'Settings',
+                    icon: 'SettingsIcon',
+                    to: `${adminPath}/settings/categories`,
+                },
+            ]
+        }
         return [
-            {
-                label: 'Reports',
-                icon: 'ReportsIcon',
-                to: `${adminPath}`,
-            },
+            // {
+            //     label: 'Dashboard',
+            //     icon: 'DashboardIcon',
+            //     to: '/',
+            // },
             {
                 label: 'Transactions',
                 icon: 'TransactionsIcon',
-                to: `${adminPath}/transactions`,
-            },
-            {
-                label: 'Settings',
-                icon: 'SettingsIcon',
-                to: `${adminPath}/settings/categories`,
+                to: '/transactions',
             },
         ]
-    }
-    return [
-        // {
-        //     label: 'Dashboard',
-        //     icon: 'DashboardIcon',
-        //     to: '/',
-        // },
-        {
-            label: 'Transactions',
-            icon: 'TransactionsIcon',
-            to: '/transactions',
-        },
-    ]
-})
+    })
 </script>
 
 <template>
@@ -70,7 +70,7 @@ const roleBasedLinks = computed(() => {
                             class="h-10 w-auto"
                             src="~/assets/logo.svg"
                             alt="Opabid transaction management"
-                        >
+                        />
                     </ULink>
                     <!-- <ClientOnly>
                         <Icon name="NuxtIcon" size="64" />
@@ -127,7 +127,7 @@ const roleBasedLinks = computed(() => {
                             class="h-10 w-auto"
                             src="~/assets/logo.svg"
                             alt="Opabid transaction management"
-                        >
+                        />
                     </ULink>
                 </div>
                 <div class="flex flex-1 flex-col pt-6">
@@ -146,7 +146,7 @@ const roleBasedLinks = computed(() => {
 
                     <ul role="list" class="flex flex-1 flex-col gap-y-7">
                         <li
-                            class="mt-auto before:absolute before:left-0 before:bottom-16 before:w-full before:h-px before:dark:bg-gray-700 "
+                            class="mt-auto before:absolute before:left-0 before:bottom-16 before:w-full before:h-px before:dark:bg-gray-700"
                         >
                             <UButton
                                 color="gray"

@@ -1,5 +1,5 @@
 import type { z } from 'zod'
-import type { IDataResponse } from "./api"
+import type { IDataResponse } from './api'
 import type { IUser } from './user'
 
 export interface ITokenData {

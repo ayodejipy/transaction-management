@@ -8,7 +8,9 @@ export const useUserStore = defineStore(
         const user = ref<IUser | null>(null)
 
         const isLoggedIn = computed(() => !!user.value)
-        const isAdmin = computed(() => user.value?.roles[0] === userRoles.SuperAdmin)
+        const isAdmin = computed(
+            () => user.value?.roles[0] === userRoles.SuperAdmin
+        )
 
         async function getProfile(): Promise<IUserData> {
             const { $customFetch } = useNuxtApp()

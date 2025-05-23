@@ -1,22 +1,22 @@
 <script setup lang="ts">
-const props = withDefaults(
-    defineProps<{
-        isRemovable?: boolean
-        index: number
-    }>(),
-    {
-        isRemovable: true,
+    const props = withDefaults(
+        defineProps<{
+            isRemovable?: boolean
+            index: number
+        }>(),
+        {
+            isRemovable: true,
+        }
+    )
+    const emit = defineEmits<{
+        (e: 'remove', value: number): void
+    }>()
+
+    const modelValue = defineModel<string>()
+
+    function onDelete() {
+        emit('remove', props.index)
     }
-)
-const emit = defineEmits<{
-    (e: 'remove', value: number): void
-}>()
-
-const modelValue = defineModel<string>()
-
-function onDelete() {
-    emit('remove', props.index)
-}
 </script>
 
 <template>

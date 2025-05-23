@@ -20,16 +20,17 @@ export const useInviteStore = defineStore('invite', () => {
         })
 
         return data
-	}
-	
-	async function resendInvite(
-		id: number
-    ): Promise<IDataResponse<string>> {
+    }
+
+    async function resendInvite(id: number): Promise<IDataResponse<string>> {
         const { $customFetch } = useNuxtApp()
 
-        const data = await $customFetch<IDataResponse<string>>(`${userInviteUrl}/${id}/resend`, {
-            method: 'POST'
-        })
+        const data = await $customFetch<IDataResponse<string>>(
+            `${userInviteUrl}/${id}/resend`,
+            {
+                method: 'POST',
+            }
+        )
 
         return data
     }

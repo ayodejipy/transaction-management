@@ -1,79 +1,78 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from '#ui/types'
-import type { IAuthData, TSchema } from '~/types';
-import { acceptInviteSchema } from '~/utils'
-import getEndpoints from '~/utils/endpoints';
+    import type { FormSubmitEvent } from '#ui/types'
+    import type { IAuthData, TSchema } from '~/types'
+    import { acceptInviteSchema } from '~/utils'
+    import getEndpoints from '~/utils/endpoints'
 
-useHead({
-    title: 'Accept Invite'
-})
+    useHead({
+        title: 'Accept Invite',
+    })
 
-definePageMeta({
-    layout: false,
-})
+    definePageMeta({
+        layout: false,
+    })
 
-const authStore = useAuthStore()
-const { accessToken, refreshToken } = storeToRefs(authStore)
+    const authStore = useAuthStore()
+    const { accessToken, refreshToken } = storeToRefs(authStore)
 
-const router = useRouter()
-const route = useRoute()
+    const router = useRouter()
+    const route = useRoute()
 
-const toast = useToast()
+    const toast = useToast()
 
-const { $customFetch } = useNuxtApp()
+    const { $customFetch } = useNuxtApp()
 
+    const loading = ref<boolean>(false)
+    const form = reactive({
+        email: '',
+        password: '',
+        confirmPassword: '',
+    })
 
-const loading = ref<boolean>(false)
-const form = reactive({
-    email: '',
-    password: '',
-    confirmPassword: '',
-})
+    const token = computed<string>(() => route.query.token as string)
 
-const token = computed<string>(() => route.query.token as string)
+    const isButtonEnabled = computed<boolean>(() => !!token.value)
 
-const isButtonEnabled = computed<boolean>(() => !!token.value)
+    async function handleAcceptInvite(event: FormSubmitEvent<TSchema>) {
+        loading.value = true
+        const acceptInviteUrl = getEndpoints('userInviteAcceptUrl')
+        const body = {
+            ...event.data,
+            token: token.value,
+        }
 
-async function handleAcceptInvite(event: FormSubmitEvent<TSchema>) {
-    loading.value = true
-    const acceptInviteUrl = getEndpoints('userInviteAcceptUrl')
-    const body = {
-        ...event.data,
-        token: token.value,
-	}
-	
-    try {
-        const data = await $customFetch<IAuthData>(acceptInviteUrl, {
-            method: 'POST',
-            body,
-        })
-		accessToken.value = data.content.token
-		refreshToken.value = data.content.refreshToken
+        try {
+            const data = await $customFetch<IAuthData>(acceptInviteUrl, {
+                method: 'POST',
+                body,
+            })
+            accessToken.value = data.content.token
+            refreshToken.value = data.content.refreshToken
 
-        toast.add({
-            title: 'Account created Successfully',
-            color: 'success',
-            description: 'Welcome onboard! Your account is ready',
-            icon: 'i-heroicons-outline-check-badge',
-		})
-		
-		router.push('/')
-    } catch {
-        toast.add({
-            title: 'Account Setup Failed',
-            color: 'error',
-            description: 'Email or password incorrect.',
-            icon: 'i-heroicons-outline-exclaimation-circle',
-        })
-        // throw new Error('Failed authenticate user. Please try again.')
-    } finally {
-        loading.value = !loading.value
+            toast.add({
+                title: 'Account created Successfully',
+                color: 'success',
+                description: 'Welcome onboard! Your account is ready',
+                icon: 'i-heroicons-outline-check-badge',
+            })
+
+            router.push('/')
+        } catch {
+            toast.add({
+                title: 'Account Setup Failed',
+                color: 'error',
+                description: 'Email or password incorrect.',
+                icon: 'i-heroicons-outline-exclaimation-circle',
+            })
+            // throw new Error('Failed authenticate user. Please try again.')
+        } finally {
+            loading.value = !loading.value
+        }
     }
-}
 
-onMounted(() => {
-    form.email = route.query.email as string
-})
+    onMounted(() => {
+        form.email = route.query.email as string
+    })
 </script>
 
 <template>
@@ -86,7 +85,7 @@ onMounted(() => {
                     class="w-16 h-16"
                     src="~/assets/logo.svg"
                     alt="application logo"
-                >
+                />
             </div>
             <div class="text-center space-y-3">
                 <h3 class="text-brand-gray text-3xl font-semibold">
@@ -119,7 +118,11 @@ onMounted(() => {
                         />
                     </UFormGroup>
 
-                    <UFormGroup size="xl" label="Confirm Password" name="confirmPassword">
+                    <UFormGroup
+                        size="xl"
+                        label="Confirm Password"
+                        name="confirmPassword"
+                    >
                         <UInput
                             v-model="form.confirmPassword"
                             type="password"

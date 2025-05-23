@@ -1,188 +1,201 @@
 <script setup lang="ts">
-import type { FormSubmitEvent, FormError, FormErrorEvent } from '#ui/types'
+    import type { FormSubmitEvent, FormError, FormErrorEvent } from '#ui/types'
 
-import type {
-    AddTransactionSchemaType,
-    ICategory,
-    ITransactionForm,
-    TSubCategory,
-} from '~/types'
+    import type {
+        AddTransactionSchemaType,
+        ICategory,
+        ITransactionForm,
+        TSubCategory,
+    } from '~/types'
 
-const props = defineProps<{
-    refresh?: () => Promise<void> | void
-}>()
+    const props = defineProps<{
+        refresh?: () => Promise<void> | void
+    }>()
 
-const isOpen = defineModel({ type: Boolean, default: false })
+    const isOpen = defineModel({ type: Boolean, default: false })
 
-const { $dayjs } = useNuxtApp()
+    const { $dayjs } = useNuxtApp()
 
-const toast = useToast()
-const transactionStore = useTransactionStore()
-const { addTransaction, updateTransaction } = transactionStore
-const { transaction } = storeToRefs(transactionStore)
+    const toast = useToast()
+    const transactionStore = useTransactionStore()
+    const { addTransaction, updateTransaction } = transactionStore
+    const { transaction } = storeToRefs(transactionStore)
 
-const categoryStore = useCategoryStore()
-const { categories } = storeToRefs(categoryStore)
+    const categoryStore = useCategoryStore()
+    const { categories } = storeToRefs(categoryStore)
 
-// const typeStore = useTypeStore()
-// const { types } = storeToRefs(typeStore)
+    // const typeStore = useTypeStore()
+    // const { types } = storeToRefs(typeStore)
 
-// types
-// const transactionTypes = computed(() =>
-//     types.value.map((type: TActiveType) => ({
-//         label: type.name,
-//         value: type.id,
-//     }))
-// )
-const transactionTypes = ref(['Credit', 'Debit'])
+    // types
+    // const transactionTypes = computed(() =>
+    //     types.value.map((type: TActiveType) => ({
+    //         label: type.name,
+    //         value: type.id,
+    //     }))
+    // )
+    const transactionTypes = ref(['Credit', 'Debit'])
 
-// categories
-const transactionCategories = computed(() =>
-    categories.value.map((category: Omit<ICategory, 'isDeleted'>) => ({
-        label: category.name,
-        value: category.id,
-    }))
-)
-
-const subCategories = ref<{ label: string; value: number }[]>([])
-
-// const fileRef = ref<HTMLInputElement>()
-
-// function onFileChange(e: Event) {
-//     const input = e.target as HTMLInputElement
-
-//     if (!input.files?.length) {
-//         return
-//     }
-
-//     //   form.attachment = URL.createObjectURL(input.files[0])
-// }
-
-const loading = ref<boolean>(false)
-const defaultFormState: ITransactionForm = {
-    amount: 0,
-    type: '',
-    categoryId: 0,
-    subCategoryId: 0,
-    transactionDate: '',
-    description: '',
-}
-const form = ref<ITransactionForm>({ ...toRef(defaultFormState).value })
-
-const validate = (state: ITransactionForm): FormError[] => {
-    const errors = []
-    if (!state.amount)
-        errors.push({ path: 'amount', message: 'Please input an amount' })
-    if (!state.type)
-        errors.push({ path: 'type', message: 'Please select a type' })
-    if (!state.categoryId)
-        errors.push({ path: 'categoryId', message: 'Please add a category' })
-    //   if (!state.subCategoryId) errors.push({ path: 'subCategoryId', message: 'Required' })
-    if (!state.transactionDate)
-        errors.push({
-            path: 'transactionDate',
-            message: 'Please select a date for the transaction',
-        })
-    if (!state.description)
-        errors.push({ path: 'description', message: 'Description is required' })
-    return errors
-}
-
-async function onError(event: FormErrorEvent) {
-    const element = document.getElementById(event.errors[0].id)
-    element?.focus()
-    element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-}
-
-const $resetForm = () => {
-    Object.assign(form.value, defaultFormState)
-}
-
-const onCloseSlide = () => {
-    $resetForm()
-    transaction.value = null
-    isOpen.value = !isOpen.value
-}
-
-const getSubCatogories = (categoryId: number): TSubCategory[] | [] => {
-    return (
-        categories.value.find((category) => category.id == categoryId)
-            ?.subCategories ?? []
+    // categories
+    const transactionCategories = computed(() =>
+        categories.value.map((category: Omit<ICategory, 'isDeleted'>) => ({
+            label: category.name,
+            value: category.id,
+        }))
     )
-}
 
-async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
-    loading.value = true
-    const transactionId = transaction.value?.id
-    try {
-        const data = transactionId
-            ? await updateTransaction(transactionId, event.data)
-            : await addTransaction(event.data)
+    const subCategories = ref<{ label: string; value: number }[]>([])
 
-        if (data.success) {
-            toast.add({
-                title: 'Transaction uploaded successfully',
-                color: 'green',
-                description: "You've successfully uploaded a new transaction",
-                icon: 'i-heroicons-outline-check-badge',
+    // const fileRef = ref<HTMLInputElement>()
+
+    // function onFileChange(e: Event) {
+    //     const input = e.target as HTMLInputElement
+
+    //     if (!input.files?.length) {
+    //         return
+    //     }
+
+    //     //   form.attachment = URL.createObjectURL(input.files[0])
+    // }
+
+    const loading = ref<boolean>(false)
+    const defaultFormState: ITransactionForm = {
+        amount: 0,
+        type: '',
+        categoryId: 0,
+        subCategoryId: 0,
+        transactionDate: '',
+        description: '',
+    }
+    const form = ref<ITransactionForm>({ ...toRef(defaultFormState).value })
+
+    const validate = (state: ITransactionForm): FormError[] => {
+        const errors = []
+        if (!state.amount)
+            errors.push({ path: 'amount', message: 'Please input an amount' })
+        if (!state.type)
+            errors.push({ path: 'type', message: 'Please select a type' })
+        if (!state.categoryId)
+            errors.push({
+                path: 'categoryId',
+                message: 'Please add a category',
             })
-
-            if (props.refresh) {
-                await props.refresh()
-            }
-
-            onCloseSlide()
-        }
-    } catch {
-        toast.add({
-            title: 'Transaction Upload Failed',
-            color: 'red',
-            description:
-                'Sorry, we are unable to upload your transaction at this moment.',
-            icon: 'i-heroicons-outline-exclaimation-circle',
-        })
-        throw new Error('Failed add a ew transaction. Please try again.')
-    } finally {
-        loading.value = !loading.value
+        //   if (!state.subCategoryId) errors.push({ path: 'subCategoryId', message: 'Required' })
+        if (!state.transactionDate)
+            errors.push({
+                path: 'transactionDate',
+                message: 'Please select a date for the transaction',
+            })
+        if (!state.description)
+            errors.push({
+                path: 'description',
+                message: 'Description is required',
+            })
+        return errors
     }
-}
 
-watch(transaction, (_updated) => {
-    if (_updated) {
-        const { amount, typeId, categoryId, transactionDateUtc, description } =
-            _updated
-        Object.assign(form.value, {
-            amount,
-            typeId,
-            categoryId,
-            description,
-            transactionDate: $dayjs(transactionDateUtc).format('YYYY-MM-DD'),
-        })
+    async function onError(event: FormErrorEvent) {
+        const element = document.getElementById(event.errors[0].id)
+        element?.focus()
+        element?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
-})
 
-watch(isOpen, (_isOpen) => {
-    if (!_isOpen) {
+    const $resetForm = () => {
+        Object.assign(form.value, defaultFormState)
+    }
+
+    const onCloseSlide = () => {
         $resetForm()
         transaction.value = null
+        isOpen.value = !isOpen.value
     }
-})
 
-watch(
-    () => form.value.categoryId,
-    (updated) => {
-        const categories = getSubCatogories(updated)
-        subCategories.value = categories.map((sub) => ({
-            value: sub.id as number,
-            label: sub.name,
-        }))
+    const getSubCatogories = (categoryId: number): TSubCategory[] | [] => {
+        return (
+            categories.value.find((category) => category.id == categoryId)
+                ?.subCategories ?? []
+        )
     }
-)
 
-onMounted(async () => {
-    // transaction categories and types
-    await categoryStore.getCategories()
-})
+    async function onSubmit(event: FormSubmitEvent<AddTransactionSchemaType>) {
+        loading.value = true
+        const transactionId = transaction.value?.id
+        try {
+            const data = transactionId
+                ? await updateTransaction(transactionId, event.data)
+                : await addTransaction(event.data)
+
+            if (data.success) {
+                toast.add({
+                    title: 'Transaction uploaded successfully',
+                    color: 'green',
+                    description:
+                        "You've successfully uploaded a new transaction",
+                    icon: 'i-heroicons-outline-check-badge',
+                })
+
+                if (props.refresh) {
+                    await props.refresh()
+                }
+
+                onCloseSlide()
+            }
+        } catch {
+            toast.add({
+                title: 'Transaction Upload Failed',
+                color: 'red',
+                description:
+                    'Sorry, we are unable to upload your transaction at this moment.',
+                icon: 'i-heroicons-outline-exclaimation-circle',
+            })
+            throw new Error('Failed add a ew transaction. Please try again.')
+        } finally {
+            loading.value = !loading.value
+        }
+    }
+
+    watch(transaction, (_updated) => {
+        if (_updated) {
+            const {
+                amount,
+                typeId,
+                categoryId,
+                transactionDateUtc,
+                description,
+            } = _updated
+            Object.assign(form.value, {
+                amount,
+                typeId,
+                categoryId,
+                description,
+                transactionDate:
+                    $dayjs(transactionDateUtc).format('YYYY-MM-DD'),
+            })
+        }
+    })
+
+    watch(isOpen, (_isOpen) => {
+        if (!_isOpen) {
+            $resetForm()
+            transaction.value = null
+        }
+    })
+
+    watch(
+        () => form.value.categoryId,
+        (updated) => {
+            const categories = getSubCatogories(updated)
+            subCategories.value = categories.map((sub) => ({
+                value: sub.id as number,
+                label: sub.name,
+            }))
+        }
+    )
+
+    onMounted(async () => {
+        // transaction categories and types
+        await categoryStore.getCategories()
+    })
 </script>
 
 <template>

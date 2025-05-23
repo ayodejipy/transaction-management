@@ -1,38 +1,37 @@
 <script setup lang="ts">
-// const route = useRoute()
-// const router = useRouter()
+    // const route = useRoute()
+    // const router = useRouter()
 
-useHead({
-    title: 'Settings'
-})
+    useHead({
+        title: 'Settings',
+    })
 
-definePageMeta({
-    key: (route) => route.fullPath,
-    title: 'Settings',
-    middleware: ['auth', 'admin']
-})
+    definePageMeta({
+        key: (route) => route.fullPath,
+        title: 'Settings',
+        middleware: ['auth', 'admin'],
+    })
 
-const ADMIN_PATH = '/admin'
-// const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PATH : '')
+    const ADMIN_PATH = '/admin'
+    // const appendedUrl = computed(() => route.path.startsWith(ADMIN_PATH) ? ADMIN_PATH : '')
 
-const links = [
-    {
-        label: 'Categories',
-        icon: 'i-heroicons-chart-bar',
-        to: `${ADMIN_PATH}/settings/categories`,
-    },
-    // {
-    //     label: 'Types',
-    //     icon: 'i-heroicons-chart-bar',
-    //     to: `${ADMIN_PATH}/settings/types`,
-    // },
-    {
-        label: 'User Management',
-        icon: 'i-ci-users-group',
-        to: `${ADMIN_PATH}/settings/users`,
-    }
-]
-
+    const links = [
+        {
+            label: 'Categories',
+            icon: 'i-heroicons-chart-bar',
+            to: `${ADMIN_PATH}/settings/categories`,
+        },
+        // {
+        //     label: 'Types',
+        //     icon: 'i-heroicons-chart-bar',
+        //     to: `${ADMIN_PATH}/settings/types`,
+        // },
+        {
+            label: 'User Management',
+            icon: 'i-ci-users-group',
+            to: `${ADMIN_PATH}/settings/users`,
+        },
+    ]
 </script>
 
 <template>

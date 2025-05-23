@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import getEndpoints from '~/utils/endpoints'
-import { format } from 'date-fns'
+import { format, isSameDay, sub } from 'date-fns'
 import type {
     ICategory,
     IColumn,
     IDaysOptionFilter,
+    RangeOption,
     ITransaction,
     ITransactionsData,
+    RangeDuration,
 } from '~/types'
 
 definePageMeta({
@@ -16,6 +18,7 @@ definePageMeta({
 
 const { $dayjs } = useNuxtApp()
 const router = useRouter()
+const route = useRoute()
 
 const { isAdmin } = storeToRefs(useUserStore())
 
@@ -29,12 +32,8 @@ useHead({
 
 const searchTerm = ref<string>('')
 const page = ref<number>(1)
-const categoryId = ref<string>('')
-const selected = ref({
-    start: '' as unknown as Date,
-    end: '' as unknown as Date,
-})
-const dateRange = ref({
+const catId = ref<number | null>(null)
+const selected = ref<Omit<IDaysOptionFilter, 'label' | 'value'>>({
     start: '' as unknown as Date,
     end: '' as unknown as Date,
 })
@@ -42,19 +41,8 @@ const dateRange = ref({
 const categoryStore = useCategoryStore()
 const { categories } = storeToRefs(categoryStore)
 
-const { transactions, transaction } = storeToRefs(useTransactionStore())
+const { transaction } = storeToRefs(useTransactionStore())
 const transactionsUrl = getEndpoints('transactionsUrl')
-
-const computedDateRange = computed({
-    get: () => dateRange.value || selected.value,
-    set: (value: object) => {
-        if (value.label) {
-            dateRange.value = value
-        }
-        selected.value = value
-    },
-})
-console.log(computedDateRange)
 
 const newTransactionUrl = computed(() => {
     const params = new URLSearchParams()
@@ -66,8 +54,7 @@ const newTransactionUrl = computed(() => {
     }
     if (page.value) params.append('PageIndex', page.value.toString())
 
-    if (categoryId.value)
-        params.append('CategoryId', categoryId.value.toString())
+    if (catId.value) params.append('CategoryId', catId.value.toString())
 
     return `${transactionsUrl}?${params.toString()}`
 })
@@ -77,13 +64,14 @@ const {
     data,
     refresh,
 } = await useAppFetch<ITransactionsData>(() => newTransactionUrl.value, {
+    watch: [newTransactionUrl],
     pick: ['content', 'paging', 'status'],
 })
 
 const shouldPaginate = computed(() => !!data.value?.paging)
 
 const dataForTable = computed(() =>
-    data.value?.content?.map((transaction: ITransaction) => ({
+    data.value?.content.map((transaction: ITransaction) => ({
         id: transaction.id,
         type: transaction.type,
         categoryName: transaction.categoryName,
@@ -150,38 +138,60 @@ const uiConfig = computed(() => ({
 }))
 
 // days filters i.e 'Past 30days'
-const daysOptionFilter = computed<IDaysOptionFilter[]>(() => [
-    {
-        label: 'Last 7 days',
-        start: $dayjs().toDate(),
-        end: $dayjs().subtract(7, 'days').toDate(),
-    },
-    {
-        label: 'Past 6 months',
-        start: $dayjs().toDate(),
-        end: $dayjs().subtract(6, 'months').toDate(),
-    },
+
+function isRangeSelected(duration: Duration) {
+    return (
+        isSameDay(
+            selected.value.start as Date,
+            sub(new Date(), duration)
+        ) && isSameDay(selected.value.end as Date, new Date())
+    )
+}
+
+function selectRange(duration: RangeDuration) {
+    if (duration.start && duration.end) {
+        selected.value = { start: duration.start, end: duration.end }
+    } else {
+        selected.value = {
+            start: sub(new Date(), duration),
+            end: new Date(),
+        }
+    }
+}
+
+const ranges: RangeOption[] = [
+    { label: 'Last 7 days', duration: { days: 7 } },
+    { label: 'Last 6 months', duration: { months: 6 } },
+    { label: 'Last year', duration: { years: 1 } },
     {
         label: 'First quarter (Q1)',
-        start: $dayjs().quarter(1).startOf('quarter').toDate(),
-        end: $dayjs().quarter(1).endOf('quarter').toDate(),
+        duration: {
+            start: $dayjs().quarter(1).startOf('quarter').toDate(),
+            end: $dayjs().quarter(1).endOf('quarter').toDate(),
+        },
     },
     {
         label: 'Second quarter (Q2)',
-        start: $dayjs().quarter(2).startOf('quarter').toDate(),
-        end: $dayjs().quarter(2).endOf('quarter').toDate(),
+        duration: {
+            start: $dayjs().quarter(2).startOf('quarter').toDate(),
+            end: $dayjs().quarter(2).endOf('quarter').toDate(),
+        },
     },
     {
         label: 'Third quarter (Q3)',
-        start: $dayjs().quarter(3).startOf('quarter').toDate(),
-        end: $dayjs().quarter(3).endOf('quarter').toDate(),
+        duration: {
+            start: $dayjs().quarter(3).startOf('quarter').toDate(),
+            end: $dayjs().quarter(3).endOf('quarter').toDate(),
+        },
     },
     {
         label: 'Fourth quarter (Q4)',
-        start: $dayjs().quarter(4).startOf('quarter').toDate(),
-        end: $dayjs().quarter(4).endOf('quarter').toDate(),
+        duration: {
+            start: $dayjs().quarter(4).startOf('quarter').toDate(),
+            end: $dayjs().quarter(4).endOf('quarter').toDate(),
+        },
     },
-])
+]
 
 // Transactions filter i.e: Income, Expenditure
 const handleExport = () => {
@@ -189,7 +199,7 @@ const handleExport = () => {
 }
 
 function $clearFilters() {
-    categoryId.value = ''
+    catId.value = 0
     searchTerm.value = ''
     selected.value.start = '' as unknown as Date
     selected.value.end = '' as unknown as Date
@@ -216,17 +226,28 @@ function getClickedPage(value: number) {
     page.value = toRef(value).value
 }
 
-watch(
-    data,
-    async (newData) => {
-        if (newData && newData.content) {
-            transactions.value = newData.content as ITransaction[]
-        } else {
-            await refresh()
-        }
-    },
-    { immediate: true }
-)
+watchEffect(() => {
+    const newQuery = {
+        ...route.query,
+        page: page.value,
+        query: searchTerm.value || undefined,
+        start_date: selected.value.start
+            ? $dayjs(selected.value.start).format('YYYY-MM-DD')
+            : undefined,
+        end_date: selected.value.end
+            ? $dayjs(selected.value.end).format('YYYY-MM-DD')
+            : undefined,
+        category_id: catId.value || undefined,
+    }
+
+    // Only push if query has actually changed
+    const currentQuery = route.query
+    const hasChanged = Object.keys(newQuery).some(key => newQuery[key as keyof typeof newQuery] !== currentQuery[key as keyof typeof currentQuery])
+
+    if (hasChanged) {
+        router.push({ path: route.path, query: newQuery })
+    }
+})
 
 onMounted(async () => {
     await categoryStore.getCategories()
@@ -236,11 +257,8 @@ onMounted(async () => {
 <template>
     <section class="w-full">
         <section class="flex justify-end items-center">
-            <button
-                type="button"
-                class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
-                @click="isOpenAddTransaction = true"
-            >
+            <button type="button" class="flex items-center gap-2 bg-brand-green text-white rounded-lg px-4 py-2.5"
+                @click="isOpenAddTransaction = true">
                 <Icon name="i-mage-file-upload" />
                 Add new transaction
             </button>
@@ -248,108 +266,58 @@ onMounted(async () => {
 
         <!-- transactions table -->
         <section
-            class="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-700 mt-6 space-y-3"
-        >
-            <div
-                class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-8 px-3 sm:px-6"
-            >
+            class="bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-700 mt-6 space-y-3">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-6 sm:gap-0 py-8 px-3 sm:px-6">
                 <div class="flex items-center gap-2">
                     <h3 class="font-semibold text-xl">All Transactions</h3>
-                    <UBadge
-                        color="green"
-                        variant="subtle"
-                        :ui="{
-                            rounded: 'rounded-full',
-                        }"
-                    >
-                        {{ transactions.length }}
+                    <UBadge color="green" variant="subtle" :ui="{
+                        rounded: 'rounded-full',
+                    }">
+                        {{ dataForTable.length }}
                     </UBadge>
                 </div>
-                <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5">
-                    <UInput
-                        v-model.lazy="searchTerm"
-                        :ui="{
-                            base: 'flex-1',
-                            rounded: 'rounded-full',
-                            icon: {
-                                base: 'text-icon-gray dark:text-gray-500',
-                            },
-                        }"
-                        icon="i-ri-search-2-line"
-                        size="lg"
-                        color="white"
-                        trailing
-                        placeholder="Search..."
-                    />
-                    <!-- <USelect
-                        v-model="daysOption"
-                        icon="i-heroicons-calendar"
-                        color="white"
-                        size="lg"
-                        padding="lg"
-                        :options="daysOptionFilter"
-                        placeholder="Past 30 days"
-                        :ui="uiConfig"
-                    /> -->
-                    <USelectMenu
-                        v-model="computedDateRange"
-                        icon="i-heroicons-calendar"
-                        color="white"
-                        size="lg"
-                        padding="lg"
-                        :options="daysOptionFilter"
-                        placeholder="Select range option"
-                        :ui="uiConfig"
-                    />
-                    <!-- <USelect
-                        color="white"
-                        size="lg"
-                        padding="lg"
-                        :options="['United States', 'Canada', 'Mexico']"
-                        placeholder="Date Range"
-                        :ui="uiConfig"
-                    /> -->
+                <div class="flex flex-wrap md:flex-nowrap items-center gap-2.5">
+                    <UInput v-model.lazy="searchTerm" :ui="{
+                        base: 'flex-1',
+                        rounded: 'rounded-full',
+                        icon: {
+                            base: 'text-icon-gray dark:text-gray-500',
+                        },
+                    }" icon="i-ri-search-2-line" size="lg" color="white" trailing placeholder="Search..." />
 
                     <UPopover>
-                        <UButton
-                            icon="i-heroicons-calendar-days-20-solid"
-                            size="lg"
-                            color="white"
-                            variant="outline"
+                        <UButton icon="i-heroicons-calendar-days-20-solid" size="lg" color="white" variant="outline"
                             :ui="{ rounded: 'rounded-full' }"
-                        >
+                            class="text-gray-400 dark:text-gray-500 ring-gray-300 dark:ring-gray-700">
                             <span v-if="selected.start && selected.end">
                                 {{ format(selected.start, 'd MMM, yyy') }} -
                                 {{ format(selected.end, 'd MMM, yyy') }}
                             </span>
-                            <span v-else>Date Range</span>
+                            <span v-else>Select a date Range</span>
                         </UButton>
 
                         <template #panel="{ close }">
-                            <DatePicker
-                                v-model="selected"
-                                is-required
-                                @close="close"
-                            />
+                            <div class="flex items-center sm:divide-x divide-gray-200 dark:divide-gray-800">
+                                <div class="hidden sm:flex flex-col py-4">
+                                    <UButton v-for="(range, index) in ranges" :key="index" :label="range.label"
+                                        color="gray" variant="ghost" class="rounded-none px-6" :class="[
+                                            isRangeSelected(range.duration)
+                                                ? 'bg-gray-100 dark:bg-gray-800'
+                                                : 'hover:bg-gray-50 dark:hover:bg-gray-800/50',
+                                        ]" truncate @click="selectRange(range.duration)" />
+                                </div>
+
+                                <DatePicker v-model="selected" is-required @close="close" />
+                            </div>
                         </template>
                     </UPopover>
 
-                    <USelect
-                        v-model="categoryId"
-                        trailing-icon="i-ci-filter-off-outline"
-                        color="white"
-                        size="lg"
-                        padding="lg"
-                        :options="transactionCategories"
-                        placeholder="All Transactions"
-                        :ui="uiConfig"
-                    />
+                    <USelect v-model="catId" leading-icon="i-ci-filter-off-outline" color="white" size="lg" padding="lg"
+                        :options="transactionCategories" placeholder="All Transactions"
+                        class="text-gray-400 dark:text-gray-500" :ui="uiConfig" />
 
-                    <UButton
-                        color="white"
-                        variant="outline"
-                        size="lg"
-                        :ui="{
+                    <UButton color="white" variant="outline" size="lg"
+                        class="text-gray-400 dark:text-gray-500 ring-gray-300 dark:ring-gray-700" :ui="{
                             font: 'font-normal',
                             rounded: 'rounded-full',
                             color: {
@@ -358,43 +326,22 @@ onMounted(async () => {
                                         'shadow-sm bg-white dark:bg-gray-900 text-icon-gray dark:text-white ring-1 ring-inset ring-light-gray dark:ring-gray-700 focus:ring-2 focus:ring-gray-600 dark:focus:ring-gray-300',
                                 },
                             },
-                        }"
-                        @click="handleExport"
-                    >
+                        }" @click="handleExport">
                         <template #leading>
-                            <Icon
-                                name="i-line-md-downloading-loop"
-                                class="w-4 h-4"
-                            />
+                            <Icon name="i-line-md-downloading-loop" class="w-4 h-4" />
                         </template>
                         Export
                     </UButton>
-                    <UButton
-                        icon="i-heroicons-x-mark"
-                        dynamic
-                        size="xs"
-                        color="gray"
-                        variant="ghost"
-                        :ui="{ rounded: 'rounded-full' }"
-                        @click="$clearFilters"
-                    >
+                    <UButton icon="i-heroicons-x-mark" dynamic size="xs" color="gray" variant="ghost"
+                        :ui="{ rounded: 'rounded-full' }" @click="$clearFilters">
                         Clear filters
                     </UButton>
                 </div>
             </div>
 
-            <AppTable
-                :loading
-                :columns
-                :data="dataForTable"
-                :selectable="true"
-                :paginate="shouldPaginate"
-                :paging="data?.paging"
-                @select="onSelect"
-                @on-click-next="getNextList"
-                @on-click-prev="getPrevList"
-                @on-page-click="getClickedPage"
-            >
+            <AppTable :loading :columns :data="dataForTable || []" :selectable="true" :paginate="shouldPaginate"
+                :paging="data?.paging" @select="onSelect" @on-click-next="getNextList" @on-click-prev="getPrevList"
+                @on-page-click="getClickedPage">
                 <!-- <template #actions="{ row }">
                     <UDropdown :items="actionsOption(row)">
                         <UButton

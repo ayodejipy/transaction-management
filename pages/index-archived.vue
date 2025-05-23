@@ -1,154 +1,158 @@
 <script setup lang="ts">
-import type {
-    IDataResponse,
-    IMonthlyTotal,
-    ITotalTransaction,
-    ITransactionPercentage,
-    ITransaction,
-    ITransactionsData,
-} from '~/types'
+    import type {
+        IDataResponse,
+        IMonthlyTotal,
+        ITotalTransaction,
+        ITransactionPercentage,
+        ITransaction,
+        ITransactionsData,
+    } from '~/types'
 
-import getEndpoints from '~/utils/endpoints'
+    import getEndpoints from '~/utils/endpoints'
 
-useHead({
-    title: 'Admin Reports',
-})
-
-definePageMeta({
-    title: 'Reports',
-    middleware: ['auth', 'admin'],
-})
-
-const { $dayjs } = useNuxtApp()
-
-const isOpenAddTransaction = ref<boolean>(false)
-
-const revenueUrl = getEndpoints('totalRevenueUrl')
-const totalStatsUrl = getEndpoints('totalStatsUrl')
-const monthlyStatsUrl = getEndpoints('monthlyStatsUrl')
-const creditDebitPercentageUrl = getEndpoints('percentageStatsUrl')
-const transactionsUrl = getEndpoints('transactionsUrl')
-
-// Access to the cached value of useFetch
-const { data: cachedTransactions } = useNuxtData(transactionsUrl)
-
-const {
-    pending: loadingTransactions,
-    data,
-    refresh,
-} = await useAppFetch<ITransactionsData>(transactionsUrl, {
-    pick: ['content'],
-    key: transactionsUrl,
-    default: () => cachedTransactions.value,
-})
-
-const transactions = computed(() =>
-    data.value?.content
-        .map((transaction: ITransaction) => ({
-            id: transaction.typeId,
-            typeName: transaction.typeName,
-            categoryName: transaction.categoryName,
-            transactionDateUtc: $dayjs(transaction.transactionDateUtc).format(
-                'DD/MM/YYYY'
-            ),
-            amount: formatCurrency(transaction.amount as number),
-            description: transaction.description,
-        }))
-        .slice(0, 10)
-)
-
-// Total revenue
-const { data: cachedRevenue } = useNuxtData(revenueUrl)
-
-const { pending: loadingRevenue, data: revenue } = await useAppFetch<
-    IDataResponse<number | undefined>
->(revenueUrl, {
-    pick: ['content'],
-    key: revenueUrl,
-    default: () => cachedRevenue.value,
-})
-const totalRevenue = computed(() => formatCurrency(revenue.value?.content || 0))
-
-// Totals e.g; credit, debit
-const { data: cachedTotalStats } = useNuxtData(totalStatsUrl)
-
-const { pending: loadingStats, data: total } =
-    await useAppFetch<ITotalTransaction>(totalStatsUrl, {
-        pick: ['content'],
-        key: totalStatsUrl,
-        default: () => cachedTotalStats.value,
+    useHead({
+        title: 'Admin Reports',
     })
 
-const statistics = computed(() => [
-    {
-        title: 'All Transactions',
-        figure: total.value?.content?.totalTransactions || 0,
-    },
-    {
-        title: 'Credit Transactions',
-        figure: formatCurrency(total.value?.content?.totalCredits || 0),
-    },
-    {
-        title: 'Debit Transactions',
-        figure: formatCurrency(total.value?.content?.totalDebits || 0),
-    },
-    {
-        title: 'Net Amount',
-        figure: formatCurrency(total.value?.content?.netTotal || 0),
-    },
-])
-
-// Credit OR Debit transactions percentage (20%, 80%)
-const { data: cachedTotalPercentage } = useNuxtData(creditDebitPercentageUrl)
-
-const { pending: loadingPercentage, data: totalPercentile } =
-    await useAppFetch<ITransactionPercentage>(creditDebitPercentageUrl, {
-        pick: ['content'],
-        key: creditDebitPercentageUrl,
-        default: () => cachedTotalPercentage.value,
+    definePageMeta({
+        title: 'Reports',
+        middleware: ['auth', 'admin'],
     })
 
-const series = computed(() => [
-    totalPercentile.value?.content.totalCreditsPercentage || 0,
-    totalPercentile.value?.content.totalDebitsPercentage || 0,
-])
+    const { $dayjs } = useNuxtApp()
 
-// Total transactions per month: Jan, Feb...
-const { data: cachedTotalPerMonth } = useNuxtData(monthlyStatsUrl)
+    const isOpenAddTransaction = ref<boolean>(false)
 
-const { pending: loadingTotalPerMonth, data: totalPerMonth } =
-    await useAppFetch<IMonthlyTotal>(monthlyStatsUrl, {
+    const revenueUrl = getEndpoints('totalRevenueUrl')
+    const totalStatsUrl = getEndpoints('totalStatsUrl')
+    const monthlyStatsUrl = getEndpoints('monthlyStatsUrl')
+    const creditDebitPercentageUrl = getEndpoints('percentageStatsUrl')
+    const transactionsUrl = getEndpoints('transactionsUrl')
+
+    // Access to the cached value of useFetch
+    const { data: cachedTransactions } = useNuxtData(transactionsUrl)
+
+    const {
+        pending: loadingTransactions,
+        data,
+        refresh,
+    } = await useAppFetch<ITransactionsData>(transactionsUrl, {
         pick: ['content'],
-        key: monthlyStatsUrl,
-        default: () => cachedTotalPerMonth.value,
+        key: transactionsUrl,
+        default: () => cachedTransactions.value,
     })
 
-const monthsSeries = computed(() =>
-    totalPerMonth.value?.content.map((month) => month.monthName)
-)
-const amountsSeries = computed(() =>
-    totalPerMonth.value?.content.map((month) => month.netTotal.toString())
-)
+    const transactions = computed(() =>
+        data.value?.content
+            .map((transaction: ITransaction) => ({
+                id: transaction.typeId,
+                typeName: transaction.typeName,
+                categoryName: transaction.categoryName,
+                transactionDateUtc: $dayjs(
+                    transaction.transactionDateUtc
+                ).format('DD/MM/YYYY'),
+                amount: formatCurrency(transaction.amount as number),
+                description: transaction.description,
+            }))
+            .slice(0, 10)
+    )
 
-const isLoading = computed(
-    () =>
-        loadingTransactions.value ||
-        loadingRevenue.value ||
-        loadingStats.value ||
-        loadingPercentage.value ||
-        loadingTotalPerMonth.value
-)
+    // Total revenue
+    const { data: cachedRevenue } = useNuxtData(revenueUrl)
 
-const uiConfig = computed(() => ({
-    divide: '',
-    ring: 'ring-1 ring-gray-100 dark:ring-gray-800',
-    header: {
-        padding: 'px-0 sm:p-6',
-    },
-    body: {
-        padding: 'px-0 sm:px-6',
-    },
-}))
+    const { pending: loadingRevenue, data: revenue } = await useAppFetch<
+        IDataResponse<number | undefined>
+    >(revenueUrl, {
+        pick: ['content'],
+        key: revenueUrl,
+        default: () => cachedRevenue.value,
+    })
+    const totalRevenue = computed(() =>
+        formatCurrency(revenue.value?.content || 0)
+    )
+
+    // Totals e.g; credit, debit
+    const { data: cachedTotalStats } = useNuxtData(totalStatsUrl)
+
+    const { pending: loadingStats, data: total } =
+        await useAppFetch<ITotalTransaction>(totalStatsUrl, {
+            pick: ['content'],
+            key: totalStatsUrl,
+            default: () => cachedTotalStats.value,
+        })
+
+    const statistics = computed(() => [
+        {
+            title: 'All Transactions',
+            figure: total.value?.content?.totalTransactions || 0,
+        },
+        {
+            title: 'Credit Transactions',
+            figure: formatCurrency(total.value?.content?.totalCredits || 0),
+        },
+        {
+            title: 'Debit Transactions',
+            figure: formatCurrency(total.value?.content?.totalDebits || 0),
+        },
+        {
+            title: 'Net Amount',
+            figure: formatCurrency(total.value?.content?.netTotal || 0),
+        },
+    ])
+
+    // Credit OR Debit transactions percentage (20%, 80%)
+    const { data: cachedTotalPercentage } = useNuxtData(
+        creditDebitPercentageUrl
+    )
+
+    const { pending: loadingPercentage, data: totalPercentile } =
+        await useAppFetch<ITransactionPercentage>(creditDebitPercentageUrl, {
+            pick: ['content'],
+            key: creditDebitPercentageUrl,
+            default: () => cachedTotalPercentage.value,
+        })
+
+    const series = computed(() => [
+        totalPercentile.value?.content.totalCreditsPercentage || 0,
+        totalPercentile.value?.content.totalDebitsPercentage || 0,
+    ])
+
+    // Total transactions per month: Jan, Feb...
+    const { data: cachedTotalPerMonth } = useNuxtData(monthlyStatsUrl)
+
+    const { pending: loadingTotalPerMonth, data: totalPerMonth } =
+        await useAppFetch<IMonthlyTotal>(monthlyStatsUrl, {
+            pick: ['content'],
+            key: monthlyStatsUrl,
+            default: () => cachedTotalPerMonth.value,
+        })
+
+    const monthsSeries = computed(() =>
+        totalPerMonth.value?.content.map((month) => month.monthName)
+    )
+    const amountsSeries = computed(() =>
+        totalPerMonth.value?.content.map((month) => month.netTotal.toString())
+    )
+
+    const isLoading = computed(
+        () =>
+            loadingTransactions.value ||
+            loadingRevenue.value ||
+            loadingStats.value ||
+            loadingPercentage.value ||
+            loadingTotalPerMonth.value
+    )
+
+    const uiConfig = computed(() => ({
+        divide: '',
+        ring: 'ring-1 ring-gray-100 dark:ring-gray-800',
+        header: {
+            padding: 'px-0 sm:p-6',
+        },
+        body: {
+            padding: 'px-0 sm:px-6',
+        },
+    }))
 </script>
 
 <template>

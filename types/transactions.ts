@@ -6,8 +6,21 @@ import type { IDataResponse } from './api'
 export interface IDaysOptionFilter {
     label: string
     value?: string | Date | Dayjs | object
-    start: string | Date | Dayjs 
-    end: string | Date | Dayjs 
+    start: Date | Dayjs
+    end: Date | Dayjs
+}
+
+export type RangeDuration = {
+    days?: number
+    months?: number
+    years?: number
+    start?: Date
+    end?: Date
+}
+
+export type RangeOption = {
+    label: string
+    duration: RangeDuration
 }
 
 export interface ITransactionForm {
@@ -47,8 +60,8 @@ export interface ITypes {
 }
 
 export type TSubCategory = {
-    id?: number;
-    name: string;
+    id?: number
+    name: string
 }
 export interface ICategory extends ITypes {
     subCategories: TSubCategory[]

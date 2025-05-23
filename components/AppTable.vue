@@ -3,104 +3,104 @@
     lang="ts"
     generic="T extends Record<string, string | number | boolean>"
 >
-import type { IColumn, ITransaction, IPaging } from '~/types'
+    import type { IColumn, ITransaction, IPaging } from '~/types'
 
-interface IProps {
-    columns: IColumn[]
-    data: T[]
-    loading?: boolean
-    paginate?: boolean
-    selectable?: boolean
-    paging?: IPaging | null
-}
-
-const props = withDefaults(defineProps<IProps>(), {
-    columns: () => [],
-    data: () => [],
-    loading: false,
-    paginate: false,
-    selectable: false,
-    paging: null,
-})
-
-const emit = defineEmits<{
-    (e: 'select', value: ITransaction): void
-    (e: 'onClickNext' | 'onClickPrev'): void
-    (e: 'onPageClick', value: number): void
-}>()
-
-// Pagination
-const paging = computed(() => props.paging)
-const page = computed(() => props.paging?.pageIndex ?? 0)
-const pageCount = computed(() => props.paging?.pageSize ?? 0)
-const totalItems = computed(() => props.paging?.totalItems ?? 0)
-
-// const pageCount = ref<number>(paging.value.pageSize)
-
-// const rows = computed(() => {
-//     return props.data.slice(
-//         (paging.value.pageIndex - 1) * pageCount.value,
-//         paging.value.pageIndex* paging.value.pageSize
-//     )
-// })
-const rows = computed(() => props.data)
-
-const tableUi = computed(() => ({
-    th: {
-        base: 'bg-[#F9FAFB] dark:bg-gray-900',
-        padding: 'px-8 py-3.5',
-        color: 'text-brand-gray dark:text-white',
-        font: 'font-medium',
-        size: 'text-sm',
-    },
-    td: {
-        padding: 'px-8 py-6',
-        color: 'text-gray-500 dark:text-gray-400',
-        font: 'font-light',
-        size: 'text-sm',
-    },
-}))
-
-function onSelect(event: Event) {
-    const row = event as unknown as ITransaction
-    emit('select', row)
-}
-
-function onClickNext() {
-    if (paging.value?.hasNextPage) {
-        emit('onClickNext')
+    interface IProps {
+        columns: IColumn[]
+        data: T[]
+        loading?: boolean
+        paginate?: boolean
+        selectable?: boolean
+        paging?: IPaging | null
     }
-}
 
-function onClickPrev() {
-    if (paging.value?.hasPreviousPage) {
-        emit('onClickPrev')
+    const props = withDefaults(defineProps<IProps>(), {
+        columns: () => [],
+        data: () => [],
+        loading: false,
+        paginate: false,
+        selectable: false,
+        paging: null,
+    })
+
+    const emit = defineEmits<{
+        (e: 'select', value: ITransaction): void
+        (e: 'onClickNext' | 'onClickPrev'): void
+        (e: 'onPageClick', value: number): void
+    }>()
+
+    // Pagination
+    const paging = computed(() => props.paging)
+    const page = computed(() => props.paging?.pageIndex ?? 0)
+    const pageCount = computed(() => props.paging?.pageSize ?? 0)
+    const totalItems = computed(() => props.paging?.totalItems ?? 0)
+
+    // const pageCount = ref<number>(paging.value.pageSize)
+
+    // const rows = computed(() => {
+    //     return props.data.slice(
+    //         (paging.value.pageIndex - 1) * pageCount.value,
+    //         paging.value.pageIndex* paging.value.pageSize
+    //     )
+    // })
+    const rows = computed(() => props.data)
+
+    const tableUi = computed(() => ({
+        th: {
+            base: 'bg-[#F9FAFB] dark:bg-gray-900',
+            padding: 'px-8 py-3.5',
+            color: 'text-brand-gray dark:text-white',
+            font: 'font-medium',
+            size: 'text-sm',
+        },
+        td: {
+            padding: 'px-8 py-6',
+            color: 'text-gray-500 dark:text-gray-400',
+            font: 'font-light',
+            size: 'text-sm',
+        },
+    }))
+
+    function onSelect(event: Event) {
+        const row = event as unknown as ITransaction
+        emit('select', row)
     }
-}
 
-watch(paging, (_updated) => {
-    if(_updated) {
-        emit('onPageClick', _updated.pageIndex)
+    function onClickNext() {
+        if (paging.value?.hasNextPage) {
+            emit('onClickNext')
+        }
     }
-})
 
-onUnmounted(() => {
-    window.removeEventListener('select', onSelect)
-    window.removeEventListener('onClickPrev', onClickPrev)
-    window.removeEventListener('onClickNext', onClickNext)
-    // window.removeEventListener('onPageClick')
-})
+    function onClickPrev() {
+        if (paging.value?.hasPreviousPage) {
+            emit('onClickPrev')
+        }
+    }
+
+    watch(paging, (_updated) => {
+        if (_updated) {
+            emit('onPageClick', _updated.pageIndex)
+        }
+    })
+
+    onUnmounted(() => {
+        window.removeEventListener('select', onSelect)
+        window.removeEventListener('onClickPrev', onClickPrev)
+        window.removeEventListener('onClickNext', onClickNext)
+        // window.removeEventListener('onPageClick')
+    })
 </script>
 
 <script lang="ts">
-export const defaultPaging: IPaging = {
-    pageIndex: 1,
-    pageSize: 5,
-    totalPages: 2,
-    totalItems: 10,
-    hasPreviousPage: false,
-    hasNextPage: false,
-}
+    export const defaultPaging: IPaging = {
+        pageIndex: 1,
+        pageSize: 5,
+        totalPages: 2,
+        totalItems: 10,
+        hasPreviousPage: false,
+        hasNextPage: false,
+    }
 </script>
 
 <template>
@@ -121,13 +121,21 @@ export const defaultPaging: IPaging = {
             :ui="tableUi"
             @select="onSelect"
         >
-            <template v-for="col in columns" :key="col.key" #[`${col.key}-data`]="{ row }">
+            <template
+                v-for="col in columns"
+                :key="col.key"
+                #[`${col.key}-data`]="{ row }"
+            >
                 <slot :name="col.key" :row="row" />
             </template>
         </UTable>
 
         <UTable v-else :columns :rows :loading class="w-full" :ui="tableUi">
-            <template v-for="col in columns"  :key="col.key" #[`${col.key}-data`]="{ row }">
+            <template
+                v-for="col in columns"
+                :key="col.key"
+                #[`${col.key}-data`]="{ row }"
+            >
                 <slot :name="col.key" :row="row" />
             </template>
         </UTable>

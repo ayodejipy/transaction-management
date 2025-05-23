@@ -17,24 +17,22 @@ export const acceptInviteSchema = z
         path: ['confirmPassword'],
     })
 
+export const TransactionTypeSchema = z.object({
+    name: z.string(),
+    description: z.string().optional(),
+})
 
-export const TransactionTypeSchema = z
-    .object({
-        name: z.string(),
-        description: z
-            .string().optional(),
-    })
-
-export const TransactionCategorySchema = z
-    .object({
-        name: z.string(),
-        description: z.string().optional(),
-        subCategories: z.object({
+export const TransactionCategorySchema = z.object({
+    name: z.string(),
+    description: z.string().optional(),
+    subCategories: z
+        .object({
             id: z.number().optional(),
             name: z.string(),
-        }).array().optional(),
-    })
-
+        })
+        .array()
+        .optional(),
+})
 
 export const AddTransactionSchema = z.object({
     amount: z.number(),
@@ -45,14 +43,12 @@ export const AddTransactionSchema = z.object({
     description: z.string(),
 })
 
-
 export const InviteUserSchema = z.object({
     email: z.string(),
     firstName: z.string(),
     lastName: z.string(),
     phone: z.string(),
 })
-
 
 export const ForgotPasswordSchema = z.object({
     email: z.string().email(),
