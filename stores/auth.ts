@@ -35,6 +35,10 @@ export const useAuthStore = defineStore('auth', () => {
                     refreshToken: refreshToken.value,
                 },
             })
+            
+            if(!data.success) {
+                throw new Error('Failed to refresh token')
+            }
 
             setTokens(data.content.token, data.content.refreshToken)
 
@@ -47,7 +51,7 @@ export const useAuthStore = defineStore('auth', () => {
                 router.push(LOGIN_PATH)
             }
 
-            throw new Error('Failed to refresh token. Please try again.')
+            throw new Error('Failed to refresh token. Please login again.')
         }
     }
 

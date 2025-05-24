@@ -199,7 +199,7 @@ const handleExport = () => {
 }
 
 function $clearFilters() {
-    catId.value = 0
+    catId.value = null
     searchTerm.value = ''
     selected.value.start = '' as unknown as Date
     selected.value.end = '' as unknown as Date

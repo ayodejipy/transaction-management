@@ -14,6 +14,8 @@ export default function useAppFetch<T>(
     const defaults: UseFetchOptions<T> = {
         baseURL: config.public.apiBaseURL,
         key: getKey,
+        retry: 1,
+        retryStatusCodes: [401],
         headers: {
             Accept: 'application/json',
         },
