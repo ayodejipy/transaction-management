@@ -209,11 +209,11 @@
                         color="primary"
                         variant="soft"
                     >
-                        <Icon name="i-ic-round-circle" class="w-2 h-2 mr-2" />
+                        <Icon name="i-ic-round-circle" class="w-2 h-2" />
                         Active
                     </UBadge>
                     <UBadge v-else color="red" variant="soft">
-                        <Icon name="i-ic-round-circle" class="w-2 h-2 mr-2" />
+                        <Icon name="i-ic-round-circle" class="w-2 h-2" />
                         Inactive
                     </UBadge>
                 </template>
