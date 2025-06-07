@@ -6,8 +6,8 @@ import type { IDataResponse } from './api'
 export interface IDaysOptionFilter {
     label: string
     value?: string | Date | Dayjs | object
-    start: Date | Dayjs
-    end: Date | Dayjs
+    start: Date | Dayjs | null
+    end: Date | Dayjs | null
 }
 
 export type RangeDuration = {

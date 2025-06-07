@@ -35,8 +35,8 @@ export const useAuthStore = defineStore('auth', () => {
                     refreshToken: refreshToken.value,
                 },
             })
-            
-            if(!data.success) {
+
+            if (!data.success) {
                 throw new Error('Failed to refresh token')
             }
 

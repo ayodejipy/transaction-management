@@ -68,6 +68,7 @@ export default defineNuxtConfig({
         '@nuxtjs/color-mode',
         '@nuxtjs/tailwindcss',
         'nuxt-icon',
+        '@vueuse/nuxt',
         '@nuxtjs/google-fonts',
     ],
 })
