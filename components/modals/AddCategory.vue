@@ -27,6 +27,7 @@
     const form: TNewCategory = reactive({ ...defaultFormState })
 
     const isEnabled = computed<boolean>(() => !!form.name)
+    const hasCategory = computed<boolean>(() => !!category.value?.id)
     const buttonText = computed(() =>
         category.value?.id ? 'Edit category' : 'Create category'
     )
@@ -54,13 +55,14 @@
         loading.value = true
 
         const categoryId = category.value?.id
+
         try {
             const data = categoryId
-                ? await updateCategory(categoryId, event.data)
-                : await addCategory(event.data)
+                ? await updateCategory(categoryId, form)
+                : await addCategory(form)
             if (data.success) {
                 toast.add({
-                    title: 'Category created Successfully',
+                    title: `Category ${categoryId ? 'edited' : 'created'} Successfully`,
                     color: 'green',
                     description:
                         "You've successfully added a new transaction category",
@@ -71,14 +73,13 @@
                 // close and reset
                 onCloseModal()
             }
-        } catch {
+        } catch (e) {
             toast.add({
                 title: 'Category Creation Failed',
                 color: 'red',
-                description: 'Unable to create your category at this moment.',
+                description: e?.data?.message || 'Unable to create your category at this moment.',
                 icon: 'i-heroicons-outline-exclaimation-circle',
             })
-            // throw new Error('Failed authenticate user. Please try again.')
         } finally {
             loading.value = !loading.value
         }
@@ -124,7 +125,7 @@
                     <h3
                         class="text-brand-gray dark:text-gray-200 text-2xl font-semibold"
                     >
-                        Add New Category
+                        {{ hasCategory ? 'Edit Category' : "Add New Category"}}
                     </h3>
                     <p class="text-dark-gray font-light">
                         Add a new category for transactions.
